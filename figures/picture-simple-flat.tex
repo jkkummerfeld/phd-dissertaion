@@ -1,0 +1,101 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    >=stealth',
+    thin,
+  },
+  trace/.style={
+    ->,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Split head form
+  \node (sntR0) at (0, 1.8) {\strut ROOT};
+
+  \node (snt00) [right=1em of sntR0.east] {\strut NP\textsubscript{SBJ}};
+  \node (sw0) [below=-0.3ex of snt00] {\strut Sam};
+%%%  \draw (sw0.north) -- (snt00.south);
+
+  \node (snt10) [right=1em of snt00.east] {\strut S};
+  \node (snt11) [right=1ex of snt10.east] {\strut VP};
+  \draw (snt10.east) -- (snt11.west);
+  \node (sw1a) at ($(snt10.west)!0.5!(snt11.east)$) {\strut};
+  \node (sw1) [below=-0.3ex of sw1a] {\strut told};
+%%%  \draw (sw1.north) -- (sw1a.south);
+
+  \node (snt20) [right=1em of snt11.east] {\strut NP};
+  \node (sw2) [below=-0.3ex of snt20] {\strut Alex};
+%%%  \draw (sw2.north) -- (snt20.south);
+
+  \node (snt30) [right=1.5em of snt20.east] {\strut -};
+  \node (sw3) [below=-0.3ex of snt30] {\strut to};
+%%%  \draw (sw3.north) -- (snt30.south);
+
+  \node (snt50) [right=1em of snt30.east] {\strut S};
+  \node (snt51) [right=1ex of snt50.east] {\strut VP};
+  \draw (snt50.east) -- (snt51.west);
+  \node (snt52) [right=1ex of snt51.east] {\strut VP};
+  \draw (snt51.east) -- (snt52.west);
+  \node (sw5a) at ($(snt50.west)!0.5!(snt52.east)$) {\strut};
+  \node (sw5) [below=-0.3ex of sw5a] {\strut run};
+%%%  \draw (sw5.north) -- (sw5a.south);
+
+  \draw [structural,out=60,in=120] (snt00.north) to (snt10.north west);
+  \draw [structural,out=120,in=60] (snt10.north) to (sntR0.north);
+  \draw [structural,out=120,in=60] (snt20.north) to (snt11.north east);
+  \draw [trace,out=30,in=150] (snt20.north) to node[midway,above=1pt] {\scriptsize NP\textsubscript{SBJ}} (snt50.north west);
+  \draw [structural,out=120,in=60] (snt50.north) to (snt11.north);
+  \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
+
+% Standard form
+  \node (w0) [above=8ex of sw0] {\strut Sam};
+  \node (w1) [right=3ex of w0.east] {\strut told};
+  \node (w2) [right=3ex of w1.east] {\strut Alex};
+  \node (w3) [right=3ex of w2.east] {\strut};
+  \node (w4) [right=3ex of w3.east] {\strut to};
+  \node (w5) [right=3ex of w4.east] {\strut run};
+
+  \node (nt00) [above=of w0.north] {\strut};
+  \node (nt10) [above=of w1.north] {\strut};
+  \node (nt20) [above=of w2.north] {\strut};
+  \node (nt30) [above=of w3.north] {\strut *\textsubscript{1}};
+  \node (nt40) [above=of w4.north] {\strut};
+  \node (nt50) [above=of w5.north] {\strut VP};
+
+  \node (nt01) [above=of nt00.north] {\strut};
+  \node (nt11) [above=of nt10.north] {\strut};
+  \node (nt21) [above=of nt20.north] {\strut};
+  \node (nt31) [above=of nt30.north] {\strut NP\textsubscript{SBJ}};
+  \path (nt40.north) -- node[above=2ex] (nt41-51) {\strut VP} (nt50.north);
+
+  \node (nt02) [above=of nt01.north] {\strut};
+  \node (nt12) [above=of nt11.north] {\strut};
+  \node (nt22) [above=of nt21.north] {\strut NP\textsubscript{1}};
+  \path (nt31.north) -- node[above=2ex] (nt32-52) {\strut S} (nt41-51.north);
+
+  \node (nt03) [above=of nt02.north] {\strut NP\textsubscript{SBJ}};
+  \path (nt12.north) -- node[above=2ex] (nt13-53) {\strut VP} (nt32-52.north);
+
+  \path (nt03.north) -- node[above=2ex] (nt04-54) {\strut S} (nt13-53.north);
+
+  \draw (w0.north) -- (nt03.south);
+  \draw (w1.north) -- (nt12.north) -- (nt13-53.south) -- (nt32-52.north);
+  \draw (w2.north) -- (nt22.south);
+  \draw (w4.north) -- (nt40.north) -- (nt41-51.south) -- (nt50.north);
+  \draw (w5.north) -- (nt50.south);
+
+  \draw (nt03.north) -- (nt04-54.south) -- (nt13-53.north);
+  \draw (nt22.north) -- (nt13-53.south);
+  \draw (nt30.north) -- (nt31.south);
+  \draw (nt31.north) -- (nt32-52.south) -- (nt41-51.north);
+
+  \node (figB) [left=4ex of sntR0] {\strut \large (b)};
+  \node (figA) at (figB |- nt31) {\strut \large (a)};
+\end{tikzpicture}

@@ -1,0 +1,107 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    rounded corners=2ex
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    shorten <=2pt,
+    >=stealth',
+    thin,
+    rounded corners=2ex,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 5.6) {\strut Sam};
+  \node (w1) [right=3ex of w0.east] {\strut told};
+  \node (w2) [right=3ex of w1.east] {\strut Alex};
+  \node (w3) [right=3ex of w2.east] {\strut};
+  \node (w4) [right=3ex of w3.east] {\strut to};
+  \node (w5) [right=3ex of w4.east] {\strut run};
+
+  \node (nt00) [above=of w0.north] {\strut};
+  \node (nt10) [above=of w1.north] {\strut};
+  \node (nt20) [above=of w2.north] {\strut};
+  \node (nt30) [above=of w3.north] {\strut *\textsubscript{1}};
+  \node (nt40) [above=of w4.north] {\strut};
+  \node (nt50) [above=of w5.north] {\strut VP};
+
+  \node (nt01) [above=of nt00.north] {\strut};
+  \node (nt11) [above=of nt10.north] {\strut};
+  \node (nt21) [above=of nt20.north] {\strut};
+  \node (nt31) [above=of nt30.north] {\strut NP\textsubscript{SBJ}};
+  \path (nt40.north) -- node[above=2ex] (nt41-51) {\strut VP} (nt50.north);
+
+  \node (nt02) [above=of nt01.north] {\strut};
+  \node (nt12) [above=of nt11.north] {\strut};
+  \node (nt22) [above=of nt21.north] {\strut NP\textsubscript{1}};
+  \path (nt31.north) -- node[above=2ex] (nt32-52) {\strut S} (nt41-51.north);
+
+  \node (nt03) [above=of nt02.north] {\strut NP\textsubscript{SBJ}};
+  \path (nt12.north) -- node[above=2ex] (nt13-53) {\strut VP} (nt32-52.north);
+
+  \path (nt03.north) -- node[above=2ex] (nt04-54) {\strut S} (nt13-53.north);
+
+  \draw (w0.north) -- (nt03.south);
+  \draw (w1.north) -- (nt12.north) -- (nt13-53.south) -- (nt32-52.north);
+  \draw (w2.north) -- (nt22.south);
+  \draw (w4.north) -- (nt40.north) -- (nt41-51.south) -- (nt50.north);
+  \draw (w5.north) -- (nt50.south);
+
+  \draw (nt03.north) -- (nt04-54.south) -- (nt13-53.north);
+  \draw (nt22.north) -- (nt13-53.south);
+  \draw (nt30.north) -- (nt31.south);
+  \draw (nt31.north) -- (nt32-52.south) -- (nt41-51.north);
+
+% Split head form
+  \node (sw0) at (0, 1.8) {\strut Sam};
+  \node (snt00) [above=of sw0.north] {\strut NP\textsubscript{SBJ}};
+  \draw (sw0.north) -- (snt00.south);
+
+  \node (swR) [left=5ex of sw0.west] {\strut};
+  \node (sntR0) [above=of swR.north] {\strut ROOT};
+
+  \node (sw1) [right=3ex of sw0.east] {\strut told};
+  \node (snt10) [above=of sw1.north] {\strut VP};
+  \draw (sw1.north) -- (snt10.south);
+  \node (snt11) [above=of snt10.north] {\strut S};
+  \draw (snt10.north) -- (snt11.south);
+
+  \node (sw2) [right=3ex of sw1.east] {\strut Alex};
+  \node (snt20) [above=of sw2.north] {\strut NP};
+  \draw (sw2.north) -- (snt20.south);
+
+  \node (sw3) [right=3ex of sw2.east] {\strut};
+
+  \node (sw4) [right=3ex of sw3.east] {\strut to};
+
+  \node (sw5) [right=3ex of sw4.east] {\strut run};
+  \node (snt50) [above=of sw5.north] {\strut VP};
+  \draw (sw5.north) -- (snt50.south);
+  \node (snt51) [above=of snt50.north] {\strut VP};
+  \draw (snt50.north) -- (snt51.south);
+  \node (snt52) [above=of snt51.north] {\strut S};
+  \draw (snt51.north) -- (snt52.south);
+
+  \draw [structural] (snt00.north) -- (snt00.north |- snt11.west) -- (snt11.west);
+  \draw [structural] (snt11.north) -- (snt11.north |- snt52.west) -- (swR.north |- snt52.west) -- (sntR0.north);
+  \draw [structural] (snt20.west) -- (snt10.east);
+  \draw [trace] (snt20.north) -- (snt20.north |- snt52.west) -- node[midway,above=1pt] {\small NP\textsubscript{SBJ}} (snt52.west);
+  \draw [structural] (sw4.north) -- (sw4.north |- snt51.west) -- (snt51.west);
+  \node (tmp0) [above=of snt52.north] {};
+  \node (tmp1) at ($(snt10.east)!0.5!(snt20.east)$) {};
+  \node (tmp2) [above=0.1ex of tmp1] {};
+  \node (tmp3) at (tmp0 -| tmp2) {};
+  \node (tmp4) at (snt10.east |- tmp2) {};
+  \draw [structural] (snt52.north) -- (snt52.north |- tmp3) -- (tmp0 -| tmp2) -- (tmp4 -| tmp3) -- (snt10.east |- tmp2);
+\end{tikzpicture}

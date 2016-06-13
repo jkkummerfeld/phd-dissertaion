@@ -1,0 +1,168 @@
+
+\tikzset{% 
+  leftChild/.style={%
+    ->,
+    >=stealth',
+    shorten >=1pt,
+    thin
+  }
+}
+
+\tikzset{% 
+  rightChild/.style={%
+    <-,
+    >=stealth',
+    shorten <=1pt,
+    thin
+  }
+}
+
+\tikzset{% 
+  len1/.style={%
+    out=30,
+    in=150
+  }
+}
+
+\tikzset{% 
+  len2/.style={%
+    out=32,
+    in=148
+  }
+}
+
+\tikzset{% 
+  len3/.style={%
+    out=34,
+    in=146
+  }
+}
+
+\tikzset{% 
+  len4/.style={%
+    out=34,
+    in=146
+  }
+}
+\tikzset{% 
+  extPoint/.style={%
+    fill=black,regular polygon, regular polygon sides=4,inner sep=0.75pt
+  }
+}
+\tikzset{% 
+  myGuide/.style={%
+    densely dotted,
+    thick,
+    color=black!25
+  }
+}
+
+\begin{tikzpicture}
+  \pgfmathsetlength{\vertSmall}{3ex}
+  \pgfmathsetlength{\vertBig}{4ex}
+  \pgfmathsetlength{\vertBigger}{6ex}
+
+  \coordinate (offset) at (0.1, 0);
+  \coordinate (voffset0) at (0, 0);
+  \coordinate (voffset1) at (0, 0.05);
+
+  \node (v0) at (0, 0) {};
+  \node (w0) at (0, 0) {};
+  \node (w1) at (1, 0) {};
+  \node (w2) at (2, 0) {};
+  \node (w3) at (3, 0) {};
+  \node (w4) at (4, 0) {};
+  \node (w5) at (5, 0) {};
+  \node (w6) at (6, 0) {};
+
+  \node (vA) [below=\vertBig of v0] {};
+  \node (v1) [above=\vertSmall of v0] {};
+  \node (v2) [above=\vertSmall of v1] {};
+  \node (v3) [above=\vertSmall of v2] {};
+  \node (v4) [above=\vertSmall of v3] {};
+  \node (v5) [above=\vertSmall of v4] {};
+  \node (v6) [above=\vertSmall of v5] {};
+
+  \draw [myGuide] (w0 |- vA) -- (w0 |- v6);
+  \draw [myGuide] (w1 |- vA) -- (w1 |- v6);
+  \draw [myGuide] (w2 |- vA) -- (w2 |- v6);
+  \draw [myGuide] (w3 |- vA) -- (w3 |- v2);
+  \draw [myGuide] (w4 |- vA) -- (w4 |- v4);
+  \draw [myGuide] (w5 |- vA) -- (w5 |- v2);
+  \draw [myGuide] (w6 |- vA) -- (w6 |- v6);
+
+  \node (w0text) [below=\vertBig of w0] {\strut ROOT};
+  \node (w1text) [below=\vertBig of w1] {\strut We};
+  \node (w2text) [below=\vertBig of w2] {\strut like};
+  \node (w3text) [below=\vertBig of w3] {\strut to};
+  \node (w4text) [below=\vertBig of w4] {\strut run};
+  \node (w5text) [below=\vertBig of w5] {\strut fast};
+  \node (w6text) [below=\vertBig of w6] {\strut .};
+
+  \draw [rightChild,len2] ($(w0 |- vA) + (offset)$) to ($(w2 |- vA) + (voffset1)$);
+  \draw [leftChild,len1] ($(w1 |- vA) + (offset)$) to ($(w2 |- vA) - (offset) + (voffset0)$);
+  \draw [leftChild,len1] ($(w3 |- vA) + (offset)$) to ($(w4 |- vA) - (offset) - (offset) + (voffset0)$);
+  \draw [leftChild,len3] ($(w1 |- vA)$) to ($(w4 |- vA) + (voffset1)$);
+  \draw [rightChild,len2] ($(w2 |- vA) + (offset) + (voffset0)$) to ($(w4 |- vA) - (offset)$);
+  \draw [rightChild,len1] ($(w4 |- vA) + (offset) + (voffset0)$) to ($(w5 |- vA) - (offset)$);
+  \draw [rightChild,len4] ($(w2 |- vA) + (voffset1)$) to ($(w6 |- vA) - (offset)$);
+
+  \draw ($(w0) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w1) - (offset)$);
+  \draw ($(w1) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w2) - (offset)$);
+  \draw ($(w2) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w3) - (offset)$);
+  \draw ($(w3) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w4) - (offset)$);
+  \draw ($(w4) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w5) - (offset)$);
+  \draw ($(w5) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w6) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v0) {\strut \tiny Initialize};
+
+  \draw ($(w0 |- v1) + (offset)$) -- node[at start,below=-2pt] {\tiny X} ($(w1 |- v1) - (offset)$);
+  \node [extPoint] at (w2 |- v1) {};
+  \draw ($(w1 |- v1) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w2 |- v1) - (offset)$);
+  \draw ($(w3 |- v1) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w4 |- v1) - (offset)$);
+  \draw ($(w4 |- v1) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w5 |- v1) - (offset)$);
+  \draw [rightChild,len2] ($(w0 |- v1) + (offset)$) to ($(w2 |- v1) + (voffset1)$);
+  \draw [leftChild,len1] ($(w1 |- v1) + (offset)$) to ($(w2 |- v1) - (offset) + (voffset0)$);
+  \draw [leftChild,len1] ($(w3 |- v1) + (offset)$) to ($(w4 |- v1) - (offset) + (voffset0)$);
+  \draw [rightChild,len1] ($(w4 |- v1) + (offset) + (voffset0)$) to ($(w5 |- v1) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v1) {\strut \tiny Add edges};
+
+  \draw ($(w2 |- v2) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w4 |- v2) - (offset)$);
+  \draw ($(w4 |- v2) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w6 |- v2) - (offset)$);
+  \draw [leftChild,len1] ($(w3 |- v2) + (offset)$) to ($(w4 |- v2) - (offset) + (voffset0)$);
+  \draw [rightChild,len1] ($(w4 |- v2) + (offset) + (voffset0)$) to ($(w5 |- v2) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v2) {\strut \tiny Combine};
+
+  \draw ($(w2 |- v3) + (offset)$) -- node[at start,below=-2pt] {\tiny X} ($(w4 |- v3) - (offset)$);
+  \node [extPoint] at (w1 |- v3) {};
+  \draw [leftChild,len1] ($(w3 |- v3) + (offset)$) to ($(w4 |- v3) - (offset) - (offset) + (voffset0)$);
+  \draw [leftChild,len3] ($(w1 |- v3)$) to ($(w4 |- v3) + (voffset1)$);
+  \draw [rightChild,len2] ($(w2 |- v3) + (offset) + (voffset0)$) to ($(w4 |- v3) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v3) {\strut \tiny Add edges};
+
+  \draw ($(w2 |- v4) + (offset)$) -- node[at start,below=-2pt] {\tiny N} ($(w6 |- v4) - (offset)$);
+  \node [extPoint] at (w1 |- v4) {};
+  \draw [leftChild,len1] ($(w3 |- v4) + (offset)$) to ($(w4 |- v4) - (offset) - (offset) + (voffset0)$);
+  \draw [leftChild,len3] ($(w1 |- v4)$) to ($(w4 |- v4) + (voffset1)$);
+  \draw [rightChild,len2] ($(w2 |- v4) + (offset) + (voffset0)$) to ($(w4 |- v4) - (offset)$);
+  \draw [rightChild,len1] ($(w4 |- v4) + (offset) + (voffset0)$) to ($(w5 |- v4) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v4) {\strut \tiny Combine};
+
+  \draw ($(w2 |- v5) + (offset)$) -- node[at start,below=-2pt] {\tiny N} ($(w6 |- v5) - (offset)$);
+  \node [extPoint] at (w1 |- v5) {};
+  \draw [leftChild,len1] ($(w3 |- v5) + (offset)$) to ($(w4 |- v5) - (offset) - (offset) + (voffset0)$);
+  \draw [leftChild,len3] ($(w1 |- v5)$) to ($(w4 |- v5) + (voffset1)$);
+  \draw [rightChild,len2] ($(w2 |- v5) + (offset) + (voffset0)$) to ($(w4 |- v5) - (offset)$);
+  \draw [rightChild,len1] ($(w4 |- v5) + (offset) + (voffset0)$) to ($(w5 |- v5) - (offset)$);
+  \draw [rightChild,len4] ($(w2 |- v5) + (voffset1)$) to ($(w6 |- v5) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v5) {\strut \tiny Add edges};
+
+  \draw ($(w0 |- v6) + (offset)$) -- node[at start,below=-2pt] {\tiny I} ($(w6 |- v6) - (offset)$);
+  \draw [rightChild,len2] ($(w0 |- v6) + (offset)$) to ($(w2 |- v6) + (voffset1)$);
+  \draw [leftChild,len1] ($(w1 |- v6) + (offset)$) to ($(w2 |- v6) - (offset) + (voffset0)$);
+  \draw [leftChild,len1] ($(w3 |- v6) + (offset)$) to ($(w4 |- v6) - (offset) - (offset) + (voffset0)$);
+  \draw [leftChild,len3] ($(w1 |- v6)$) to ($(w4 |- v6) + (voffset1)$);
+  \draw [rightChild,len2] ($(w2 |- v6) + (offset) + (voffset0)$) to ($(w4 |- v6) - (offset)$);
+  \draw [rightChild,len1] ($(w4 |- v6) + (offset) + (voffset0)$) to ($(w5 |- v6) - (offset)$);
+  \draw [rightChild,len4] ($(w2 |- v6) + (voffset1)$) to ($(w6 |- v6) - (offset)$);
+  \node [anchor=west] (step0) at (w6 |- v6) {\strut \tiny Combine};
+\end{tikzpicture}

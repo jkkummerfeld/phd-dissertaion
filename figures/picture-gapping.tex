@@ -1,0 +1,83 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    rounded corners=2ex
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut cooked};
+  \node (w1) [below right=2ex and 3ex of w0.south east] {\strut soup};
+  \node (w2) [right=3ex of w1.east] {\strut today};
+  \node (w3) [above right=7ex and 3ex of w2.north east] {\strut and};
+  \node (w4) [below right=7ex and 3ex of w3.south east] {\strut curry};
+  \node (w5) [right=3ex of w4.east] {\strut yesterday};
+
+  \node (nt10) [above=of w1.north] {\strut NP\textsubscript{1}};
+  \node (nt20) [above=of w2.north] {\strut NP\textsubscript{TMP,2}};
+  \node (nt40) [above=of w4.north] {\strut NP\textsubscript{=1}};
+  \node (nt50) [above=of w5.north] {\strut NP\textsubscript{TMP,=2}};
+
+  \path (w0.north) -- node[above=2ex] (nt01-21) {\strut VP} (nt20.north);
+  \path (nt40.north) -- node[above=2ex] (nt41-51) {\strut VP} (nt50.north);
+  \path (nt01-21.north) -- node[above=2ex] (nt02-52) {\strut VP} (nt41-51.north);
+
+  \draw (w0.north) -- (nt01-21.south) -- (nt20.north);
+  \draw (w1.north) -- (nt10.south);
+  \draw (nt10.north) -- (nt01-21.south);
+  \draw (w2.north) -- (nt20.south);
+  \draw (w3.north) -- (nt02-52.south);
+  \draw (w4.north) -- (nt40.south);
+  \draw (w5.north) -- (nt50.south);
+  \draw (nt01-21.north) -- (nt02-52.south) -- (nt41-51.north);
+  \draw (nt40.north) -- (nt41-51.south) -- (nt50.north);
+
+% Split head form
+  \node (sw0) at (9, 0) {\strut cooked};
+  \node (sw1) [below right=2ex and 3ex of sw0.south east] {\strut soup};
+  \node (sw2) [right=3ex of sw1.east] {\strut today};
+  \node (sw3) [above right=7ex and 3ex of sw2.north east] {\strut and};
+  \node (sw4) [below right=7ex and 3ex of sw3.south east] {\strut curry};
+  \node (sw5) [right=3ex of sw4.east] {\strut yesterday};
+
+  \node (snt00) [above=of sw0.north] {\strut VP};
+  \node (snt10) [above=of sw1.north] {\strut NP};
+  \node (snt20) [above=of sw2.north] {\strut NP\textsubscript{TMP}};
+  \node (snt40) [above=of sw4.north] {\strut NP};
+  \node (snt50) [above=of sw5.north] {\strut NP\textsubscript{TMP}};
+
+  \node (snt01) [above=of snt00.north] {\strut VP};
+  \node (snt41) [above=of snt40.north] {\strut VP};
+
+  \draw (sw0.north) -- (snt00.south);
+  \draw (snt00.north) -- (snt01.south);
+  \draw (sw1.north) -- (snt10.south);
+  \draw (sw2.north) -- (snt20.south);
+  \draw (sw4.north) -- (snt40.south);
+  \draw (snt40.north) -- (snt41.south);
+  \draw (sw5.north) -- (snt50.south);
+  \draw [structural] (snt10.north) -- (snt10.north |- snt00.east) -- (snt00.east);
+  \node (tmp0) at ($(0,0.1)+(snt00.east)$) {};
+  \draw [structural] (snt20.north) -- (snt20.north |- tmp0) -- (tmp0);
+  \draw [structural] (sw3.north)   -- (sw3.north |- snt01.east) -- (snt01.east);
+  \node (tmp1) at ($(0,0.1)+(snt01.east)$) {};
+  \draw [structural] (snt41.north) -- (snt41.north |- tmp1) -- (tmp1);
+  \draw [structural] (snt50.north) -- (snt50.north |- snt41.east) -- (snt41.east);
+  \draw [trace] (snt40.north west) to [out=165,in=15] node[midway,above=1pt] {\small =} (snt10.north east);
+  \draw [trace] (snt50.north west) to [out=165,in=15] node[midway,above=1pt] {\small =} (snt20.north east);
+
+\end{tikzpicture}

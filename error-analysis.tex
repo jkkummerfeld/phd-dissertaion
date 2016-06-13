@@ -64,60 +64,6 @@ errors arise when moving out-of-domain.  We have released our
 system\footnote{http://code.google.com/p/berkeley-parser-analyser/} to enable
 future work to apply our methodology.
 
-\section{Background}
-
-Most attempts to understand the behaviour of constituency parsers have focused
-on overall evaluation metrics.  The three main methods are intrinsic evaluation
-with \parseval, evaluation on dependencies extracted from the
-constituency parse, and evaluation on downstream tasks that rely on parsing.
-In all three cases there has been previous work that
-considers more than just the final result of the metric, but the analysis is
-either limited in scope, or constrained by the evaluation process.
-
-Intrinsic evaluation with \parseval, which calculates precision and recall over
-labeled tree nodes, is a useful indicator of overall performance, but does not
-pinpoint which structures the parser has most difficulty with.  Even when the
-breakdown for particular node types is presented
-(\eg~Collins,~2003\nocite{Collins:2003}), the interaction between node errors
-is not taken into account.  For example, a VP node could be missing because of
-incorrect PP attachment, a coordination error, or a unary production mistake.
-There has been some work that addresses these issues by analysing the output of
-constituency parsers on linguistically motivated error types, but only by hand
-on sets of around 100 sentences
-\cite{Hara:2007:EIR:1621410.1621412,yu-EtAl:2011:IWPT}.  By automatically
-classifying parse errors we are able to consider the output of multiple parsers
-on thousands of sentences.
-
-The second major parser evaluation method involves extraction of grammatical
-relations \cite{King:2003,Briscoe-Carroll:2006} or dependencies
-\cite{Lin:1998,Briscoe-Carroll-Graham-Copestake:2002}.  These metrics have been
-argued to be more informative and generally applicable
-\cite{Carroll-etal:1998}, and have the advantage that the breakdown over
-dependency types is more informative than over node types. There have been
-comparisons of multiple parsers \cite{conf/lrec/FosterG08,Nivre:2010,cer2010},
-as well as work on finding relations between errors
-\cite{Hara:2009:DEA:1699648.1699662}, and breaking down errors by a range of
-factors \cite{mcdonald-nivre:2007:EMNLP-CoNLL2007}.  However, one challenge is
-that results for constituency parsers are strongly influenced by the dependency
-scheme being used and how easy it is to extract the dependencies from a given
-parser's output \cite{Clark-Hockenmaier:2002}.  Our approach does not have this
-disadvantage, as we analyse parser output directly.
-
-The third major approach involves extrinsic evaluation, where the parser's
-output is used in a downstream task, such as
-machine translation \cite{Quirk-CorstonOliver:2006},
-information extraction \cite{miyao-EtAl:2008:ACLMain},
-textual entailment \cite{Yuret-han-turgut:2010}, or
-semantic dependencies \cite{Dridan-Oepen:2011}.
-While some of these approaches give a better sense of the impact of parse
-errors, they require integration into a larger system, making it less clear
-where a given error originates.
-
-The work we present here differs from existing approaches by directly and
-automatically classifying errors into meaningful types.  This enables the first
-very broad, yet detailed, study of parser behaviour, evaluating the output of
-thirteen parsers over thousands of sentences.
-
 \section{Parsers}
 
 Our evaluation is over a wide range of \ptb constituency parsers and their

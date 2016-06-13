@@ -1,0 +1,80 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut cakes};
+  \node (w1) [right=3ex of w0.east] {\strut};
+  \node (w2) [right=3ex of w1.east] {\strut Charlie};
+  \node (w3) [right=3ex of w2.east] {\strut baked};
+  \node (w4) [right=3ex of w3.east] {\strut *T*\textsubscript{1}};
+
+  \node (nt00) [above=of w0.north] {\strut};
+  \node (nt10) [above=of w1.north] {\strut};
+  \node (nt20) [above=of w2.north] {\strut};
+  \node (nt30) [above=of w3.north] {\strut};
+  \node (nt40) [above=of w4.north] {\strut NP};
+  \draw (w4.north) -- (nt40.south);
+
+  \node (nt01) [above=of nt00.north] {\strut};
+  \node (nt11) [above=of nt10.north] {\strut 0};
+  \node (nt21) [above=of nt20.north] {\strut NP\textsubscript{SBJ}};
+  \draw (w2.north) -- (nt21.south);
+  \path (nt30.north) -- node[above=2ex] (nt31-41) {\strut VP} (nt40.north);
+  \draw (w3.north) -- (nt30.north) -- (nt31-41.south) -- (nt40.north);
+
+  \node (nt02) [above=of nt01.north] {\strut};
+  \node (nt12) [above=of nt11.north] {\strut WHNP\textsubscript{1}};
+  \draw (nt11.north) -- (nt12.south);
+  \path (nt21.north) -- node[above=2ex] (nt22-42) {\strut S} (nt31-41.north);
+  \draw (nt21.north) -- (nt22-42.south) -- (nt31-41.north);
+
+  \node (nt03) [above=of nt02.north] {\strut NP};
+  \draw (w0.north) -- (nt03.south);
+  \path (nt12.north) -- node[above=2ex] (nt13-43) {\strut SBAR} (nt22-42.north);
+  \draw (nt12.north) -- (nt13-43.south) -- (nt22-42.north);
+
+  \path (nt03.north) -- node[above=2ex] (nt04-44) {\strut NP} (nt13-43.north);
+  \draw (nt03.north) -- (nt04-44.south) -- (nt13-43.north);
+
+% Split head form
+  \node (snt00) at (-0.5, -2) {\strut NP};
+  \node (snt01) [right=1ex of snt00.east] {\strut NP};
+  \node (sw0a) at ($(snt00.east)!0.5!(snt01.west)$) {\strut};
+  \node (sw0) [below=-0.3ex of sw0a] {\strut cakes};
+%%%  \draw (sw0.north) -- (sw0a.south);
+  \draw (snt00.east) -- (snt01.west);
+  \node (snt10) [right=1em of snt01.east] {\strut NP\textsubscript{SBJ}};
+  \node (sw1) [below=-0.3ex of snt10] {\strut Charlie};
+%%%  \draw (sw1.north) -- (snt10.south);
+  \node (snt20) [right=1em of snt10.east] {\strut SBAR};
+  \node (snt21) [right=1ex of snt20.east] {\strut (WHNP 0)};
+  \node (snt22) [right=1ex of snt21.east] {\strut S};
+  \node (snt23) [right=1ex of snt22.east] {\strut VP};
+  \node (sw2a) at ($(snt20.east)!0.5!(snt23.west)$) {\strut};
+  \node (sw2) [below=-0.3ex of sw2a] {\strut baked};
+%%%  \draw (sw2.north) -- (sw2a.south);
+  \draw (snt20.east) -- (snt21.west);
+  \draw (snt21.east) -- (snt22.west);
+  \draw (snt22.east) -- (snt23.west);
+
+  \draw [trace,out=135,in=45] (snt23.north) to node[midway,above=2pt] {\small NP} (snt21.north);
+  \draw [structural,out=135,in=45,color=black!30] (snt20.north) to (snt01.north);
+  \draw [structural,out=45,in=135,color=black!30] (snt10.north) to (snt22.north);
+\end{tikzpicture}

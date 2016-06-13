@@ -1,0 +1,97 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut cooked};
+  \node (w1) [right=3ex of w0.east] {\strut soup};
+  \node (w2) [right=3ex of w1.east] {\strut today};
+  \node (w3) [right=3ex of w2.east] {\strut and};
+  \node (w4) [right=3ex of w3.east] {\strut curry};
+  \node (w5) [right=3ex of w4.east] {\strut yesterday};
+
+  \node (nt00) [above=of w0.north] {\strut};
+  \node (nt10) [above=of w1.north] {\strut NP\textsubscript{1}};
+  \node (nt20) [above=of w2.north] {\strut NP\textsubscript{TMP,2}};
+  \node (nt30) [above=of w3.north] {\strut};
+  \node (nt40) [above=of w4.north] {\strut NP\textsubscript{=1}};
+  \node (nt50) [above=of w5.north] {\strut NP\textsubscript{TMP,=2}};
+
+  \path (nt00.north) -- node[above=2ex] (nt01-21) {\strut VP} (nt20.north);
+  \node (nt31) [above=of nt30.north] {\strut};
+  \path (nt40.north) -- node[above=2ex] (nt41-51) {\strut VP} (nt50.north);
+
+  \path (nt01-21.north) -- node[above=2ex] (nt02-52) {\strut VP} (nt41-51.north);
+
+  \draw (w0.north) -- (nt00.north) -- (nt01-21.south) -- (nt20.north);
+  \draw (w1.north) -- (nt10.south);
+  \draw (nt10.north) -- (nt01-21.south);
+  \draw (w2.north) -- (nt20.south);
+  \draw (w3.north) -- (nt31.north) -- (nt02-52.south);
+  \draw (w4.north) -- (nt40.south);
+  \draw (w5.north) -- (nt50.south);
+  \draw (nt01-21.north) -- (nt02-52.south) -- (nt41-51.north);
+  \draw (nt40.north) -- (nt41-51.south) -- (nt50.north);
+
+% Split head form
+  \node (snt00) at (0.0, -2) {\strut VP};
+  \node (snt01) [right=2ex of snt00.east] {\strut VP};
+  \draw (snt00.east) -- (snt01.west);
+  \node (snt10) [right=1em of snt01.east] {\strut NP};
+  \node (snt20) [right=1em of snt10.east] {\strut NP\textsubscript{TMP}};
+  \node (snt30) [right=1em of snt20.east] {\strut -};
+  \node (snt40) [right=1em of snt30.east] {\strut VP};
+  \node (snt41) [right=2ex of snt40.east] {\strut NP};
+  \draw (snt40.east) -- (snt41.west);
+  \node (snt50) [right=1em of snt41.east] {\strut NP\textsubscript{TMP}};
+  \node (sw0a) at ($(snt00.west)!0.5!(snt01.east)$) {\strut};
+  \node (sw0) [below=-0.3ex of sw0a.south] {\strut cooked};
+%%%  \draw (sw0.north) -- (sw0a.south);
+  \node (sw1) [below=-0.3ex of snt10.south] {\strut soup};
+%%%  \draw (sw1.north) -- (snt10.south);
+  \node (sw2) [below=-0.3ex of snt20.south] {\strut today};
+%%%  \draw (sw2.north) -- (snt20.south);
+  \node (sw3) [below=-0.3ex of snt30.south] {\strut and};
+%%%  \draw (sw3.north) -- (snt30.south);
+  \node (sw4a) at ($(snt40.west)!0.5!(snt41.east)$) {\strut};
+  \node (sw4) [below=-0.3ex of sw4a.south] {\strut curry};
+%%%  \draw (sw4.north) -- (sw4a.south);
+  \node (sw5) [below=-0.3ex of snt50.south] {\strut yesterday};
+%%%  \draw (sw5.north) -- (snt50.south);
+
+  \draw [name path=s0,structural,color=black!30] (snt10.north) to [out=135,in=45] (snt01.north east);
+  \draw [name path=s1,structural,color=black!30] (snt20.north) to [out=135,in=45] (snt01.north);
+  \draw [name path=s2,structural,semithick] (snt30.north) to [out=135,in=45] (snt00.north east);
+  \draw [name path=s3,structural,color=black!30] (snt40.north) to [out=135,in=45] (snt00.north);
+  \draw [name path=s4,structural,color=black!30] (snt50.north) to [out=135,in=45] (snt40.north east);
+  \draw [name path=t0,trace,semithick] (snt41.north) to [out=135,in=45] node[midway,above=1pt] {\small =} (snt10.north);
+  \draw [name path=t1,trace,semithick] (snt50.north) to [out=135,in=45] node[midway,above=1pt] {\small =} (snt20.north);
+
+%%%  \fill [red, opacity=0.5, name intersections={of=t0 and s1}]
+%%%    (intersection-1) circle (2pt) node {};
+%%%  \fill [red, opacity=0.5, name intersections={of=t0 and s2}]
+%%%    (intersection-1) circle (2pt) node {};
+%%%  \fill [red, opacity=0.5, name intersections={of=t1 and s2}]
+%%%    (intersection-1) circle (2pt) node {};
+%%%  \fill [red, opacity=0.5, name intersections={of=t1 and s3}]
+%%%    (intersection-1) circle (2pt) node {};
+%%%  \fill [red, opacity=0.5, name intersections={of=t1 and t0}]
+%%%    (intersection-1) circle (2pt) node {};
+
+\end{tikzpicture}

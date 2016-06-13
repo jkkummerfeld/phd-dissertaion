@@ -1,3 +1,49 @@
 \chapter{Introduction}
 
-Introduce it all
+
+\section{Graph Parsing}
+
+\subsection{Old abstract}
+General treebank analyses are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
+We propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
+In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
+We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
+Our dynamic program uniquely decomposes structures, is sound and complete with respect to a subset of the class of one-endpoint-crossing graphs, and covers $97.7\%$ of the Penn English treebank.
+We also implement a proof-of-concept parser that recovers a range of null elements and trace types.
+
+\subsection{Old intro}
+
+Many syntactic representations use graphs and/or discontinuous structures, such as traces in Government and Binding theory, and f-structure in Lexical Functional Grammar \cite{gb,Bresnan:1982}.
+Sentences in the Penn Treebank \cite{ptb} have a core projective tree structure, and trace edges that represent control structures, wh-movement and more.
+However, most parsers and the standard evaluation metric ignore these edges and all null elements.
+By leaving out parts of the structure, they fail to provide all predicates to downstream tasks such as question answering.
+While there has been work on capturing some parts of this extra structure, it has generally either been through post-processing on trees
+\cite{Johnson:2002,Jijkoun:2003,Campbell:2004,Levy:2004,Gabbard:2006},
+or has only captured a limited set of phenomena via grammar augmentation
+\cite{collins:1997,dienes-dubey:2003,schmid:2006,cai-chiang-goldberg:2011}.
+%%%In both cases phenomena such as shared argumentation are completely ignored.
+%%%Similarly, most work on the Abstract Meaning Representation \cite{amr}, has removed edges to turn all structures into trees.
+
+\begin{figure}
+  \centering
+  \scalebox{0.65}{
+  \input{picture-simple-flat}
+  }
+  \vspace{-5mm}
+  \caption{\label{fig:repr}
+    Parse representation: (a) constituency (b) ours.
+  }
+\end{figure}
+
+We propose a new parse representation and a new algorithm that can efficiently consider almost all syntactic phenomena.
+Our representation is an extension of TAG-based tree representations \cite{cck,Shen:2007}, modified to represent graphs and designed to maximize coverage under a new class of graphs.
+Our algorithm extends a non-projective tree parsing algorithm \cite{ec} to graph structures, with improvements to avoid derivational ambiguity.
+
+Our representation, shown in Figure~\ref{fig:repr}b, consists of complex tags composed of non-terminals, and edges indicating attachment.
+In this form, traces can create problematic structures such as directed cycles, but we show how careful choice of head rules can minimize such issues.
+
+Our algorithm runs in time $O(n^4)$ under a first-order model.
+We also introduce extensions that ensure parses contain a directed projective tree of non-trace edges.
+We implemented a proof-of-concept parser with a basic first-order model, scoring $88.3$ on trees in section 22, and recovering a range of trace types.
+
+Together, our representation and algorithm form an inference method that can cover $97.7\%$ of sentences, far above the coverage of projective tree algorithms ($46.8\%$).

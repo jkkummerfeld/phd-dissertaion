@@ -1,0 +1,89 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    rounded corners=2ex
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    shorten <=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut Sam};
+  \node (w1) [right=3ex of w0.east] {\strut told};
+  \node (w2) [below right=2ex and 3ex of w1.south east] {\strut Alex};
+  \node (w3) [below right=2ex and 3ex of w2.south east] {\strut *\textsubscript{1}};
+  \node (w4) [right=3ex of w3.east] {\strut to};
+  \node (w5) [below right=2ex and 3ex of w4.south east] {\strut run};
+
+  \node (nt0) [above=2ex of w0.north] {\strut NP\textsubscript{SBJ}};
+  \node (nt2) [above=2ex of w2.north] {\strut NP\textsubscript{1}};
+  \node (nt3) [above=2ex of w3.north] {\strut NP\textsubscript{SBJ}};
+  \node (nt5) [above=2ex of w5.north] {\strut VP};
+
+  \path (w4.north) -- node[above=2ex] (nt4-5) {\strut VP} (nt5.north);
+
+  \path (nt3.north) -- node[above=2ex] (nt3-5) {\strut S} (nt4-5.north);
+
+  \path (w1.north) -- node[above=2ex] (nt1-5) {\strut VP} (nt3-5.north);
+
+  \path (nt0.north) -- node[above=2ex] (nt0-5) {\strut S} (nt1-5.north);
+
+  \draw (w0.north) -- (nt0.south);
+  \draw (nt0.north) -- (nt0-5.south) -- (nt1-5.north);
+  \draw (w1.north) -- (nt1-5.south) -- (nt3-5.north);
+  \draw (w2.north) -- (nt2.south);
+  \draw (nt2.north) -- (nt1-5.south);
+  \draw (w3.north) -- (nt3.south);
+  \draw (nt3.north) -- (nt3-5.south) -- (nt4-5.north);
+  \draw (w4.north) -- (nt4-5.south) -- (nt5.north);
+  \draw (w5.north) -- (nt5.south);
+
+%%%% Split head form
+  \node (sw0) at (7, 0) {\strut Sam};
+  \node (sw1) [right=3ex of sw0.east] {\strut told};
+  \node (sw2) [below right=2ex and 3ex of sw1.south east] {\strut Alex};
+  \node (sw4) [below right=2ex and 3ex of sw2.south east] {\strut to};
+  \node (sw5) [below right=2ex and 3ex of sw4.south east] {\strut run};
+
+  \node (snt0) [above=2ex of sw0.north] {\strut NP\textsubscript{SBJ}};
+  \node (snt10) [above=2ex of sw1.north] {\strut VP};
+  \node (snt11) [above=2ex of snt10.north] {\strut S};
+  \node (snt2) [above=2ex of sw2.north] {\strut NP};
+  \node (snt50) [above=2ex of sw5.north] {\strut VP};
+  \node (snt51) [above=2ex of snt50.north] {\strut VP};
+  \node (snt52) [above=2ex of snt51.north] {\strut S};
+
+  \draw (sw0.north) -- (snt0.south);
+  \draw (sw1.north) -- (snt10.south);
+  \draw (snt10.north) -- (snt11.south);
+  \draw (sw2.north) -- (snt2.south);
+  \draw (sw5.north) -- (snt50.south);
+  \draw (snt50.north) -- (snt51.south);
+  \draw (snt51.north) -- (snt52.south);
+
+  \draw [structural] (snt0.north) -- (snt0.north |- snt11.west) -- (snt11.west);
+  \draw [structural] (snt2.north) -- (snt2.north |- {$(0,-0.05)+(snt10.east)$}) -- ($(0,-0.05)+(snt10.east)$);
+  \draw [trace,out=30,in=150] (snt2.north) to node[midway,above=1pt] {\small NP\textsubscript{SBJ}} (snt52.north);
+  \draw [structural] (sw4.north) -- (sw4.north |- snt51.west) -- (snt51.west);
+  \draw [structural] (snt52.north) -- (snt52.north |- {$(0,0.05)+(snt10.east)$}) -- ($(0,0.05)+(snt10.east)$);
+
+%%%  \draw [structural] (aw1.north) to [out=90,in=45] (awR.north);
+%%%  \draw [structural] (aw0.north) to [out=45,in=135] (aw1.north west);
+%%%  \draw [structural] (aw2.north) to [out=135,in=45] (aw1.north east);
+%%%  \draw [trace] (aw2.north east) to [out=45,in=135] (aw5.north);
+%%%  \draw [structural] (aw4.north) to [out=45,in=135] (aw5.north west);
+%%%  \draw [structural] (aw5.north) to [out=90,in=45] (aw1.north);
+\end{tikzpicture}

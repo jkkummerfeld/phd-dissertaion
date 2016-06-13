@@ -1,0 +1,93 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut Page};
+  \node (w1) [right=3ex of w0.east] {\strut was};
+  \node (w2) [right=3ex of w1.east] {\strut named};
+  \node (w3) [right=3ex of w2.east] {\strut *\textsubscript{1}};
+  \node (w4) [right=3ex of w3.east] {\strut CEO of Google};
+  \node (w5) [right=3ex of w4.east] {\strut today};
+
+  \node (nt01) [above=of w0.north] {\strut};
+  \node (nt11) [above=of w1.north] {\strut};
+  \node (nt21) [above=of w2.north] {\strut};
+  \node (nt31) [above=of w3.north] {\strut NP};
+  \node (nt41) [above=of w4.north] {\strut NP};
+  \node (nt51) [above=of w5.north] {\strut};
+
+  \node (nt02) [above=of nt01.north] {\strut};
+  \node (nt12) [above=of nt11.north] {\strut};
+  \node (nt22) [above=of nt21.north] {\strut};
+  \path (nt31.north) -- node[above=2ex] (nt32-42) {\strut S} (nt41.north);
+  \node (nt52) [above=of nt51.north] {\strut ADJP};
+
+  \node (nt03) [above=of nt02.north] {\strut};
+  \node (nt13) [above=of nt12.north] {\strut};
+  \path (nt22.north) -- node[above=2ex] (nt23-53) {\strut VP} (nt52.north);
+
+  \node (nt04) [above=of nt03.north] {\strut NP\textsubscript{1}};
+  \path (nt13.north) -- node[above=2ex] (nt14-54) {\strut VP} (nt23-53.north);
+
+  \path (nt04.north) -- node[above=2ex] (nt05-55) {\strut S} (nt14-54.north);
+
+  \draw (w0.north) -- (nt04.south);
+  \draw (nt04.north) -- (nt05-55.south) -- (nt14-54.north);
+  \draw (w1.north) -- (nt13.north) -- (nt14-54.south) -- (nt23-53.north);
+  \draw (w2.north) -- (nt22.north) -- (nt23-53.south) -- (nt52.north);
+  \draw (nt32-42.north) -- (nt23-53.south);
+  \draw (nt31.north) -- (nt32-42.south) -- (nt41.north);
+  \draw (w3.north) -- (nt31.south);
+  \draw (w4.north) -- (nt41.south);
+  \draw (w5.north) -- (nt52.south);
+
+% Split head form
+
+  \node (sntR0) at (0, -2) {\strut ROOT};
+  \node (snt00) [right=0.5em of sntR0.east] {\strut NP};
+  \node (snt10) [right=1em of snt00.east] {\strut S};
+  \node (snt11) [right=1ex of snt10.east] {\strut VP};
+  \node (snt20) [right=2.5em of snt10.east] {\strut VP};
+  \node (snt30) [right=4em of snt20.east] {\strut S};
+  \node (snt31) [right=1ex of snt30.east] {\strut NP};
+  \node (snt40) [right=2.5em of snt31.east] {\strut ADJP};
+  \node (sw0) [below=-0.3ex of snt00.south] {\strut Page};
+  \node (sw1a) at ($(snt10.east)!0.5!(snt11.west)$) {\strut};
+  \draw (snt10.east) -- (snt11.west);
+  \node (sw1) [below=-0.3ex of sw1a.south] {\strut was};
+  \node (sw2) [below=-0.3ex of snt20.south] {\strut named};
+  \node (sw3a) at ($(snt30.east)!0.5!(snt31.west)$) {\strut};
+  \draw (snt30.east) -- (snt31.west);
+  \node (sw3) [below=-0.3ex of sw3a.south] {\strut CEO of Google};
+  \node (sw4) [below=-0.3ex of snt40.south] {\strut today};
+%%%  \draw (sw0.north) -- (snt00.south);
+%%%  \draw (sw1.north) -- (sw1a.south);
+%%%  \draw (sw2.north) -- (snt20.south);
+%%%  \draw (sw3.north) -- (sw3a.south);
+%%%  \draw (sw4.north) -- (snt40.south);
+
+  \draw [structural] (snt10.north) to [out=135,in=45] (sntR0.north);
+  \draw [structural,color=black!30] (snt00.north east) to [out=45,in=135] (snt11.north);
+  \draw [structural,color=black!30] (snt20.north) to [out=135,in=45] (snt11.north);
+  \draw [structural,color=black!30] (snt30.north) to [out=135,in=45] (snt20.north east);
+  \draw [structural] (snt40.north) to [out=135,in=45] (snt20.north);
+  \draw [trace] (snt00.north) to [out=45,in=135] node[midway,above=1pt] {\small NP} (snt31.north);
+
+\end{tikzpicture}

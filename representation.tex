@@ -1,4 +1,272 @@
 \chapter{Representation}
 
-PTB repr.
+\begin{figure*}
+\begin{subfigure}[b][3.75cm][b]{0.19\textwidth}
+  \centering
+  \scalebox{0.5}{\input{figures/picture-null-to-null-flat}}
+  \caption{\label{fig:null-null}
+    Null to null
+  }
+\end{subfigure}
+\hspace{4mm}
+\begin{subfigure}[b][3.75cm][b]{0.24\textwidth}
+  \centering
+  \scalebox{0.5}{ \input{figures/picture-gapping-flat}}
+  \caption{\label{fig:gapping}
+    Gapping
+  }
+\end{subfigure}
+\hspace{4mm}
+\begin{subfigure}[b][3.75cm][b]{0.16\textwidth}
+  \centering
+  \scalebox{0.5}{ \input{figures/picture-cycle-flat}}
+  \caption{\label{fig:cycle}
+    Cycle
+  }
+\end{subfigure}
+\hspace{4mm}
+\begin{subfigure}[b][3.75cm][b]{0.29\textwidth}
+  \centering
+  \scalebox{0.5}{ \input{figures/picture-non1ec-flat}}
+  \caption{\label{fig:not-1ec}
+    Not One-Endpoint Crossing
+  }
+\end{subfigure}
+\caption{
+Examples of syntactic phenomena.
+Dashed edges are traces, solid edges are structural.
+Some edges are fainter to more clearly show the key edges for each case.
+}
+\end{figure*}
+
+The algorithm we define cannot operate directly on the standard constituent parse representation.
+Instead, we define a new representation in which each non-terminal symbol is associated with a specific word (the head).
+Unlike dependency parsing, we retain all the information required to reconstruct the constituency parse.
+
+Our representation is based on \cite{cck}'s tree representation, with three key differences:
+(1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
+(2) we add representations of null elements and co-indexation,
+(3) we modify the head rules to avoid complex structures.
+
+\subsection{Core Structure}
+We represent parses with two components.
+Every word is assigned a spine, and every word is the child of one non-trace edge.
+Together, these form the base tree structure of the parse.
+
+\parbox{0.44\textwidth}{
+\centering
+\scalebox{0.7}{
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    >=stealth',
+    thin,
+  },
+  trace/.style={
+    ->,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+  \node (sntR0) at (0, 1.8) {\strut ROOT};
+
+  \node (snt00) [right=1em of sntR0.east] {\strut NP\textsubscript{SBJ}};
+  \node (sw0) [color=black!50,below=-0.3ex of snt00] {\strut Sam};
+
+  \node (snt10) [right=1em of snt00.east] {\strut S};
+  \node (snt11) [right=1ex of snt10.east] {\strut VP};
+  \draw (snt10.east) -- (snt11.west);
+  \node (sw1a) at ($(snt10.west)!0.5!(snt11.east)$) {\strut};
+  \node (sw1) [color=black!50,below=-0.3ex of sw1a] {\strut told};
+
+  \node (snt20) [right=1em of snt11.east] {\strut NP};
+  \node (sw2) [color=black!50,below=-0.3ex of snt20] {\strut Alex};
+
+  \node (snt30) [right=1.5em of snt20.east] {\strut -};
+  \node (sw3) [color=black!50,below=-0.3ex of snt30] {\strut to};
+
+  \node (snt50) [right=1em of snt30.east] {\strut S};
+  \node (snt51) [right=1ex of snt50.east] {\strut VP};
+  \draw (snt50.east) -- (snt51.west);
+  \node (snt52) [right=1ex of snt51.east] {\strut VP};
+  \draw (snt51.east) -- (snt52.west);
+  \node (sw5a) at ($(snt50.west)!0.5!(snt52.east)$) {\strut};
+  \node (sw5) [color=black!50,below=-0.3ex of sw5a] {\strut run};
+
+  \draw [structural,out=60,in=120] (snt00.north) to (snt10.north west);
+  \draw [structural,out=120,in=60] (snt10.north) to (sntR0.north);
+  \draw [structural,out=120,in=60] (snt20.north) to (snt11.north east);
+  \draw [trace,out=30,in=150] (snt20.north) to (snt50.north west);
+  \draw [structural,out=120,in=60] (snt50.north) to (snt11.north);
+  \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
+\end{tikzpicture}
+}}
+
+\paragraph{Spines}
+Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
+If a symbol occurs more than once in a spine, we use indices to distinguish between instances.
+
+\paragraph{Edges}
+A link between two words, with a label indicating: (1) the top of the child's spine, and (2) the symbol that it connects to in the parent's spine.
+In our figures the arcs show their label by starting and ending at the appropriate symbols.
+
+\subsubsection{Avoiding Adjunction Ambiguity}
+
+\cite{cck} use r-adjunction to add additional non-terminals to spines.
+This introduces ambiguity, because edges modifying the same spine from different sides may not have a unique order of application.
+We resolve this issue by using more articulated spines that have the complete set of non-terminals.
+The potential drawback of our approach is that coverage of spines is more limited by the training set than their approach.
+In practice, coverage is high, with $99.93\%$ of spines in the development set observed in the training set.
+
+\subsection{Additional Structure}
+
+The base tree representation described above does not cover null elements or co-indexation, and so only fully represents $26.6\%$ of sentences.
+
+\paragraph{Null Elements}
+The Penn Treebank contains a range of null elements, indicating structures such as the trace of movement, PRO, and null complementizers.
+These elements do not span any words, so do not have a head word.
+For example, in Figure~\ref{fig:repr}a there is a null element that represents the missing subject of the infinitive.
+
+We represent null elements in our structure in two ways.
+If the null element has a reference index, shown as a subscript in our figures, we represent the null element as part of an edge, as described below.
+Otherwise, we insert it into a spine, as shown for the null element and its parent WHNP in Figure~\ref{fig:null-null}.
+
+\paragraph{Co-indexation}
+The treebank represents movement with index pairs on null elements and non-terminals, \myeg *\textsubscript{1} and NP\textsubscript{1} in Figure~\ref{fig:cycle}.
+To represent co-indexation we create extra edges, one for each index, going from the null element to the non-terminal.
+The edge is labeled to indicate the type of trace and null element.
+There are three special cases of co-indexation:
+
+\textbf{(1)}
+The treebank uses a chain of indexes to represent the case of a non-terminal that links to multiple null elements.
+We represent this case with multiple edges, all starting at the non-terminal and ending at each of the different null positions.
+
+\textbf{(2)}
+It is possible for a trace edge to have the same start and end points as a non-trace edge.
+We restrict this situation to allow at most one base edge, one trace edge, and one chain edge at the same time.
+This decreases edge coverage in the training set by 0.012\%.
+
+\textbf{(3)}
+In some cases the non-terminal does not span any words, but instead contains another null element, \myeg the WHNP in Figure~\ref{fig:null-null}.
+For these we generate an edge, but reverse the direction.
+This reversal is necessary to avoid creating a loop in the structure.
+In Figure~\ref{fig:null-null} we show a special case where the trace edge links two positions in the same spine.
+We represent this as part of the spine, rather than as an edge.
+
+\paragraph{Gapping}
+For parallel constructions the treebank co-indexes arguments that are fulfilling the same roles, as shown in Figure~\ref{fig:gapping}.
+These are distinct from the previous cases because neither index is on a null element.
+We considered two approaches for these cases: (1) add edges from the repetition to the first occurrence (shown in Figure~\ref{fig:gapping}), (2) add edges from the repetition to the parent of the first occurrence, \myeg the left VP in Figure~\ref{fig:gapping}.
+The second approach produces more structures that fall within the graph space we consider and explicitly represents all predicates, but only implicitly captures the original treebank structure.
+
+\subsection{Head Rules}
+
+To construct the spines we use head rules that consider the type of a non-terminal and its children.
+In many cases different head word options represent more syntactic or semantic aspects of the span.
+When parsing trees, any set of head rules will generate a valid structure.
+For graphs, the head rules can have a major impact on properties of the final structure.
+Two particular properties that are relevant to our algorithm are whether cycles are present, and whether the edges obey the one-endpoint crossing property.
+
+\paragraph{Cycles}
+One example of cycles was mentioned in the previous section, but they can occur whenever a trace edge is added, \myeg between \emph{companies} and \emph{linked} in Figure~\ref{fig:cycle}.
+Starting from \cite{cck}'s head rules, we made modifications to avoid most cycles.
+For example, in a subordinate clause consisting of a Wh-noun phrase (WHNP) and a declarative clause (S), we switched the head to be the S.
+Often the WHNP has a trace to within the S, so making it the head would create a cycle.
+
+\paragraph{One-Endpoint Crossing}
+We generalize \cite{ec}'s definition of one-endpoint crossing trees to graphs.
+A graph is one-endpoint crossing (1ec) if for any edge $e$, all edges that cross $e$ share an endpoint (treating the edges as undirected).
+
+The dark edges in Figure~\ref{fig:not-1ec} show an example of how head rules can impact this property.
+The trace edge from \emph{Page} to \emph{CEO of Google} does not satisfy the 1ec property because it is crossed by two edges with no endpoints in common.
+By switching the head rule for VPs to use a child VP rather than an auxiliary, we can resolve this case.
+
+\subsection{Coverage}
+
+\begin{table}
+  \centering
+  \begin{tabular}{|lrr|}
+    \hline
+      & Acyclic & Has a cycle \\
+    \hline
+    \hline
+%%%    Projective Tree & \textbf{18,637} & 0 \\
+%%%    Projective Graph & \textbf{13,594} & 358 \\
+%%%    One-Endpoint Crossing & \textbf{6,879} & 129 \\
+%%%    Other Graph & 228  & 7 \\
+    Projective Tree & \textbf{46.8\%} & - \\
+    Projective Graph & \textbf{34.1\%} & 0.9\% \\
+    One-Endpoint Crossing & \textbf{17.3\%} & 0.3\% \\
+    Other Graph & 0.6\% & 0.01\% \\
+    \hline
+  \end{tabular}
+  \vspace{-4mm}
+  \caption{\label{tab:structures}
+    Number of sentences in the training set that are of each structure type.
+    Values in bold are for structures that are recoverable using our algorithm.
+  }
+\end{table}
+
+\begin{table}
+\centering
+  \vspace{2mm}
+  \begin{tabular}{|lrr|}
+    \hline
+%%%    & \multicolumn{2}{c}{Problematic (\%)} \\
+    & \multicolumn{2}{c}{Coverage (\%)} \\
+    Approach & Sentences & Edges \\
+    \hline
+    \hline
+%%%    No traces & 56.15 & 3.73 \\
+%%%    \hline
+%%%    Core representation & 23.31 & 1.53 \\
+%%%    + Head rule changes & 3.32 & 0.45 \\
+%%%    + Null reversal & 2.28 & 0.41 \\
+%%%    + Gapping shift & 1.81 & 0.38 \\
+    Projective trees & 43.85 & 96.27 \\
+    Core representation (3.1) & 76.69 & 98.47 \\
+    + Head rule changes (3.3) & 96.68 & 99.55 \\
+    + Null reversal (3.2) & 97.72 & 99.59 \\
+    + Gapping shift (3.2) & 98.19 & 99.62 \\
+    \hline
+  \end{tabular}
+  \vspace{-2mm}
+  \caption{\label{tab:coverage}
+    Coverage improvements for parts of our representation.
+    Core uses the representation proposed in this paper, with the head rules from \cite{cck}.
+    Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
+  }
+\end{table}
+
+Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
+Structures that are recoverable using our algorithm are bolded.
+The structures we consider cover almost all sentences, while projective trees, the standard output of parsers, account for less than half of sentences.
+
+In Table~\ref{tab:coverage} we show the impact of design decisions for our representation.
+The percentages indicate how many sentences in the training set are completely recoverable by our algorithm.
+Each row shows the outcome of an addition to the previous row, starting from no traces at all, going to our representation with the head rules of \cite{cck}, then changing the head rules, reversing null-null edges, and changing the target of edges in gapping.
+The largest gain comes from changing the head rules, which is unsurprising since \cite{cck}'s rules were designed for trees, where any set of rules produce valid structures.
+
+\subsection{Problematic Structures}
+
+To understand what structures are still not covered by our approach we manually inspected twenty examples that contained a cycle and twenty that were not one-endpoint-crossing.
+For the cycles, eleven of the cases related to sentences containing variations of NP \emph{said} interposed between two parts of a single quote.
+A cycle was present because the top node of the parse was co-indexed with a null argument of \emph{said} while \emph{said} was an argument of the head word of the quote.
+The remaining cases were split between use of Expletive (5) and Interpret Constituent Here (4) traces.
+
+%%% 3 EXP
+%%% 5 ICH
+%%% 2 NP says
+%%% 1 Gapping
+%%% 1 list
+%%% 8 other
+For the cases where the structure was not one-endpoint-crossing it was more difficult to determine trends.
+The same three cases, ICH, EXP, and NP \emph{said} accounted for half of the issues.
+Of the rest, most involved a set of arcs like the crossing arcs in Figure~\ref{fig:not-1ec}, but there was no clear way to avoid the crossings by adjusting head rules.
 

@@ -18,12 +18,73 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
-\usepackage{subfig}
+%%%\usepackage{subfig}
 \usepackage{color}
 \usepackage{pstricks}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{synttree}
+\usepackage{array}
+\usepackage{arydshln}
+\usepackage{xcolor,colortbl}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{ulem}
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{subcaption}
+\usepackage{mdwlist}
+% Last intentionally
+\usepackage{hyperref}
+
+\hypersetup{colorlinks=true,
+backref=section,
+linktocpage=true,
+linkcolor=blue,% normal internal document links
+menucolor=blue,% colour for 'menu' links (not sure what these are, it matched linkcolor before)
+anchorcolor=black,% text of the anchor
+citecolor=green,% bib refs
+urlcolor=magenta,% URLs
+pdftitle={Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output},
+pdfauthor={Jonathan K. Kummerfeld},
+pdfsubject={Natural Language Processing},
+pdfpagelayout=OneColumn}
+
+\usetikzlibrary{arrows,backgrounds,positioning,fit,calc,intersections,shapes}
+
+\tikzset{% 
+  not allowed/.style={%
+    densely dotted,
+    thick,
+    color=red
+  }
+}
+\tikzset{% 
+  required directed/.style={%
+    shorten >=1pt,
+    >=stealth',
+    ->
+  }
+}
+\tikzset{% 
+  required undirected/.style={%
+  }
+}
+
+
+\newcommand{\myeg}{e.g.\@\xspace}
+\newcommand{\myie}{i.e.\@\xspace}
+\newcommand{\mathscale}{0.8}
+\newcommand{\onlygraphs}[1]{\textcolor{blue}{\scalebox{0.9}{\fbox{$#1$}}}}
+
+\newcommand{\finalequation}[1]{
+  \begin{center}
+    \small
+    #1
+  \end{center}
+  \vspace{3mm}
+}
 
 % TODO - switch away from syntax tree entirely
 % Syntax-tree settings
@@ -65,7 +126,7 @@
 
 % Declarations for Front Matter
 
-\title{Eulerian Knowledge Prexy and Lyman Zig on Wiggly}
+\title{Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output}
 \author{Jonathan K. Kummerfeld}
 \degreesemester{Summer}
 \degreeyear{2016}
@@ -78,8 +139,7 @@
 \campus{Berkeley}
 
 \maketitle
-% TODO: Delete (or comment out) the \approvalpage line for the final version.
-\approvalpage
+%%%\approvalpage
 \copyrightpage
 
 \include{abstract}

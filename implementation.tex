@@ -1,3 +1,62 @@
 \chapter{Implementation}
 
-All the pruning, tricks, etc
+As described in the previous section, the time complexity of the new algorithm poses a challenge for efficient parsing.
+In addition, that complexity was based on the assumption that we only consider compatible items.
+To parse efficiently we apply several types of pruning and design our core data structure to avoid considering incompatible items.
+
+\paragraph{Coarse to Fine Pruning \cite{Goodman:1997}}
+Rather than parsing immediately with the full model we use three passes with progressively richer structure:
+(1) projective trees without spines,
+(2) non-projective graphs without spines,
+(3) full structure.
+Each pass prunes using max-marginals from the preceding pass.
+The third pass also prunes spines that are not consistent with at least one unpruned edge from the second pass.
+
+ - discussion of the trace pruning
+
+ - discussion of the spine pruning
+
+ - discussion of rule pruning
+
+\paragraph{State beams}
+In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
+We ensure diversity by dividing each beam into a collection of sub-beams.
+In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
+This definition enables us to avoid considering most incompatible items.
+The third pass also includes one of the spines in the sub-beam definition for the same reason.
+
+\paragraph{Cube pruning  \cite{Chiang:2007}}
+We apply the standard cube pruning approach when doing binary and ternary compositions.
+Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
+Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
+
+\section{Parser Architecture}
+
+- overall structure
+
+- every optimisation
+
+\section{Results}
+
+We implemented a proof-of-concept system to get preliminary results using this algorithm and representation.
+We used only first-order features, \ie features do not consider pairs of edges.
+Our code for both the algorithm and conversion to and from our representation will be made available.
+
+First we considered the standard parsing metric for trees.
+After one training pass through sections $2$--$21$ of the PTB on sentences up to length $40$, we get an F-score of $88.26$ on section $22$.
+This is lower than other systems, including the \cite{cck} parser, which scores $92.0$ on all sentences.
+However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
+
+For full graph parsing we considered sentences up to length $25$ (half of the treebank).
+For unlabeled trace edges, we obtain a precision of $73\%$ and a recall of $15\%$.
+Using \cite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $52\%$ and recall $18\%$.
+This is lower than \cite{Johnson:2002}'s results ($73$ and $63$ on all sentences).
+However, we have shown that our algorithm can recover trace edges and expect that it can improve with feature development and longer training on the full corpus.
+
+Finally, we measured the speed of the complete parser.
+Pruning thresholds for the first two passes were tuned to retain $99\%$ of non-trace edges.
+With that setting, the first pass prunes all but $0.43\%$ of possible edges, and $48.9\%$ of chart cells.
+The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells.
+However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained.
+With these settings, for sentences up to length $25$, it took $57$ seconds per sentence.
+

@@ -1,0 +1,69 @@
+\begin{tikzpicture}
+[ every node/.style={
+    node distance=2ex,
+    inner sep=0pt
+  },
+  structural/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin
+  },
+  trace/.style={
+    ->,
+    shorten >=2pt,
+    >=stealth',
+    thin,
+    dashed
+  },
+]
+
+% Standard form
+  \node (w0) at (0, 0) {\strut companies};
+  \node (w1) [right=3ex of w0.east] {\strut linked};
+  \node (w2) [right=3ex of w1.east] {\strut};
+  \node (w3) [right=3ex of w2.east] {\strut to};
+  \node (w4) [right=3ex of w3.east] {\strut ...};
+
+  \node (nt00) [above=of w0.north] {\strut};
+  \node (nt10) [above=of w1.north] {\strut};
+  \node (nt20) [above=of w2.north] {\strut *\textsubscript{1}};
+  \node (nt30) [above=of w3.north] {\strut};
+  \node (nt40) [above=of w4.north] {\strut};
+
+  \node (nt01) [above=of nt00.north] {\strut};
+  \node (nt11) [above=of nt10.north] {\strut};
+  \node (nt21) [above=of nt20.north] {\strut NP};
+  \draw (nt20.north) -- (nt21.south);
+  \path (nt30.north) -- node[above=2ex] (nt31-41) {\strut VP} (nt40.north);
+  \draw (w3.north) -- (nt30.north) -- (nt31-41.south) -- (nt40.north) -- (w4.north);
+
+  \node (nt02) [above=of nt01.north] {\strut NP\textsubscript{1}};
+  \draw (w0.north) -- (nt02.south);
+  \path (nt11.north) -- node[above=2ex] (nt12-42) {\strut VP} (nt31-41.north);
+  \draw (nt21.north) -- (nt12-42.south);
+  \draw (w1.north) -- (nt11.north) -- (nt12-42.south) -- (nt31-41.north);
+
+  \path (nt02.north) -- node[above=2ex] (nt03-43) {\strut NP} (nt12-42.north);
+  \draw (nt02.north) -- (nt03-43.south) -- (nt12-42.north);
+
+% Split head form
+  \node (sw0) at (0, -3) {\strut companies};
+  \node (snt00) [above=of sw0.north] {\strut NP};
+  \node (snt01) [above=of snt00.north] {\strut NP};
+  \node (sw1) [right=3ex of sw0.east] {\strut linked};
+  \node (snt10) [above=of sw1.north] {\strut VP};
+  \node (sw2) [right=3ex of sw1.east] {\strut};
+  \node (sw3) [right=3ex of sw2.east] {\strut to};
+  \node (sw4) [right=3ex of sw3.east] {\strut ...};
+  \node (snt40) [above=of sw4.north] {\strut VP};
+
+  \draw (sw0.north) -- (snt00.south);
+  \draw (snt00.north) -- (snt01.south);
+  \draw (sw1.north) -- (snt10.south);
+  \draw (sw4.north) -- (snt40.south);
+  \draw [trace,out=15,in=165] (snt00.north east) to node[midway,sloped,above=1pt] {\small NP} (snt10.north west);
+  \draw [structural] (snt10.north) to [out=90,in=15] (snt01.east);
+  \draw [structural] (sw3.north) to [out=90,in=195] (snt40.west);
+  \draw [structural] (snt40.north) to [out=90,in=15] (snt10.east);
+\end{tikzpicture}
