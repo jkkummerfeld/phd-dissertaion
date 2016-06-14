@@ -1,6 +1,64 @@
 \chapter{Introduction}
 
 
+\section{Error Analysis}
+
+Constituency parser performance is primarily interpreted through a single
+metric, F-score on \wsj section 23, that conveys no linguistic information
+regarding the remaining errors.  We classify errors within a set of
+linguistically meaningful types using tree transformations that repair groups
+of errors together.  We use this analysis to answer a range of questions about
+parser behaviour, including what linguistic constructions are difficult for
+state-of-the-art parsers, what types of errors are being resolved by rerankers,
+and what types are introduced when parsing out-of-domain text.
+
+\section{Overview}
+
+Parsing has been a major area of research within computational linguistics for
+decades, and constituent parser F-scores on \wsj section 23 have exceeded
+$90\%$ \cite{Petrov-Klein:2007}, and $92\%$ when using self-training and
+reranking \cite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
+While
+these results give a useful measure of overall performance, they provide no
+information about the nature, or relative importance, of the remaining errors.
+
+Broad investigations of parser errors beyond the \parseval metric
+\cite{Black-etal:1991} have either focused on specific parsers, \eg
+\cite{Collins:2003}, or have involved conversion to dependencies
+\cite{Carroll-etal:1998,King:2003}.  In all of these cases, the analysis has
+not taken into consideration how a set of errors can have a common cause, \eg a
+single mis-attachment can create multiple node errors.
+
+We propose a new method of error classification using tree transformations.
+Errors in the parse tree are repaired using subtree movement, node
+creation, and node deletion.  Each step in the process is then associated with
+a linguistically meaningful error type, based on factors such as the node that is
+moved, its siblings, and parents.  
+
+Using our method we analyse the output of thirteen constituency parsers on
+newswire.  Some of the frequent error types that we identify are widely recognised
+as challenging, such as prepositional phrase (PP) attachment.  However, other
+significant types have not received as much attention, such as clause
+attachment and modifier attachment.
+
+Our method also enables us to investigate where reranking and self-training
+improve parsing.  Previously, these developments were analysed only in terms of
+their impact on F-score.  Similarly, the challenge of out-of-domain parsing has
+only been expressed in terms of this single objective.  We are able to
+decompose the drop in performance and show that a disproportionate number of
+the extra errors are due to coordination and clause attachment.
+
+This work presents a comprehensive investigation of parser behaviour in terms
+of linguistically meaningful errors.  By applying our method to multiple
+parsers and domains we are able to answer questions about parser behaviour that
+were previously only approachable through approximate measures, such as counts
+of node errors.  We show which errors have been reduced over the past fifteen
+years of parsing research; where rerankers are making their gains and where
+they are not exploiting the full potential of k-best lists; and what types of
+errors arise when moving out-of-domain.  We have released our
+system\footnote{http://code.google.com/p/berkeley-parser-analyser/} to enable
+future work to apply our methodology.
+
 \section{Graph Parsing}
 
 \subsection{Old abstract}
@@ -27,7 +85,7 @@ or has only captured a limited set of phenomena via grammar augmentation
 \begin{figure}
   \centering
   \scalebox{0.65}{
-  \input{picture-simple-flat}
+  \input{figures/picture-simple-flat}
   }
   \vspace{-5mm}
   \caption{\label{fig:repr}

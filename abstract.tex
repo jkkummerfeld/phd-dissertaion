@@ -1,12 +1,26 @@
-% (This file is included by thesis.tex; you do not latex it by itself.)
-
 \begin{abstract}
 
-% The text of the abstract goes here.  If you need to use a \section
-% command you will need to use \section*, \subsection*, etc. so that
-% you don't get any numbering.  You probably won't be using any of
-% these commands in the abstract anyway.
+Representation of syntactic structure is a core area of research in Computational Linguistics, disambiguating distinctions in meaning that are crucial for correct interpretation of language.
+Development of algorithms and statistical models over the past two decades has led to systems that are accurate enough to be deployed in industry, playing a key role in products such as Google Search and Apple Siri, and part of the foundation of startups such as SpaCy and WriteLab.
+However, syntactic parsers today are usually constrained to tree representations of language, and performance is interpreted through a single metric that coneys no linguistic information regarding remaining errors.
 
-Invasive brag; forbearance.
+In this dissertation, we present new tools for manipulating syntactic structures: modifying existing structures and making new ones.
+Each tool is based on a core algorithm and adaptations specific to linguistic structure.
+
+First, we consider a search algorithm that, given two structures, will find a sequence of modifications leading from one structure to the other.
+We apply this algorithm to syntactic error analysis, where one structure is the output of a parser, the other is the correct parse, and each modification corresponds to fixing one error.
+We constructed a tool based on the algorithm and analysed variations in behaviour between parsers, types of text, and languages.
+Our analysis provided new empirical evidence for and against widely-held beliefs in the community regarding the prevalence of certain errors and hence the nature of unsolved challenges in parsing.
+
+Next, we describe a mapping algorithm that converts one syntactic representation into another.
+Specifically, we map from Combinatory Categorial Grammar derivations to Phrase Structure trees.
+Our approach follows the philosophy of \ccg, defining a phrase structure for each lexical category and general rules for combining phrase structures.
+This produces significantly more accurate phrase structures than past work, and has the advantage that the mapping decomposes in the same way as the CKY parsing algorithm.
+
+Finally, we present a dynamic programming algorithm, which constructs the graph structure that has the highest score under an edge-factored scoring function.
+In the process of defining a parse representation compatible with the algorithm, we found that certain linguistic distinctions could dramatically impact coverage.
+We also show various ways to modify the algorithm to improve performance by exploiting properties of observed linguistic structure.
+This approach to syntactic parsing is the first to cover virtually all structure encoded in the Penn Treebank.
+
 
 \end{abstract}
