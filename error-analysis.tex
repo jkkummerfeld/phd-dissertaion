@@ -15,31 +15,31 @@ Our evaluation is over a wide range of \ptb constituency parsers and their varia
 For all parsers we used the publicly available version, with the standard parameter settings.
 
 \begin{description}\itemsep1pt
-	\item[ Berkeley] \cite{Petrov-etal:2006,Petrov-Klein:2007}. An
+	\item[ Berkeley] \parencite{Petrov-etal:2006,Petrov-Klein:2007}. An
 	unlexicalised parser with a grammar constructed with automatic state
 	splitting.
 
 	\item[ Bikel] (2004)\nocite{Bikel:2004} implementation of Collins (1997).
 
 	\item[ BUBS]
-	\cite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
+	\parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
 	`grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar,
 	but parses with various pruning techniques to improve speed, at the cost of
 	accuracy.
 
 	\item[ Charniak] (2000)\nocite{Charniak:2000}. A generative parser with a
 	maximum entropy-inspired model.  We also use the reranker
-	\cite{Charniak-Johnson:2005}, and the self-trained model
-	\cite{McClosky-Charniak-Johnson:2006}.
+	\parencite{Charniak-Johnson:2005}, and the self-trained model
+	\parencite{McClosky-Charniak-Johnson:2006}.
 
 	\item[ Collins] (1997)\nocite{Collins:1997}. A generative lexicalised parser, with
 	three models, a base model, a model that uses subcategorisation
 	frames for head words, and a model that takes into account traces.
 
-	\item[ SSN] \cite{Henderson:2003,Henderson:2004}. A statistical left-corner
+	\item[ SSN] \parencite{Henderson:2003,Henderson:2004}. A statistical left-corner
 	parser, with probabilities estimated by a neural network.
 
-	\item[ Stanford] \cite{Klein-Manning:2003,Klein-Manning:2003:NIPS}. We
+	\item[ Stanford] \parencite{Klein-Manning:2003,Klein-Manning:2003:NIPS}. We
 	consider both the unlexicalised PCFG parser (-U) and the factored parser
 	(-F), which combines the PCFG parser with a lexicalised dependency parser.
 \end{description}
@@ -625,7 +625,7 @@ approach has the advantage that we identify groups of errors with a single
 cause.  For example, a missing unary production may correspond to an extra
 bracket that contains a subtree that attached incorrectly.
 
-%%%\input{figures/wsj23_comparison.tex}
+\input{figures/wsj23_comparison.tex}
 
 \subsection{Methodology}
 
@@ -699,7 +699,7 @@ errors are second most important by number of groups (in
 Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors
 (in Table~\ref{tab:wsj23-comp}).
 
-%%%\input{figures/reranking.tex}
+\input{figures/reranking.tex}
 
 As expected, PP attachment is the largest contributor to errors, across all
 parsers.  Interestingly, coordination is sixth on the list, though that is
@@ -733,7 +733,7 @@ BUBS are particularly damaging for PP attachment errors and unary errors.
 
 Various comparisons can be made between Charniak parser variants.  We discuss
 the reranker below.  For the self-trained model
-\cite{McClosky-Charniak-Johnson:2006} performed some error analysis,
+\textcite{McClosky-Charniak-Johnson:2006} performed some error analysis,
 considering variations in F-score depending on the frequency of tags such as
 PP, IN and CC in sentences.  Here we see gains on all error types, though
 particularly for clause attachment, modifier attachment and coordination, which
@@ -741,18 +741,18 @@ fits with their observations.
 
 \subsection{Reranking}
 
-%%%\input{figures/domains_charniak.tex}
+\input{figures/domains_charniak.tex}
 
 The standard dynamic programming approach to parsing limits the range of
 features that can be employed.  One way to deal with this issue is to modify
 the parser to produce the top $K$ parses, rather than just the 1-best, then use
 a model with more sophisticated features to choose the best parse from this
-list \cite{collins:00}.  While re-ranking has led to gains in performance
-\cite{Charniak-Johnson:2005}, there has been limited analysis of how
+list \parencite{collins:00}.  While re-ranking has led to gains in performance
+\parencite{Charniak-Johnson:2005}, there has been limited analysis of how
 effectively rerankers are using the set of available options.  Recent work has
 explored this question in more depth, but focusing on how variation in the
 parameters impacts performance on standard metrics
-\cite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
+\parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
 
 In Table~\ref{tab:reranking} we present a breakdown over error types for the
 Charniak parser, using the self-trained model and reranker.  The oracle results
@@ -788,17 +788,17 @@ improvements for longer lists, unlike the other error types.
 \subsection{Out-of-Domain}
 
 Parsing performance drops considerably when shifting outside of the domain a
-parser was trained on \cite{Gildea:2001}.
-\cite{Clegg:2005:EIT:1626315.1626317} evaluated parsers qualitatively on
-node types and rule productions.  \cite{Bender:2011:PEO:2145432.2145479}
+parser was trained on \parencite{Gildea:2001}.
+\textcite{Clegg:2005:EIT:1626315.1626317} evaluated parsers qualitatively on
+node types and rule productions.  \textcite{Bender:2011:PEO:2145432.2145479}
 designed a Wikipedia test set to evaluate parsers on dependencies representing
 ten specific linguistic phenomena.
 
 To provide a deeper understanding of the errors arising when parsing outside of
 the newswire domain, we analyse performance of the Charniak parser with
 reranker and self-trained model on the eight parts of the Brown corpus
-\cite{Marcus-Marcinkiewicz-Santorini:1993}, and two parts of the Google Web
-corpus \cite{Petrov:2012}.  Table~\ref{tab:domain-info} shows statistics for
+\parencite{Marcus-Marcinkiewicz-Santorini:1993}, and two parts of the Google Web
+corpus \parencite{Petrov:2012}.  Table~\ref{tab:domain-info} shows statistics for
 the corpora.  The variation in average sentence lengths skew the results for
 errors per sentence.  To handle this we divide by the number of words to
 determine the results in Table~\ref{tab:charniak-domains}, rather than by the

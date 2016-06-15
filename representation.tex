@@ -43,7 +43,7 @@ The algorithm we define cannot operate directly on the standard constituent pars
 Instead, we define a new representation in which each non-terminal symbol is associated with a specific word (the head).
 Unlike dependency parsing, we retain all the information required to reconstruct the constituency parse.
 
-Our representation is based on \cite{cck}'s tree representation, with three key differences:
+Our representation is based on \textcite{cck}'s tree representation, with three key differences:
 (1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
 (2) we add representations of null elements and co-indexation,
 (3) we modify the head rules to avoid complex structures.
@@ -118,7 +118,7 @@ In our figures the arcs show their label by starting and ending at the appropria
 
 \subsubsection{Avoiding Adjunction Ambiguity}
 
-\cite{cck} use r-adjunction to add additional non-terminals to spines.
+\textcite{cck} use r-adjunction to add additional non-terminals to spines.
 This introduces ambiguity, because edges modifying the same spine from different sides may not have a unique order of application.
 We resolve this issue by using more articulated spines that have the complete set of non-terminals.
 The potential drawback of our approach is that coverage of spines is more limited by the training set than their approach.
@@ -175,12 +175,12 @@ Two particular properties that are relevant to our algorithm are whether cycles 
 
 \paragraph{Cycles}
 One example of cycles was mentioned in the previous section, but they can occur whenever a trace edge is added, \myeg between \emph{companies} and \emph{linked} in Figure~\ref{fig:cycle}.
-Starting from \cite{cck}'s head rules, we made modifications to avoid most cycles.
+Starting from \textcite{cck}'s head rules, we made modifications to avoid most cycles.
 For example, in a subordinate clause consisting of a Wh-noun phrase (WHNP) and a declarative clause (S), we switched the head to be the S.
 Often the WHNP has a trace to within the S, so making it the head would create a cycle.
 
 \paragraph{One-Endpoint Crossing}
-We generalize \cite{ec}'s definition of one-endpoint crossing trees to graphs.
+We generalize \textcite{ec}'s definition of one-endpoint crossing trees to graphs.
 A graph is one-endpoint crossing (1ec) if for any edge $e$, all edges that cross $e$ share an endpoint (treating the edges as undirected).
 
 The dark edges in Figure~\ref{fig:not-1ec} show an example of how head rules can impact this property.
@@ -239,7 +239,7 @@ By switching the head rule for VPs to use a child VP rather than an auxiliary, w
   \vspace{-2mm}
   \caption{\label{tab:coverage}
     Coverage improvements for parts of our representation.
-    Core uses the representation proposed in this paper, with the head rules from \cite{cck}.
+    Core uses the representation proposed in this paper, with the head rules from \textcite{cck}.
     Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
   }
 \end{table}
@@ -250,8 +250,8 @@ The structures we consider cover almost all sentences, while projective trees, t
 
 In Table~\ref{tab:coverage} we show the impact of design decisions for our representation.
 The percentages indicate how many sentences in the training set are completely recoverable by our algorithm.
-Each row shows the outcome of an addition to the previous row, starting from no traces at all, going to our representation with the head rules of \cite{cck}, then changing the head rules, reversing null-null edges, and changing the target of edges in gapping.
-The largest gain comes from changing the head rules, which is unsurprising since \cite{cck}'s rules were designed for trees, where any set of rules produce valid structures.
+Each row shows the outcome of an addition to the previous row, starting from no traces at all, going to our representation with the head rules of \textcite{cck}, then changing the head rules, reversing null-null edges, and changing the target of edges in gapping.
+The largest gain comes from changing the head rules, which is unsurprising since \textcite{cck}'s rules were designed for trees, where any set of rules produce valid structures.
 
 \subsection{Problematic Structures}
 

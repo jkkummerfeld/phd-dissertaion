@@ -3,7 +3,8 @@
 % Based on the example from Paul Vojta.
 
 \documentclass{ucbthesis}
-\usepackage{biblatex}
+%%%\usepackage{natbib}
+\usepackage[style=authoryear-icomp,backref,sorting=ynt]{biblatex}
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -38,13 +39,15 @@
 % Last intentionally
 \usepackage{hyperref}
 
+% For printing, set hidelinks=true 
 \hypersetup{colorlinks=true,
+plainpages=false,
 backref=section,
 linktocpage=true,
 linkcolor=blue,% normal internal document links
 menucolor=blue,% colour for 'menu' links (not sure what these are, it matched linkcolor before)
 anchorcolor=black,% text of the anchor
-citecolor=green,% bib refs
+citecolor=gray,% bib refs
 urlcolor=magenta,% URLs
 pdftitle={Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output},
 pdfauthor={Jonathan K. Kummerfeld},
@@ -120,12 +123,22 @@ pdfpagelayout=OneColumn}
  
 \newcommand{\wrongnode}[1]{\textbf{\fbox{#1}}}
 
+\DeclareFieldFormat*{booktitle}{#1}
+
+\DeclareFieldFormat*{titlecase}{%
+    \ifdef{\currentfield}
+      {\ifcurrentfield{booktitle}
+         {\usefield{\uline}{\currentfield}}%
+         {#1}}
+      {#1}}
+
 % Example of specifying allowed hyphenation within a word
 % \hyphenation{mar-gin-al-ia}
 
 \begin{document}
 
 % Declarations for Front Matter
+\pagenumbering{roman}
 
 \title{Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output}
 \author{Jonathan K. Kummerfeld}
@@ -173,9 +186,11 @@ Acknowledgements!
 \end{frontmatter}
 
 \pagestyle{headings}
+\pagenumbering{arabic}
 
 \include{introduction}
 \include{error-analysis}
+\include{ccg}
 \include{algorithm}
 \include{representation}
 \include{implementation}

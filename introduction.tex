@@ -16,16 +16,16 @@ and what types are introduced when parsing out-of-domain text.
 
 Parsing has been a major area of research within computational linguistics for
 decades, and constituent parser F-scores on \wsj section 23 have exceeded
-$90\%$ \cite{Petrov-Klein:2007}, and $92\%$ when using self-training and
-reranking \cite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
+$90\%$ \parencite{Petrov-Klein:2007}, and $92\%$ when using self-training and
+reranking \parencite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
 While
 these results give a useful measure of overall performance, they provide no
 information about the nature, or relative importance, of the remaining errors.
 
 Broad investigations of parser errors beyond the \parseval metric
-\cite{Black-etal:1991} have either focused on specific parsers, \eg
-\cite{Collins:2003}, or have involved conversion to dependencies
-\cite{Carroll-etal:1998,King:2003}.  In all of these cases, the analysis has
+\parencite{Black-etal:1991} have either focused on specific parsers, \eg
+\parencite{Collins:2003}, or have involved conversion to dependencies
+\parencite{Carroll-etal:1998,King:2003}.  In all of these cases, the analysis has
 not taken into consideration how a set of errors can have a common cause, \eg a
 single mis-attachment can create multiple node errors.
 
@@ -71,16 +71,16 @@ We also implement a proof-of-concept parser that recovers a range of null elemen
 
 \subsection{Old intro}
 
-Many syntactic representations use graphs and/or discontinuous structures, such as traces in Government and Binding theory, and f-structure in Lexical Functional Grammar \cite{gb,Bresnan:1982}.
-Sentences in the Penn Treebank \cite{ptb} have a core projective tree structure, and trace edges that represent control structures, wh-movement and more.
+Many syntactic representations use graphs and/or discontinuous structures, such as traces in Government and Binding theory, and f-structure in Lexical Functional Grammar \parencite{gb,Bresnan:1982}.
+Sentences in the Penn Treebank \parencite{ptb} have a core projective tree structure, and trace edges that represent control structures, wh-movement and more.
 However, most parsers and the standard evaluation metric ignore these edges and all null elements.
 By leaving out parts of the structure, they fail to provide all predicates to downstream tasks such as question answering.
 While there has been work on capturing some parts of this extra structure, it has generally either been through post-processing on trees
-\cite{Johnson:2002,Jijkoun:2003,Campbell:2004,Levy:2004,Gabbard:2006},
+\parencite{Johnson:2002,Jijkoun:2003,Campbell:2004,Levy:2004,Gabbard:2006},
 or has only captured a limited set of phenomena via grammar augmentation
-\cite{collins:1997,dienes-dubey:2003,schmid:2006,cai-chiang-goldberg:2011}.
+\parencite{collins:1997,dienes-dubey:2003,schmid:2006,cai-chiang-goldberg:2011}.
 %%%In both cases phenomena such as shared argumentation are completely ignored.
-%%%Similarly, most work on the Abstract Meaning Representation \cite{amr}, has removed edges to turn all structures into trees.
+%%%Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has removed edges to turn all structures into trees.
 
 \begin{figure}
   \centering
@@ -94,8 +94,8 @@ or has only captured a limited set of phenomena via grammar augmentation
 \end{figure}
 
 We propose a new parse representation and a new algorithm that can efficiently consider almost all syntactic phenomena.
-Our representation is an extension of TAG-based tree representations \cite{cck,Shen:2007}, modified to represent graphs and designed to maximize coverage under a new class of graphs.
-Our algorithm extends a non-projective tree parsing algorithm \cite{ec} to graph structures, with improvements to avoid derivational ambiguity.
+Our representation is an extension of TAG-based tree representations \parencite{cck,Shen:2007}, modified to represent graphs and designed to maximize coverage under a new class of graphs.
+Our algorithm extends a non-projective tree parsing algorithm \parencite{ec} to graph structures, with improvements to avoid derivational ambiguity.
 
 Our representation, shown in Figure~\ref{fig:repr}b, consists of complex tags composed of non-terminals, and edges indicating attachment.
 In this form, traces can create problematic structures such as directed cycles, but we show how careful choice of head rules can minimize such issues.

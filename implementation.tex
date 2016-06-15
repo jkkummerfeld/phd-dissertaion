@@ -4,7 +4,7 @@ As described in the previous section, the time complexity of the new algorithm p
 In addition, that complexity was based on the assumption that we only consider compatible items.
 To parse efficiently we apply several types of pruning and design our core data structure to avoid considering incompatible items.
 
-\paragraph{Coarse to Fine Pruning \cite{Goodman:1997}}
+\paragraph{Coarse to Fine Pruning \parencite{Goodman:1997}}
 Rather than parsing immediately with the full model we use three passes with progressively richer structure:
 (1) projective trees without spines,
 (2) non-projective graphs without spines,
@@ -25,7 +25,7 @@ In all three passes, the sub-beams separate items based on their type ($N$, $L$,
 This definition enables us to avoid considering most incompatible items.
 The third pass also includes one of the spines in the sub-beam definition for the same reason.
 
-\paragraph{Cube pruning  \cite{Chiang:2007}}
+\paragraph{Cube pruning \parencite{Chiang:2007}}
 We apply the standard cube pruning approach when doing binary and ternary compositions.
 Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
 Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
@@ -44,13 +44,13 @@ Our code for both the algorithm and conversion to and from our representation wi
 
 First we considered the standard parsing metric for trees.
 After one training pass through sections $2$--$21$ of the PTB on sentences up to length $40$, we get an F-score of $88.26$ on section $22$.
-This is lower than other systems, including the \cite{cck} parser, which scores $92.0$ on all sentences.
+This is lower than other systems, including the \textcite{cck} parser, which scores $92.0$ on all sentences.
 However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
 
 For full graph parsing we considered sentences up to length $25$ (half of the treebank).
 For unlabeled trace edges, we obtain a precision of $73\%$ and a recall of $15\%$.
-Using \cite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $52\%$ and recall $18\%$.
-This is lower than \cite{Johnson:2002}'s results ($73$ and $63$ on all sentences).
+Using \textcite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $52\%$ and recall $18\%$.
+This is lower than \textcite{Johnson:2002}'s results ($73$ and $63$ on all sentences).
 However, we have shown that our algorithm can recover trace edges and expect that it can improve with feature development and longer training on the full corpus.
 
 Finally, we measured the speed of the complete parser.
