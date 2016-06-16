@@ -1,4 +1,4 @@
-\chapter{Implementation}
+\section{Implementation}
 
 As described in the previous section, the time complexity of the new algorithm poses a challenge for efficient parsing.
 In addition, that complexity was based on the assumption that we only consider compatible items.
@@ -30,7 +30,7 @@ We apply the standard cube pruning approach when doing binary and ternary compos
 Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
 Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
 
-\section{Parser Architecture}
+\subsection{Parser Architecture}
 
 - overall structure
 

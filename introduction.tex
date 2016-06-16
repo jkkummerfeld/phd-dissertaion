@@ -1,5 +1,38 @@
 \chapter{Introduction}
 
+Communication is a fundamental part of human society, enabling the transfer of information between people.
+Textual language in particular is found throughout our daily lives;
+when asking a question, we type it into a search engine and usually read an answer from either Wikipedia or discussions between other people;
+to find out what is happening in the world we read newspapers or listen to a newsreader;
+for entertainment we read stories, listen to podcasts, or watch TV shows (virtually all of which contain dialogue);
+and for personal communcation we write electronic messages in a variety of formats.
+One of the keys to all of this communication is the use of structure to convey meaning.
+Part of this structure is visible--by convention you are looking at this page from left to right and top to bottom, treating each connected component of ink (or light) as a character, combining a sequence of characters into words, and so on to progressively larger levels of structure.
+The focus of this dissertation, syntax, is the mostly invisible structure that exists somewhere between characters and sentences.
+People are able to identify syntactic structure by drawing on knowledge from a range of sources, and in the process they discard a vast array of alternative interpretations for a given utterance.
+In the past century, artificial symbolic processing by machines has advanced dramatically, to the point where computers can start to engage in textual communication, both understanding what people have written and writing back.
+Approaching human-level communication will require systems to resolve syntactic ambiguities in text, either explicitly with an interpretable syntactic structure or implicitly with some other intermediate representation.
+
+Over the past two decades there has been rapid development in systems for the syntactic parsing task, where the input is a single sentence and the output is a structure that encodes syntactic relationships between words in the sentence.
+This development has largely been driven by development of new statistical methods for constructing models of language from resources manually labeled with syntactic structures by linguists.
+In addition to variations in statistical and engineering approaches, research has explored various syntactic representations.
+These representations are based on different linguistic theories, which sometimes encode the same phenomena in different ways and sometimes differ on what phenomena should be disambiguated within syntax.
+
+In this thesis, we present new algorithms that extend the capabilities of various systems related to syntax.
+The first area of research we consider is how we evaluate our systems to understand their strengths and weaknesses.
+We propose a search algorithm that finds the set of errors present in a parse.
+Using the algorithm, we compare a range of systems, a range of text domains, and two languages.
+The second aspect of syntax we consider is conversion between different linguistic formalisms.
+Our system uses a bottom-up approach that more flexible and more effective than previous work.
+Finally, we explore how to extend parsing algorithms beyond tree structured output.
+We introduce a new algorithm that can efficiently find the max or sum over all possible structures for a sentence, scored with an edge-factored model.
+We define a new representation that is compatible with the algorithm while representing virtually all forms of linguistic structure in the Penn Treebank.
+
+\section{Syntax}
+ - representation of meaning
+ - constituency v dependency
+ - CFG v mildly context sensitive
+ - ambiguity (meaningful and spurious)
 
 \section{Error Analysis}
 
@@ -12,15 +45,14 @@ parser behaviour, including what linguistic constructions are difficult for
 state-of-the-art parsers, what types of errors are being resolved by rerankers,
 and what types are introduced when parsing out-of-domain text.
 
-\section{Overview}
 
 Parsing has been a major area of research within computational linguistics for
 decades, and constituent parser F-scores on \wsj section 23 have exceeded
 $90\%$ \parencite{Petrov-Klein:2007}, and $92\%$ when using self-training and
 reranking \parencite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
-While
-these results give a useful measure of overall performance, they provide no
-information about the nature, or relative importance, of the remaining errors.
+While these results give a useful measure of overall performance, they provide
+no information about the nature, or relative importance, of the remaining
+errors.
 
 Broad investigations of parser errors beyond the \parseval metric
 \parencite{Black-etal:1991} have either focused on specific parsers, \eg
@@ -59,17 +91,16 @@ errors arise when moving out-of-domain.  We have released our
 system\footnote{http://code.google.com/p/berkeley-parser-analyser/} to enable
 future work to apply our methodology.
 
-\section{Graph Parsing}
+\section{Conversion}
 
-\subsection{Old abstract}
+\section{Parsing}
+
 General treebank analyses are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
 We propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
 We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
 Our dynamic program uniquely decomposes structures, is sound and complete with respect to a subset of the class of one-endpoint-crossing graphs, and covers $97.7\%$ of the Penn English treebank.
 We also implement a proof-of-concept parser that recovers a range of null elements and trace types.
-
-\subsection{Old intro}
 
 Many syntactic representations use graphs and/or discontinuous structures, such as traces in Government and Binding theory, and f-structure in Lexical Functional Grammar \parencite{gb,Bresnan:1982}.
 Sentences in the Penn Treebank \parencite{ptb} have a core projective tree structure, and trace edges that represent control structures, wh-movement and more.
@@ -79,8 +110,8 @@ While there has been work on capturing some parts of this extra structure, it ha
 \parencite{Johnson:2002,Jijkoun:2003,Campbell:2004,Levy:2004,Gabbard:2006},
 or has only captured a limited set of phenomena via grammar augmentation
 \parencite{collins:1997,dienes-dubey:2003,schmid:2006,cai-chiang-goldberg:2011}.
-%%%In both cases phenomena such as shared argumentation are completely ignored.
-%%%Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has removed edges to turn all structures into trees.
+In both cases phenomena such as shared argumentation are completely ignored.
+Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has removed edges to turn all structures into trees.
 
 \begin{figure}
   \centering
@@ -105,3 +136,6 @@ We also introduce extensions that ensure parses contain a directed projective tr
 We implemented a proof-of-concept parser with a basic first-order model, scoring $88.3$ on trees in section 22, and recovering a range of trace types.
 
 Together, our representation and algorithm form an inference method that can cover $97.7\%$ of sentences, far above the coverage of projective tree algorithms ($46.8\%$).
+
+\section{Contributions}
+

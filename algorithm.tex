@@ -1,4 +1,6 @@
-\chapter{Algorithm}
+\chapter{Graph Parsing}
+
+\section{Algorithm}
 
 \tikzset{% 
   not allowed/.style={%
@@ -32,7 +34,7 @@
 }{
 }
 
-\section{Parsing Algorithm for Graphs}
+\subsection{Parsing Algorithm for Graphs}
 
 % TODO - Add the intuition that when edges are added to/from the external point
 % to the span, those edges are all going to be crossed at some point in the
@@ -55,7 +57,7 @@ To indicate ranges we use $[pq]$, $[pq)$, $(pq]$, or $(pq)$, where the bracket v
 To indicate an edge we use two points without brackets, \myeg $pq$.
 To define a class of edges we either use a point and a set connected by a dash, \myeg $o$--$(pq)$, or two sets connected by a dash, \myeg $(ps)$--$(sq)$.
 
-\subsection{Item Types}
+\subsubsection{Item Types}
 
 Rather than the conventional constituency parsing approach where items fully cover words and end in the gaps between words, our items fully cover the gaps and end on the words, as shown in Figure~\ref{fig:alg-example}, and like in \textcite{eisner-satta-1999}'s algorithm.
 We use six item types, differing in the type of edge crossing they contain.  \\
@@ -148,7 +150,7 @@ Comparing these definitions with the items in \textcite{ec}, we have one entirel
 These changes are necessary to avoid derivational ambiguity when a structure falls into multiple classes.
 Enforcing these difference involves changes throughout the deduction rules.
 
-\subsection{Example Derivation}
+\subsubsection{Example Derivation}
 
 \begin{figure}
 \centering
@@ -167,7 +169,7 @@ $I \land I \mapsto I$ \hfill Combining items either side of \emph{to} \\
 $X \land I \mapsto N$ \hfill Combining items either side of \emph{run} \\
 $X \land I \land N \mapsto I$ \hfill Final step
 
-\subsection{Deduction Rules}
+\subsubsection{Deduction Rules}
 One set of deduction rules is concerned with removing direct edges between the points $p$, $q$, and $o$ in each item.
 These are straightforward, so we leave them for the supplementary materials.
 
@@ -177,7 +179,7 @@ Since our item types are entirely disjoint, throughout the rules below we need t
 Here we describe the rules top-down, using properties of the complete item to determine how it is decomposed.
 In this way we can show completeness, as we cover all possible settings of the properties we consider.
 
-\subsubsection{Interval}\label{sec:interval}
+\paragraph{Interval}\label{sec:interval}
 Is there a $p$--$(pq)$ edge? \\
 No, then split at $p+1$: \\
 \begin{tightflushright}
@@ -435,10 +437,10 @@ No: \\
 \end{tikzpicture}
 \end{tightflushright}
 
-\subsubsection{Exterval}
+\paragraph{Exterval}
 No decomposition rules are needed, as the removal of the $op$ or $oq$ edge leaves behind an Interval.
 
-\subsubsection{Both} \label{sec:alg:both}
+\paragraph{Both} \label{sec:alg:both}
 Consider the case when $o$ is to the right (the case when $o$ is to the left is symmetrical).
 Consider $ps_p$, the longest $p$--$(pq)$ edge. \\
 Does $ps_p$ cross any $q$--$(pq)$ edges? \\
@@ -660,7 +662,7 @@ The dashed edges are required for the $N$ items, but not the $L$ items.
 The choice of split point in this case is one source of derivational ambiguity in \textcite{ec}.
 Below we describe how to check that the chaining pattern is present in an $L$, but in practice we avoid it entirely by requiring the $L$ to have the edge $ps$, with no loss in coverage.
 
-\subsubsection{Left and Right}
+\paragraph{Left and Right}
 These are defined symmetrically.
 Consider the $o$--$(pq)$ edges in an $L$.
 Use the edge $os$ with $s$ furthest from $p$ to define the split point.
@@ -794,7 +796,7 @@ The top and bottom cases lead to multiple such edges, while the middle case will
 Finally, we could track the chaining property discussed in the previous section.
 The property is only true in the following cases: when the edge $pq$ is present, when an $X$ is combined with an $L$ that has the property, and when an $X$ is combined with an $N$ that has the $pq$ edge.
 
-\subsubsection{Neither}
+\paragraph{Neither}
 Consider the $o$--$(pq)$ edges.
 Use the edge $os$ with $s$ furthest from $o$ to define the split point.
 Is $o$ to the right of the span? \\
@@ -840,17 +842,17 @@ No, symmetrical to the yes case.
 As in the previous section, our decomposition differs from \textcite{ec}'s to meet our altered definition of $N$.
 Here, when a sub-item is an $X$ there is only one $o$--$(pq)$ edge, and when it is an $N$ there is more than one.
 
-\subsection{Extensions}
+\subsubsection{Extensions}
 To handle our representation, we extend the core algorithm described above to support labels on edges and labels on words (spines).
 Additionally, we can constrain the search space to structures containing a projective tree of non-trace edges.
 
-\subsubsection{Edge Labels and Spines}\label{sec:labels}
+\paragraph{Edge Labels and Spines}\label{sec:labels}
 Edge labels can be added by calculating either the sum or max over edge types when adding each edge, and recording the chosen edge in the back reference for the state.
 Spines must be added to the state definition, specifying a label for each visible word ($p$, $q$ and $o$).
 This state expansion is necessary to ensure agreement when combining items.
 \textcite{cck}'s projective tree parser uses a similar approach, while \textcite{ec}'s algorithm is for dependency parsing and so does not consider spines.
 
-\subsubsection{Enforcing a tree backbone}
+\paragraph{Enforcing a tree backbone}
 The algorithm above constrains the space of graph structures, but we also want to restrict our search to parses containing a directed projective tree of non-trace edges.
 This requirement is satisfied if every word is the child of exactly one non-trace edge, and no non-trace edges cross.
 
@@ -864,7 +866,7 @@ Crossing edges are introduced in two ways:
 In both cases we can avoid non-trace edges crossing by using a boolean that tracks whether there are non-trace $o$--$[pq]$ edges in each item.
 The justification is complex and can be found in the supplementary material.
 
-\subsection{Derivational ambiguity}
+\subsubsection{Derivational ambiguity}
 
 One key difference between our algorithm and the original one-endpoint-crossing algorithm presented by \textcite{ec} is that we avoid spurious ambiguity in the ways a parse can be decomposed.
 Most of the cases in which this ambiguity arises are due to symmetry that is not explicitly broken.
@@ -872,7 +874,7 @@ For example, the choice of $t$ in the description of Intervals.
 We resolved these issues by breaking such cases of symmetry, and altering the definitions of the items to ensure they cannot represent equivalent structures.
 By avoiding derivational ambiguity we reduce the search space, and enable efficient summing over the space.
 
-\subsection{Complexity}
+\subsubsection{Complexity}
 
 Without any labels, our algorithm is $O(n^4)$, where $n$ is the length of the sentence.
 This comes from both the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
@@ -886,7 +888,7 @@ Finally, there is an important constant in the complexity, relating to the numbe
 For any set of split points there are multiple items that could be combined.
 Once our templates are expanded to show the possible state combinations there are 49,292 rules.
 
-%%%\subsection{Inside-Outside}
+%%%\subsubsection{Inside-Outside}
 
 %%%When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
 %%%Each edge exists in only one place in the derivation, between the item without it and the item with it.
@@ -896,7 +898,7 @@ Once our templates are expanded to show the possible state combinations there ar
 
 
 
-\section{Complete Dynamic Program}
+\subsection{Complete Dynamic Program}
 
 \begin{figure*}
 \begin{multicols}{3}
@@ -1193,7 +1195,7 @@ Note, since we are considering graphs, two points could be linked both directly 
 We track parent information to know about parents of items, and existence of specific edges.
 As a result, if both an indirect link and a direct link are present, the state records a direct link being present.
 
-\section{Eisner's algorithm}
+\subsection{Eisner's algorithm}
 
 In the same notation (for comparison) here is a graph version of Eisner's algorithm (to get back to trees only, replace the parts that are blue and boxed with $F$):
 
@@ -1234,20 +1236,20 @@ In the same notation (for comparison) here is a graph version of Eisner's algori
 \end{flalign*}
 }}
 
-\section{Full Algorithm Derivation}
+\subsection{Full Algorithm Derivation}
 
 In the paper we provide only a sketch of the algorithm, here we explain the full derivation.
 For completeness, some of the content is repeated.
 When showing the possible deduction rules for each item type we show figures that indicate the required characteristics in each case.
 In the figures black solid curves indicate edges that must exist, and red dotted curves are edges that are not allowed, either by construction or due to constraints.
 
-\subsection{Notation}
+\subsubsection{Notation}
 
 To indicate a range we use $[pq]$, $[pq)$, $(pq]$, or $(pq)$, where the bracket variations indicate inclusion, $[]$, or exclusion, $()$, of the endpoint.
 We also used $[pq]$ to indicate a span without an external point, and $[pq.o]$ to indicate a span with external point $o$.
 To indicate edges we either use two points without brackets, \myeg $pq$, or a point and a set connected by a hyphen, \myeg $o$--$(pq)$, or two sets connected by a hyphen, \myeg $(ps)$--$(sq)$.
 
-\subsection{Item Types}
+\subsubsection{Item Types}
 
 We use six item types, differing in the type of edge crossing they contain.
 Each consists of a span, $[pq]$ and an optional point outside the span, $o$, either to the left or right:
@@ -1268,7 +1270,7 @@ Each consists of a span, $[pq]$ and an optional point outside the span, $o$, eit
   Same as $L$, but $o$--$(pq)$ edges may also be crossed by $q$--$(ps)$ edges, and at least one crossing of each type occurs.
 \end{description}
 
-\subsection{Initialization}
+\subsubsection{Initialization}
 
 To start, an item is added for every position $p$ in the sentence, except the last one. The items are:
 
@@ -1278,10 +1280,10 @@ To start, an item is added for every position $p$ in the sentence, except the la
 
 If any type of word label is being used, an item must be inserted for every pair of possible labels.
 
-\subsection{Interval}
+\subsubsection{Interval}
 The first way we subdivide into cases is based on whether there is a direct edge linking the two ends of the item.
 
-\subsubsection{Direct Edges Present}
+\paragraph{Direct Edges Present}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1303,7 +1305,7 @@ We can break these cases down into the edge, plus the item beneath it:
 
 If we were only considering trees then we would constrain the sub-item to be $I[ij \; F \; F]$.
 
-\subsubsection{No Direct Edges Present}
+\paragraph{No Direct Edges Present}
 
 First consider the case when $p$ does not have a parent in this item (the case when it does is symmetrical to the case when $q$ has a parent, which is covered by this case).
 
@@ -1527,7 +1529,7 @@ Again, we add extra constraints to ensure the direct $ts$ edge can only occur in
   $RNX\cdotp [pts \; F \; .\overline{S} \; P\overline{T}] \quad I[ts \; . \; .] \quad \cdotp \uwave{LN}[sqt \; .\overline{T} \; . \; \overline{S}.]$
 }
 
-\subsection{Exterval}
+\subsubsection{Exterval}
 In this case we simply need to remove the edge from $o$ to the span and we will have an interval.
 Let the external point be to the right of the span (having it on the left is symmetrical).
 The two general structures are as follows, with the dashed lines indicating that a $pq$ edge may or may not be present, and the small square indicating the external point:
@@ -1566,7 +1568,7 @@ There are four possibilities in total, depending on which direction the edge goe
   $X[pqo \; .\overline{O} \; .\overline{O} \; \overline{P}Q] \leftarrow \max A[q \; o] \quad I[pq \; . \; .]$ \\
 }
 
-\subsection{Both}
+\subsubsection{Both}
 The way we decomposed the Interval case has implications for the range of possible Both structures.
 Specifically, it can only come up in two ways:
 
@@ -1578,7 +1580,7 @@ Specifically, it can only come up in two ways:
 The $B$ item is not involved in any further decompositions, so these are the only cases we need to consider.
 As in the Interval case, we start by separating out cases with direct edges and those without.
 
-\subsubsection{Direct Edges Present}
+\paragraph{Direct Edges Present}
 In this case we have these two structures, with all the edges shown required because of the definition of a $B$ item:
 
 \begin{center}
@@ -1624,7 +1626,7 @@ In each case we remove the $p$--$q$ edge.
   $\cdotp B[pqo \; Q\overline{O} \; F \; \overline{PQ}] \leftarrow \max A[q \; p] \quad \cdotp B[pqo \; \overline{QO} \; F \; \overline{PQ}]$
 }
 
-\subsubsection{No Direct Edges Present}
+\paragraph{No Direct Edges Present}
 Consider the case when $o$ is to the right of the span (the case when $o$ is to the left of the span is symmetrical).
 Consider the longest $p$--$(pq)$ edge.
 There are two general cases, depending on whether this edge crosses any $q$--$(pq)$ edges.
@@ -1808,7 +1810,7 @@ How to track the chaining property is discussed below for completeness.
   $\cdotp N[pso \; \overline{SO} \; P. \; \overline{P}.] \quad \cdotp RN[sqo \; Q\overline{O} \; F \; \overline{SQ}]$
 }
 
-\subsection{Left}
+\subsubsection{Left}
 The other decompositions, and the way we will structure this one, enable us to constrain the possible direct edges for $L$ items.
 Specifically, there is never a $po$ edge.
 To make this the case there will be instances later in this section where the decomposition provides a choice where an edge could come from one of two sub-items.
@@ -1961,10 +1963,10 @@ Therefore, $[sq.p]$ is an $N$.
   $LN[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$ \\
 }
 
-\subsection{Right}
+\subsubsection{Right}
 Defined symmetrically to $L$.
 
-\subsection{Neither}
+\subsubsection{Neither}
 Here we have the most flexibility in direct edges, though the structure of the decompositions means that we never have the case of both $op$ and $oq$ at the same time.
 
 \begin{center}
@@ -2073,7 +2075,7 @@ For $[sq.o]$ we only have one $o$--$[sq]$ edge, namely $os$, and so this is an $
   $I[ps \; . \; .] \quad X\cdotp [sqo \; .\overline{O} \; .\overline{O} \; S\overline{Q}]$
 }
 
-\subsection{Additional constraints}
+\subsubsection{Additional constraints}
 The description above gives the complete decomposition, additional general rules are used to determine the specific rule set.
 They are enforced by the code that converts the templates into all valid deduction rules:
 
@@ -2085,7 +2087,7 @@ They are enforced by the code that converts the templates into all valid deducti
 
 All three of these can be enforced in the rule creation because we have the complete set of parent connections present in the definition of what combinations are allowed.
 
-\subsection{Enforcing a tree backbone}
+\subsubsection{Enforcing a tree backbone}
 The algorithm above constrains the space of graph structures, but does not say anything about the edge types being combined.
 In practice, we are only interested in parses that are composed of trace edges plus a projective tree of structural edges.
 Since prior work focused on trees, not graphs, support for this constraint has not previously been explored.
@@ -2098,13 +2100,13 @@ Together, these constrains ensure we have a tree.
 To ensure the tree is projective we need to prevent structural edges from crossing.
 Crossing edges are introduced in two ways, and in both we can avoid structural edges crossing by tracking whether there are structural $o$--$[pq]$ edges.
 
-\subsubsection{When creating edges}
+\paragraph{When creating edges}
 Every time we add a $pq$ edge in the $N$, $L$, $R$ and $B$ items we create a crossing with all $o$--$(pq)$ edges.
 We do not create a crossing with edges $oq$ or $op$, but our ordering of edge creation means these are definitely not present when we add a $pq$ edge, so tracking structural $o$--$[pq]$ edges gives us the information we need.
 
 We set the boolean for structural $o$--$[pq]$ edges to true if it is currently true or we are creating a structural $op$ or $oq$ edge, and false otherwise.
 
-\subsubsection{When combining items}
+\paragraph{When combining items}
 In these cases we never introduce a crossing when making a $B$, or in any rule that combines a set of items with only one non-$I$.
 That leaves these cases, where the top half and bottom half are symmetrical:
 

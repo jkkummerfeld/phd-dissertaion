@@ -3,12 +3,15 @@
 % Based on the example from Paul Vojta.
 
 \documentclass{ucbthesis}
-%%%\usepackage{natbib}
 \usepackage[style=authoryear-icomp,backref,sorting=ynt]{biblatex}
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
 % \usepackage{indentfirst}
+
+% TODO: Packages to look into:
+% Fancy Header http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/fancyhdr/fancyhdr.pdf (for easy changes to header and footer)
+% Fancy Ref http://ctan.unsw.edu.au/macros/latex/contrib/fancyref/fancyref.pdf (for "the Figure on the next page")
 
 \newtheorem{theorem}{Jibberish}
 
@@ -75,6 +78,8 @@ pdfpagelayout=OneColumn}
   }
 }
 
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
 
 \newcommand{\myeg}{e.g.\@\xspace}
 \newcommand{\myie}{i.e.\@\xspace}
@@ -189,15 +194,17 @@ Acknowledgements!
 \pagenumbering{arabic}
 
 \include{introduction}
-\include{error-analysis}
-\include{ccg}
-\include{algorithm}
-\include{representation}
-\include{implementation}
-\include{conclusion}
+%%%\include{error-analysis}
+%%%\include{ccg}
+%%%\include{algorithm}
+%%%\include{representation}
+%%%\include{implementation}
+%%%\include{conclusion}
 
-% \appendix
-% \chapter{More Monticello Candidates}
+%%%\appendix
+
+%%%\include{resources}
+%%%\include{advice}
 
 \printbibliography
 
