@@ -29,9 +29,60 @@ We introduce a new algorithm that can efficiently find the max or sum over all p
 We define a new representation that is compatible with the algorithm while representing virtually all forms of linguistic structure in the Penn Treebank.
 
 \section{Syntax}
- - representation of meaning
- - constituency v dependency
+
+\begin{figure}
+  TODO FIGURE
+  \caption{
+  \label{fig:syntax}
+  dependency, 
+%%%  Ellen nsubj (x2), one dashed
+%%%  enjoys 
+%%%  reading xcomp
+  constituency, 
+%%%  (ROOT
+%%%    (S
+%%%      (NP-1 Ellen)
+%%%      (VP enjoys
+%%%          (S
+%%%            (NP *-1)
+%%%            (VP running)))))
+  and categorial forms of the sentence \textexample{Ellen enjoys running}.
+%%%  Ellen NP
+%%%  enjoys (S\NP)/(S\NP)
+%%%  reading S\NP
+%%% beneath
+%%%  Ellen NP -> S / (S\NP)
+%%%  enjoys (S\NP)/(S\NP)
+%%%  reading S\NP 
+  }
+\end{figure}
+
+One of the core research areas in linguistics is syntax, the study of processes that determine word order in sentences.
+For the purposes of this thesis, it is important to understand a few general properties of the syntactic theories we consider.
+In every case, the syntactic structure encodes relationships between words in the sentence.
+For example, Figure~\ref{fig:syntax} shows how the sentence \textexample{Ellen enjoys running} is represented in the three syntactic formalisms we consider.
+
+In the leftmost case, which uses dependency grammar \parencite{dependency-grammar}, each edges indicates a relationship between two words.
+The label expresses the type of dependency, out of 40-50 types (TODO CITE universal dependencies and stanford dependencies).
+The arrow points from the word that is the \textit{dependent} / \textit{child} to the word that is the \textit{head} / \textit{parent}
+\footnote{The direction of the arrow is a convention that varies. We follow the convention in linguistics. Note that this is the reverse of the convention in graph theory.}.
+The dashed edge is often excluded in order to make the edges from a tree (a structure that connects all words, but does not contain a cycle).
+
+The middle case, which uses Government and Binding Theory \parencite{gb}, has a hierarchical phrase structure.
+Each symbol is a \textit{constituent}, capturing the idea that the set of words beneath it function as a single unit.
+Consistituents are linked together to form larger constituents according to rules.
+This figure also shows a null element between \textexample{enjoys} and \textexample{running}, which is used to encode the relationship between \textexample{Ellen} and \textexample{running}.
+As with the dashed edge in the dependency case, the null element is often removed from this structure to make it a tree.
+
+The rightmost case, categorial grammar \parencite{categorial-grammar}, also has a hierarchical structure, but uses complex lexical categories that are then combined according to a small set of inference rules.
+This particular example uses Combinatory Categorial Grammar \parencite[CCG][]{Steedman:2000}, a variant in which combinatory logic is used to construct both syntactic and semantic forms in parallel.
+The two structures shown appear different on the surface, but produce the same lambda expression.
+This ability to have different structures encode the same meaning is a form of derivational or spurious ambiguity
+\footnote{\textcite{Steedman:2000} explores the possibility that this ambiguity could encode variations in prosody.}.
+Immediately beneath each word is its lexical category, which can either by an atomic symbol, or a complex structured combination of symbols.
+
  - CFG v mildly context sensitive
+
  - ambiguity (meaningful and spurious)
 
 \section{Error Analysis}
