@@ -16,6 +16,7 @@
 \newtheorem{theorem}{Jibberish}
 
 \bibliography{dissertation}
+%%%\usepackage{times}
 \usepackage{xspace}
 \usepackage{url}
 \usepackage{latexsym}
@@ -23,8 +24,10 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 %%%\usepackage{subfig}
+\usepackage{LI}
+\usepackage{qtree}
+\usepackage{rotating}
 \usepackage{color}
-\usepackage{pstricks}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{synttree}
@@ -39,6 +42,7 @@
 \usepackage{pgf}
 \usepackage{subcaption}
 \usepackage{mdwlist}
+\usepackage{pstricks}
 % Last intentionally
 \usepackage{hyperref}
 
@@ -81,11 +85,34 @@ pdfpagelayout=OneColumn}
 \setcounter{tocdepth}{2}
 \setcounter{secnumdepth}{2}
 
+\definecolor{mygrey}{rgb}{0.8,0.8,0.8}
+
+\newcommand{\candc}{{\small C\&C}\xspace}
+\newcommand{\ccg}{\textsc{ccg}\xspace}
+\newcommand{\cfg}{\textsc{cfg}\xspace}
+\newcommand{\cky}{\textsc{cky}\xspace}
+\newcommand{\dg}{\textsc{dg}\xspace}
+\newcommand{\dop}{\textsc{dop}\xspace}
+\newcommand{\evalb}{\textsc{evalb}\xspace}
+\newcommand{\gb}{\textsc{gb}\xspace}
+\newcommand{\hpsg}{\textsc{hpsg}\xspace}
+\newcommand{\lfg}{\textsc{lfg}\xspace}
+\newcommand{\ltag}{\textsc{ltag}\xspace}
+\newcommand{\mytag}{\textsc{tag}\xspace}
+\newcommand{\nlp}{\textsc{nlp}\xspace}
+\newcommand{\parseval}{\textsc{parseval}\xspace}
+\newcommand{\pos}{\textsc{pos}\xspace}
+\newcommand{\ptb}{\textsc{ptb}\xspace}
+\newcommand{\wsj}{\textsc{wsj}\xspace}
+
 \newcommand{\myeg}{e.g.\@\xspace}
 \newcommand{\myie}{i.e.\@\xspace}
+\newcommand{\myvs}{vs.\@\xspace}
+ 
 \newcommand{\mathscale}{0.8}
 \newcommand{\textexample}[1]{\textsf{#1}}
 \newcommand{\onlygraphs}[1]{\textcolor{blue}{\scalebox{0.9}{\fbox{$#1$}}}}
+\newcommand{\cf}[1]{\mbox{$#1$}}   % category font
 
 \newcommand{\finalequation}[1]{
   \begin{center}
@@ -108,24 +135,6 @@ pdfpagelayout=OneColumn}
 \setcounter{totalnumber}{500}
 \setcounter{topnumber}{500}
 \setcounter{bottomnumber}{500}
-
-\newcommand{\nlp}{\textsc{nlp}\xspace}
-\newcommand{\wsj}{\textsc{wsj}\xspace}
-\newcommand{\ptb}{\textsc{ptb}\xspace}
-\newcommand{\parseval}{\textsc{parseval}\xspace}
-\newcommand{\evalb}{\textsc{evalb}\xspace}
-\newcommand{\cky}{\textsc{cky}\xspace}
-\newcommand{\pos}{\textsc{pos}\xspace}
-\newcommand{\dop}{\textsc{dop}\xspace}
-\newcommand{\ccg}{\textsc{ccg}\xspace}
-
-\newcommand{\schwa}{\acronym{schwa}}
-\newcommand{\schwalab}{\raisebox{.45em}{\rotatebox{180}{e}}-lab}
-
-\newcommand{\eg}{e.g.\@\xspace}
-\newcommand{\ie}{i.e.\@\xspace}
-
-\newcommand{\smallsf}{\small\sf}
  
 \newcommand{\wrongnode}[1]{\textbf{\fbox{#1}}}
 
@@ -185,9 +194,7 @@ pdfpagelayout=OneColumn}
 \clearpage
 \listoftables
 
-\begin{acknowledgements}
-Acknowledgements!
-\end{acknowledgements}
+\include{acknowledgements}
 
 \end{frontmatter}
 
@@ -195,17 +202,17 @@ Acknowledgements!
 \pagenumbering{arabic}
 
 \include{introduction}
-%%%\include{error-analysis}
-%%%\include{ccg}
-%%%\include{algorithm}
-%%%\include{representation}
-%%%\include{implementation}
-%%%\include{conclusion}
+\include{error-analysis}
+\include{ccg}
+\include{algorithm}
+\include{representation}
+\include{implementation}
+\include{conclusion}
 
-%%%\appendix
+\appendix
 
-%%%\include{resources}
-%%%\include{advice}
+\include{resources}
+\include{advice}
 
 \printbibliography
 

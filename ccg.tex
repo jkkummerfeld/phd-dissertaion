@@ -1,2 +1,845 @@
 \chapter{Formalism Conversion}
 
+%%% Possible todos:
+%%% - Make it clearer what 'robustness' means
+%%% - Average distance from the diagonal in the plots (all, and just below):
+%%%   1192 6.78926 sentences, average distance below diagonal
+%%%   721 12.63 sentences, average distance above diagonal
+%%% - deps numbers for all ptb output (do some of the distinctions go away again,
+%%%   and so things get closer?)
+%%% - Improve the fallback to be smarter (not just an NP bracket always)
+%%% - Consider discussing extremely rare constructions, which become a grammar
+%%%   rule in a PTB parser, and a crazy category in CCG (but then that category
+%%%   isn't used by the parser, as it is below the threshold)
+
+%%% From revierwers:
+%%% - Re-pitch the motivation
+%%% - Make the details of our method more explicit
+
+%%%  ============================================================================
+%%%  
+%%%  The paper shows a clear improvement over previous conversion attempts, and
+%%%  tackles an important mapping problem between CCG parsing and CFG parsing. The
+%%%  evaluation is very interesting.
+%%%  
+%%%  However, more detail is necessary in explaining what information goes into each
+%%%  of the rules for your method (an overview table would be good), and what the
+%%%  coverage of the rules is. Just make this a bit more explicit, like you do for
+%%%  explaining the C&C parser.
+%%%  
+%%%  I think it would help the paper to work through the PP/ADVP example in detail
+%%%  instead of the discussion of the Italian magistrates example.
+%%%  
+%%%  Also, please check the following for correctness:
+%%%  S[ng]\NP + (S\NP)\(S\NP)
+%%%  “coming” + “closer to achieving...” (1)
+%%%  “gaining” + “circulation in recent years” (2)
+%%%  In Example 1, the correct PTB bracket is a PP,
+%%%  while in Example 2 it is an ADVP.
+%%%  
+%%%  It is not obvious what is the PP in "coming closer to achieving" and the ADVP
+%%%  in "gaining circulation in recent years" - do you mean PP in 2 and ADVP in 1?
+%%%  
+%%%  Also, the number of rules used seems to be in the same order of magnitude as
+%%%  number of rules in C&C, although the introduction criticizes C&C for the number
+%%%  of hand crafted rules. Please clarify if this is not correct.
+%%%  
+%%%  At some point, you say "Using sections 00 and 02-21 of the treebanks we
+%%%  hand-crafted instructions for 527 lexical categories, including all those used
+%%%  by the C&C parser." Are there any additional lexical categories in the treebank
+%%%  which the C&C parser doesn't use (but other parsers might use)?
+%%%  
+%%%  ============================================================================
+%%%  
+%%%  This paper presents an improvement to previous CCG to PTB transformation
+%%%  algorithms. However, one of the motivations of the Clark and Curran paper on
+%%%  which this paper was based was to show that the conversion from CCG derivation
+%%%  to PTB tree is hard, and that because of this CCG parsers should not be
+%%%  evaluated according to PTB trees. We are shown an improved mapping between
+%%%  representations but it is not clear that this is a problem that can be solved
+%%%  or whether it is needed. The authors should make it clearer whether they
+%%%  consider the improvement of this mapping to be an ongoing research goal and why
+%%%  it is important when we have other ways of comparing parser output.
+%%%  
+%%%  The exact contributions are unclear from the paper alone but all rules are
+%%%  included in the attached code. The authors are right to warn against reading
+%%%  too much into the evaluation in Table 4 and I am especially sceptical about the
+%%%  usefulness of the PROJ score. However, while I am not convinced that there is
+%%%  any need to judge CCG derivations on the basis of the PTB trees that they can
+%%%  generate, I think that this software would be useful to the community as a
+%%%  development aid.
+%%%  
+%%%  ============================================================================
+%%%  
+%%%  This paper presents a new method for converting CCGBank-style parse tree to
+%%%  Penn treebank-style trees. The approach makes use of a large number of
+%%%  hand-written transaction procedures, that covert more sentences correctly when
+%%%  compared to previous work. Evaluations are performed on gold and automatically
+%%%  produced trees and used to compare a number of existing parsers.
+%%%  
+%%%  This paper presents a well throughout out approach to tree conversion. The use
+%%%  of instructions for individual lexical categories (instead of all pairs of
+%%%  categories in a parse) is well motivated and interesting. One open question
+%%%  that I had was relative to the complexity of writing the instructions/rules. It
+%%%  would be helpful to quantify, even anecdotally, how much effort was involved.
+%%%  The evaluation is well done and the approach does seem to work better, in terms
+%%%  of conversion coverage. However, the CCG parsers still seem to lack behind in
+%%%  traditional evaluations and I am left wondering how important that comparison
+%%%  is in the first place, given the difference in representations between CCG and
+%%%  PTB parsers.
+%%%  
+%%%  My main complaint with this paper is the informality of Section 3 (Our
+%%%  Approach). All of the operations are introduced anecdotally by example.
+%%%  Although the examples are very helpful, it would be much better if there were
+%%%  some formal specification of the set of possible operations/instructions. The
+%%%  inclusion of the source code is helpful, but does not really solve the problem.
+%%%  However, this complaint is relatively minor since the overall story was= clear.
+
+\newcommand{\old}{\candc{}-\textsc{conv}\xspace}
+
+We propose an improved, bottom-up method for converting \ccg derivations into
+\ptb-style phrase structure trees.  In contrast with past work
+\parencite{Clark-Curran:2009}, which used simple transductions on category pairs,
+our approach uses richer transductions attached to single categories.  Our
+conversion preserves more sentences under round-trip conversion
+(51.1\% \myvs 39.6\%)
+and is more robust.  In particular, unlike past methods, ours does not
+require ad-hoc rules over non-local features, and so can be easily
+integrated into a parser.
+
+\section{Introduction}
+
+Converting the Penn Treebank (\ptb, Marcus et al., 1993)
+\nocite{Marcus-Marcinkiewicz-Santorini:1993} to other formalisms, such as \hpsg
+\parencite{Miyao-Ninomiya-Tsujii:2004}, \lfg \parencite{Cahill-etal:2008}, \ltag
+\parencite{Xia:1999}, and \ccg \parencite{CCGBank}, is a complex process that renders
+linguistic phenomena in formalism-specific ways.  Tools for reversing these
+conversions are desirable for downstream parser use and parser comparison.
+However, reversing conversions is difficult, as corpus conversions may lose
+information or smooth over \ptb inconsistencies.
+
+\textcite{Clark-Curran:2009} developed a \ccg to \ptb conversion that treats the
+\ccg derivation as a phrase structure tree and applies hand-crafted rules to
+every pair of categories that combine in the derivation.  Because their
+approach does not exploit the generalisations inherent in the \ccg formalism,
+they must resort to ad-hoc rules over non-local features of the \ccg
+constituents being combined (when a fixed pair of \ccg categories correspond to
+multiple \ptb structures).  Even with such rules, they correctly convert only
+39.6\% of gold CCGbank derivations.
+
+Our conversion assigns a set of bracket instructions to each word based on its \ccg
+category, then follows the \ccg derivation, applying and combining instructions
+at each combinatory step to build a phrase structure tree.  This requires
+specific instructions for each category (not all pairs), and generic operations
+for each combinator.  We cover all categories in the development set and
+	correctly convert 51.1\% of sentences.  Unlike Clark and Curran's
+	approach, we require no rules that consider non-local features of
+	constituents, which enables the possibility of simple integration with a
+	\cky-based parser.
+
+The most common errors our approach makes involve nodes for clauses and rare
+spans such as QPs, NXs, and NACs.  Many of these errors are inconsistencies in
+the original \ptb annotations that are not recoverable.  These issues make
+evaluating parser output difficult, but our method does enable an improved
+comparison of \ccg and \ptb parsers.
+
+\section{Background}
+
+There has been extensive work on converting parser output for evaluation, \myeg
+\textcite{Lin:1998} and \textcite{Briscoe-Carroll-Graham-Copestake:2002} proposed
+using underlying dependencies for evaluation.  There has also been work on
+conversion to phrase structure, from dependencies \parencite{Xia:2001,Xia:2009} and
+from lexicalised formalisms, \myeg \hpsg \parencite{Matsuzaki-Tsujii:2008} and \mytag
+\parencite{Chiang:2000,Sarkar:2001}. Our focus is on \ccg to \ptb conversion
+\parencite{Clark-Curran:2009}.
+
+\subsection{Combinatory Categorial Grammar (\ccg)}
+
+The lower half of Figure~\ref{fig:example} shows a \ccg derivation
+\parencite{Steedman:2000} in which each word is assigned a {\em category}, and
+{\em combinatory rules} are applied to adjacent categories until only one
+remains.  Categories can be atomic, \myeg the \cf{N} assigned to
+\textit{magistrates}, or complex functions of the form {\em result / arg}, where
+{\em result} and {\em arg} are categories and the slash indicates the argument's
+directionality.  Combinators define how adjacent categories can combine.
+Figure~\ref{fig:example} uses {\em function application}, where a complex
+category consumes an adjacent argument to form its result, \myeg \cf{S[dcl]\bs
+NP} combines with the \cf{NP} to its left to form an \cf{S[dcl]}.  More
+powerful combinators allow categories to combine with greater flexibility.
+
+\begin{figure}
+\vspace{-7mm}
+%%%\begin{pspicture}(0,0)(8,2.8)
+%%%\psline[linewidth=0.3pt]{}(0.05,-0.5)(0.05,0.8)
+%%%\rput(0.05,0.97){\scriptsize \scalebox{0.90}{JJ}}
+%%%\psline[linewidth=0.3pt]{}(1.12,-0.5)(1.12,0.8)
+%%%\rput(1.12,0.97){\scriptsize \scalebox{0.90}{NNS}}
+%%%\psline[linewidth=0.3pt]{}(0.05,1.09)(0.6,1.34)(1.12,1.09)
+%%%\psline[linewidth=0.3pt]{}(5.17,-0.5)(5.17,-0.3)
+%%%\rput(5.17,-0.1307){\scriptsize \scalebox{0.90}{PRP\$}}
+%%%\psline[linewidth=0.3pt]{}(6.0,-0.5)(6.0,-0.3)
+%%%\rput(6.0,-0.13){\scriptsize \scalebox{0.90}{NN}}
+%%%\psline[linewidth=0.3pt]{}(5.15,0)(5.575,0.25)(6.0,0)
+%%%\psline[linewidth=0.3pt]{}(6.85,-0.5)(6.85,-0.3)
+%%%\rput(6.85,-0.13){\scriptsize \scalebox{0.90}{DT}}
+%%%\psline[linewidth=0.3pt]{}(7.65,-0.5)(7.65,-0.3)
+%%%\rput(7.65,-0.13){\scriptsize \scalebox{0.90}{NN}}
+%%%\psline[linewidth=0.3pt]{}(6.85,0)(7.25,0.25)(7.65,0)
+%%%\rput(5.575,0.42){\scriptsize \scalebox{0.90}{NP}}
+%%%\rput(7.25,0.42){\scriptsize \scalebox{0.90}{NP}}
+%%%\psline[linewidth=0.3pt]{}(5.575,0.55)(6.4125,0.8)(7.25,0.55)
+%%%\psline[linewidth=0.3pt]{}(3.1,-0.5)(3.1,0.8)
+%%%\rput(3.1,0.97){\scriptsize \scalebox{0.90}{VBD}}
+%%%\rput(6.4125,0.97){\scriptsize \scalebox{0.90}{S}}
+%%%\psline[linewidth=0.3pt]{}(3.1,1.09)(4.756,1.34)(6.4125,1.09)
+%%%\rput(0.6,1.51){\scriptsize \scalebox{0.90}{NP}}
+%%%\rput(4.756,1.51){\scriptsize \scalebox{0.90}{VP}}
+%%%\psline[linewidth=0.3pt]{}(0.6,1.63)(2.678,1.88)(4.756,1.63)
+%%%\rput(2.678,2.05){\scriptsize \scalebox{0.90}{S}}
+%%%\end{pspicture}
+
+\vspace{2.8mm}
+\hspace{-6mm}
+\scalebox{0.80}{
+\footnotesize{
+	\deriv{7}{
+%%%		\textrm{JJ} & \textrm{NNS} & \textrm{VBD} & \textrm{PRP\$} & \textrm{NN} & \textrm{DT} & \textrm{NN} \\[2pt]
+		\textrm{Italian} & \textrm{magistrates} & \textrm{labeled} & \textrm{his} & \textrm{\hspace*{-2mm}death\hspace*{-2mm}} & \textrm{a} & \textrm{\hspace*{-3mm}suicide\hspace*{-3mm}} \\[3pt]
+		\cf{N/N} & \cf{N} & \cf{((S[dcl]\bs NP)/NP)/NP} & \cf{NP[nb]/N} & \cf{N} & \cf{NP[nb]/N} & \cf{N} \\
+		\fapply{2} & & \fapply{2} & \fapply{2} \\
+		\mc{2}{N} & & \mc{2}{NP} & \mc{2}{NP} \\
+		\uline{2} & \fapply{3} \\
+		\mc{2}{NP} & \mc{3}{\cf{(S[dcl]\bs NP)/NP}} \\
+		& & \fapply{4} \\
+		& & \mc{4}{\cf{S[dcl]\bs NP}} \\
+		\bapply{6} \\
+		\mc{6}{\cf{S[dcl]}} \\
+	}
+}
+}
+\vspace{-4mm}
+\caption{\label{fig:example}
+A crossing constituents example: \textit{his\,\ldots{}suicide} (\ptb) crosses
+\textit{labeled \ldots death} (CCGbank).
+}
+\vspace{-2mm}
+%%%\vspace{3mm}
+\end{figure}
+
+\begin{table}[t!]
+\footnotesize
+%%%\small
+%%%\renewcommand{\tabcolsep}{1mm}
+\begin{center}
+\begin{tabular}{l|l}
+\hline
+Categories & Schema \\
+\hline\hline
+\cf{N} & create an NP \\
+\cf{((S[dcl]\bs NP)/NP)/NP} & create a VP \\
+\hline
+\cf{N/N} + \cf{N} & place left under right \\
+\cf{NP[nb]/N} + \cf{N} & place left under right \\
+\cf{((S[dcl]\bs NP)/NP)/NP} + \cf{NP} & place right under left \\
+\cf{(S[dcl]\bs NP)/NP} + \cf{NP} & place right under left \\
+\cf{NP} + \cf{S[dcl]\bs NP} & place both under S\\
+\hline
+\end{tabular}
+\end{center}
+\vspace*{-2.5mm}
+\caption{\label{fig:candc09}
+Example \old lexical and rule schemas.
+}
+\vspace*{-5.5mm}
+\end{table}
+
+We cannot form a \ptb tree by simply relabeling the categories in a \ccg
+derivation because the mapping to phrase labels is many-to-many, \ccg
+derivations contain extra brackets due to binarisation, and there are cases
+where the constituents in the \ptb tree and the \ccg derivation cross (\myeg
+in Figure~\ref{fig:example}).
+%%%\footnote{These differences are the result of
+%%%conscious decisions made in the construction of CCGbank, in many cases enabling
+%%%the derivation to encode extra dependencies that are not explicitly present in
+%%%the \ptb}.
+
+\subsection{\textcite{Clark-Curran:2009}}
+
+%%%TODO consider changing to use a nocite
+%%%Clark and Curran (\ptb, Marcus et al., 1993)
+%%%\nocite{Marcus-Marcinkiewicz-Santorini:1993}
+\textcite{Clark-Curran:2009}, hereafter \old,  assign a {\em schema} to each
+leaf (lexical category) and rule (pair of combining categories) in the \ccg derivation.
+The \ptb tree is constructed from the \ccg bottom-up, creating leaves with
+lexical schemas, then merging/adding sub-trees using rule schemas at each step.
+
+The schemas for Figure~\ref{fig:example} are shown in Table~\ref{fig:candc09}.
+These apply to create NPs over \textit{magistrates}, \textit{death}, and
+\textit{suicide}, and a VP over \textit{labeled}, and then combine the trees by
+placing one under the other at each step, and finally create an S node at the
+root.
+
+\old has sparsity problems, requiring schemas for all valid pairs of
+categories --- at a minimum, the 2853 unique category combinations found in
+CCGbank. \textcite{Clark-Curran:2009} create schemas for only 776 of these,
+handling the remainder with approximate catch-all rules.
+
+\old only specifies one simple schema for each rule (pair of
+categories).  This appears reasonable at first, but frequently causes
+problems, \myeg:
+
+\vspace{2mm}
+\parbox{0.97\linewidth}{\footnotesize
+\cf{(N/N)/(N/N)} + \cf{N/N} \\
+``more than'' + ``30'' \hfill(1)\hspace*{2mm}\\ % should form a QP
+``relatively'' + ``small'' \hfill(2)\hspace*{2mm}\\ % should from an ADJP
+}
+\vspace{-3mm}
+%%% ((N/N)/(N/N))\(S[adj]\NP) IN than
+%%% (N/N)/(N/N) RB relatively
+
+Here either a QP bracket (1) or an ADJP bracket (2) should be created.  Since
+both examples involve the same rule schema, \old would incorrectly process them
+in the same way.  To combat the most glaring errors, \old manipulates the \ptb
+tree with ad-hoc rules based on non-local features over the \ccg nodes
+being combined --- an approach that cannot be easily integrated into a
+parser.
+
+These disadvantages are a consequence of failing to exploit the generalisations
+that \ccg combinators define.  We return to this example below to show how our
+approach handles both cases correctly.
+
+\section{Our Approach}
+
+Our conversion assigns a set of instructions to each lexical category and
+defines generic operations for each combinator that combine instructions.
+Figure~\ref{fig:inst-example} shows a typical instruction, which specifies the
+node to create and where to place the \ptb trees associated with the two
+categories combining.  More complex operations are shown in
+Table~\ref{tab:operators}.  Categories with multiple arguments are assigned one
+instruction per argument, \myeg \textit{labeled} has three.  These are applied
+one at a time, as each combinatory step occurs.
+
+For the example from the previous section we begin by assigning the
+instructions shown in Table~\ref{tab:instructions}.  Some of these can apply
+immediately as they do not involve an argument, \myeg \textit{magistrates} has (NP$\;$~f).
+
+One of the more complex cases in the example is \textit{Italian}, which is
+assigned (NP~f~\{a\}). This creates a new bracket, inserts the functor's tree, and
+flattens and inserts the argument's tree, producing:
+
+\vspace{1mm}
+{\footnotesize
+%%%\noindent
+(NP (JJ Italian) (NNS magistrates))
+}
+\vspace{1mm}
+
+%%%Similar operations apply for the other NPs, followed by a unary rule,
+%%%mapping \cf{N} to \cf{NP}.  We handle this by applying one of twelve special
+%%%cases for non-combinatory unary operations in CCGbank.
+
+%%%Next \textit{labeled} and \textit{his death} combine.  The verb takes three
+%%%arguments, and so has three instructions.  Here we apply the first:
+
+%%%\vspace{1mm}
+%%%{\footnotesize
+%%%\noindent
+%%%(VP (VBD labeled) (NP (PRP\$ his) (NN death))) \\
+%%%(VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))) \\
+%%%(S (NP (JJ Italian) (NNS magistrates)) (VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))))
+%%%}
+%%%\vspace{1mm}
+
+For the complete example the final tree is almost correct but omits the S
+bracket around the final two NPs.  To fix our example we could have modified
+our instructions to use the final symbol in Table~\ref{tab:operators}.  The
+subscripts indicate which subtrees to place where.
+However, for this particular construction the \ptb annotations are
+inconsistent, and so we cannot recover without introducing more errors elsewhere.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.85\linewidth]{figures/ccg-example}
+\end{center}
+\vspace{-5mm}
+\caption{\label{fig:inst-example}
+An example function application.
+Top row: \ccg rule.
+Bottom row: applying instruction (VP f a).
+}
+\vspace{-1mm}
+\end{figure}
+
+\begin{table}
+\small
+%%%\footnotesize
+\begin{center}
+\renewcommand{\tabcolsep}{1mm}
+\begin{tabular}{lll}
+	\hline
+		Symbol & Meaning & Example \\
+	\hline
+	\hline
+		(X f a) & Add an X bracket around & (VP$\;$ f$\;$ a) \\
+		& functor and argument \\
+		\{ \} & Flatten enclosed node & (N$\;$ f$\;$ \{a\}) \\
+		X* & Use same label as arg. & (S*$\;$ f$\;$ \{a\}) \\
+		& or default to X \\
+		f$_i$ & Place subtrees &  (PP$\;$ f$_0$$\;$ (S$\;$ f$_{1..k}$$\;$ a)) \\
+	\hline
+\end{tabular}
+\end{center}
+\vspace{-4.5mm}
+\caption{\label{tab:operators}
+Types of operations in instructions.
+}
+\vspace{-5mm}
+\end{table}
+
+%%%As well as creating and flattening, we define three other operators.
+%%%The * operator takes the label for the new node from the argument,
+%%%\myeg the result of an \cf{S\bs S_1} should correspond to the label of
+%%%argument 1 (SINV, SBAR, etc, which all appear as \cf{S} in \ccg).
+% Perhaps mention why this exists? The fact that in CCGbank the [X] label is
+% used to allow a single category to cover multiple cases?
+%%%The $<$ and $>$ operators move subtrees to different locations.  To fix our
+%%%running example we could use this in \textit{labeled}'s second instruction to
+%%%move \textit{his death} under a new S.  However, this is an example of a \ptb
+%%%inconsistency that we cannot recover without introducing more
+%%%errors elsewhere.
+
+For combinators other than function application, we combine the instructions in
+various ways.  Additionally, we vary the instructions assigned based on the
+\pos tag in 32 cases, and for the word \textit{not}, to recover distinctions
+not captured by CCGbank categories alone.  In 52 cases the later
+instructions depend on the structure of the argument being picked up.  We have
+sixteen special cases for non-combinatory binary rules and twelve special
+cases for non-combinatory unary rules.
+
+Our approach naturally handles our QP \myvs ADJP example because the two cases
+have different lexical categories: {\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}}
+on \textit{than} and {\small \cf{(N/N)/(N/N)}} on \textit{relatively}.  This
+lexical difference means we can assign different instructions to correctly
+recover the QP and ADJP nodes, whereas \old applies the same schema in both
+cases as the categories combining are the same.
+
+\section{Evaluation}
+
+\begin{table}
+\small
+%%%\footnotesize
+\begin{center}
+\renewcommand{\tabcolsep}{1mm}
+\begin{tabular}{lll}
+	\hline
+		Category & Instruction set \\
+	\hline
+	\hline
+		\cf{N} & (NP$\;$ f) \\[1pt]
+		\cf{N/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
+		\cf{NP[nb]/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
+		\cf{((S[dcl]\bs NP_3)/NP_2)/NP_1} & (VP$\;$ f$\;$ a) \\
+		 & (VP$\;$ \{f\}$\;$ a) \\
+		 & (S$\;$ a$\;$ f) \\
+	\hline
+\end{tabular}
+\end{center}
+\vspace{-4.5mm}
+\caption{\label{tab:instructions}
+%%%\footnotesize
+Instruction sets for the categories in Figure~\ref{fig:example}.
+}
+\vspace{-2mm}
+\end{table}
+
+%% TODO: 100 hours seems like a fair amount, make it clear that this included implementation time
+Using sections 00-21 of the treebanks, we hand-crafted instructions for 527
+lexical categories, a process that took under 100 hours, and includes all the
+categories used by the \candc parser.  There are 647 further categories and 35
+non-combinatory binary rules in sections 00-21 that we did not annotate.  For
+unannotated categories, we use the instructions of the result category with an
+added instruction.
+
+\begin{table}
+\renewcommand{\tabcolsep}{1.65mm}
+%%%\vspace{-0.4mm}
+\small
+\begin{center}
+\begin{tabular}{llcccc}
+	\hline
+		System & Data & P & R & F & Sent. \\
+	\hline
+	\hline
+		 & 00 (all) & 95.37 & 93.67 & 94.51 & 39.6 \\
+		\candc & 00 (len $\le 40$) & 95.85 & 94.39 & 95.12 & 42.1 \\
+		\textsc{conv} & 23 (all) & 95.33 & 93.95 & 94.64 & 39.7 \\
+		 & 23 (len $\le 40$) & 95.44 & 94.04 & 94.73 & 41.9 \\
+	\hline
+		 & 00 (all) & 96.69 & 96.58 & 96.63 & 51.1 \\
+		This & 00 (len $\le 40$) & 96.98 & 96.77 & 96.87 & 53.6 \\
+		Work & 23 (all) & 96.49 & 96.11 & \textbf{96.30} & \textbf{51.4} \\
+		 & 23 (len $\le 40$) & 96.57 & 96.21 & 96.39 & 53.8 \\
+	\hline
+\end{tabular}
+\end{center}
+\vspace{-4.5mm}
+\caption{\label{tab:conversion-comparison}
+	\parseval Precision, Recall, F-Score, and exact sentence match for converted
+	gold \ccg derivations.
+}
+\vspace{-5mm}
+\end{table}
+
+Table~\ref{tab:conversion-comparison} compares our approach
+with \old on gold \ccg derivations.  The results shown are 
+as reported by \evalb
+\parencite{Black-etal:1991} using the \textcite{Collins:1997} parameters.
+Our approach leads to increases on all metrics of at least 1.1\%, and
+increases exact sentence match by over 11\% (both absolute).
+
+Many of the remaining errors relate to missing and extra clause nodes and a
+range of rare structures, such as QPs, NACs, and NXs. The only other prominent
+errors are single word spans, \myeg extra or missing ADVPs.  Many of these errors
+are unrecoverable from CCGbank, either because inconsistencies in the \ptb have
+been smoothed over or because they are genuine but rare constructions that
+were lost.
+
+\begin{figure}
+	\vspace{-0.3cm}
+	\hspace{-1.4cm}
+	\scalebox{0.8}{
+	\input{figures/ccg-graph2.tex}
+	\hspace{-2.9cm}
+	\input{figures/ccg-graph1.tex}
+	}
+	\vspace{-0.8cm}
+	\caption{
+		\label{fig:scatter_plots}
+		For each sentence in the treebank, we plot the converted parser output
+		against gold conversion (left), and the original parser evaluation against
+		gold conversion (right).
+		Left: Most points lie below the diagonal, indicating that the quality of
+		converted parser output (y) is upper bounded by the quality of conversion on
+		gold parses (x).
+		Right: No clear correlation is present, indicating that the set of
+		sentences that are converted best (on the far right), are not necessarily
+		easy to parse.
+	\vspace{-4.5mm}
+	}
+\end{figure}
+
+\subsection{Parser Comparison}
+
+When we convert the output of a \ccg parser, the \ptb trees that are produced
+will contain errors created by our conversion as well as by the parser. In this
+section we are interested in comparing parsers, so we need to factor out errors
+created by our conversion.
+
+One way to do this is to calculate a projected score (\textsc{proj}), as the
+parser result over the oracle result, but this is a very rough approximation.
+Another way is to evaluate only on the 51\% of sentences for which our
+conversion from gold \ccg derivations is perfect (\textsc{clean}).  However,
+even on this set our conversion introduces errors, as the parser output may
+contain categories that are harder to convert.
+
+Parser F-scores are generally higher on \textsc{clean}, which could mean that this
+set is easier to parse, or it could mean that these sentences don't contain
+annotation inconsistencies, and so the parsers aren't incorrect for returning
+the true parse (as opposed to the one in the \ptb).  To test this distinction
+we look for correlation between conversion quality and parse difficulty on
+another metric.  In particular, Figure~\ref{fig:scatter_plots} (right) shows
+\ccg labeled dependency performance for the \candc parser \myvs CCGbank
+conversion \parseval scores. The lack of a strong correlation, and the spread
+on the line $x=100$, supports the theory that these sentences are not
+necessarily easier to parse, but rather have fewer annotation inconsistencies.
+
+In the left plot, the y-axis is \parseval on converted \candc parser output.
+Conversion quality essentially bounds the performance of the parser.  The few
+points above the diagonal are mostly short sentences on which the \candc parser
+uses categories that lead to one extra correct node.
+%%%(a common case is ADVP v ADJP).
+The main constructions on which parse errors occur, \myeg PP attachment, are
+rarely converted incorrectly, and so we expect the number of errors to be
+cumulative.  Some sentences are higher in the right plot than the left because
+there are distinctions in \ccg that are not always present in the \ptb, \myeg the
+argument-adjunct distinction.
+
+\begin{table}
+\renewcommand{\tabcolsep}{1.8mm}
+\small
+%%%\hspace{-4mm}
+\begin{center}
+\begin{tabular}{lrr|r}
+	\hline
+	Sentences & \textsc{clean} & \textsc{all} & \textsc{proj} \\
+	\hline
+	\hline
+		\multicolumn{2}{l}{Converted gold \ccg} & & \\
+		CCGbank & \hspace{0mm}100.0 & \hspace{0mm}96.3 & -- \\
+	\hline
+		\multicolumn{2}{l}{Converted \ccg} & & \\
+		\textcite{Clark-Curran:2007} & 90.9 & 85.5 & 88.8 \\
+		\textcite{Fowler-Penn:2010} & 90.9 & 86.0 & 89.3 \\
+		\textcite{Auli-Lopez:2011} & 91.7 & 86.2 & 89.5 \\
+	\hline
+		\multicolumn{2}{l}{Native \ptb} & & \\
+		\textcite{Klein-Manning:2003} & 89.8 & 85.8 & -- \\
+		\textcite{Petrov-Klein:2007} & 93.6 & 90.1 & -- \\
+		\textcite{Charniak-Johnson:2005} & 94.8 & 91.5 & -- \\
+	\hline
+\end{tabular}
+\vspace{-3.0mm}
+\caption{
+	\label{tab:full-comp}
+	F-scores on section 23 for \ptb parsers and \ccg parsers with their output
+	converted by our method.
+	\textsc{clean} is only on sentences that are converted perfectly from gold
+	\ccg (51\%).
+	\textsc{all} is over all sentences.  
+	\textsc{proj} is a projected F-score (\textsc{all} result / CCGbank
+	\textsc{all} result).
+%%%	Assuming this is an accurate indication of parser performance, the \ccg
+%%%	parsers are close to the performance of the Petrov parser.
+}
+\end{center}
+\vspace{-6mm}
+\end{table}
+
+Table~\ref{tab:full-comp} presents F-scores for three \ptb parsers and three
+\ccg parsers (with their output converted by our method).  One interesting
+comparison is between the \ptb parser of \textcite{Petrov-Klein:2007} and the
+\ccg parser of \textcite{Fowler-Penn:2010}, which use the same underlying
+parser.  The performance gap is partly due to structures in the \ptb that are
+not recoverable from CCGbank, but probably also indicates that the split-merge
+model is less effective in \ccg, which has far more symbols than the \ptb.
+
+It is difficult to make conclusive claims about the performance of the parsers.
+As shown earlier, \textsc{clean} does not completely factor out the errors
+introduced by our conversion, as the parser output may be more difficult to
+convert, and the calculation of \textsc{proj} only roughly factors out the
+errors.  However, the results do suggest that the performance of the \ccg
+parsers is approaching that of the Petrov parser.
+
+\section{Conclusion}
+
+By exploiting the generalised combinators of the \ccg formalism, we have
+developed a new method of converting \ccg derivations into \ptb-style trees.
+Our system, which is publicly
+available\footnote{http://code.google.com/p/berkeley-ccg2pst/}, is more
+effective than previous work, increasing exact sentence match by more than 11\%
+(absolute), and can be directly integrated with a \ccg parser.
+%%% Consider pusing the idea that we have found the inconsistencies in the treebank / the sentences that are inconsistent
+
+\section{Alternate figures}
+
+\begin{figure}
+%%%\begin{pspicture}(0,0)(8,3.3)
+%%%\psline[linewidth=0.3pt]{}(0.05,0)(0.6,0.3)(1.12,0)
+%%%\rput(0.6,0.47){\scriptsize \scalebox{0.95}{NP}}
+%%%\psline[linewidth=0.3pt]{}(5.15,0)(5.65,0.3)(6.1,0)
+%%%\psline[linewidth=0.3pt]{}(6.95,0)(7.45,0.3)(7.9,0)
+%%%\rput(5.65,0.47){\scriptsize \scalebox{0.95}{NP}}
+%%%\rput(7.45,0.47){\scriptsize \scalebox{0.95}{NP}}
+%%%\psline[linewidth=0.3pt]{}(5.65,0.6)(6.55,1.0)(7.45,0.6)
+%%%\rput(6.55,1.17){\scriptsize \scalebox{0.95}{S}}
+%%%\psline[linewidth=0.3pt]{}(3.1,0)(4.8,1.7)(6.55,1.29)
+%%%\rput(4.8,1.87){\scriptsize \scalebox{0.95}{VP}}
+%%%\psline[linewidth=0.3pt]{}(0.6,0.6)(2.7,2.5)(4.8,2.0)
+%%%\rput(2.7,2.7){\scriptsize \scalebox{0.95}{S}}
+%%%\end{pspicture}
+
+\vspace{-2.5mm}
+\hspace{-6mm}
+\scalebox{0.80}{
+\footnotesize{
+	\deriv{7}{
+		\textrm{JJ} & \textrm{NNS} & \textrm{VBD} & \textrm{PRP\$} & \textrm{NN} & \textrm{DT} & \textrm{NN} \\[2pt]
+		\textrm{Italian} & \textrm{magistrates} & \textrm{labeled} & \textrm{his} & \textrm{\hspace*{-2mm}death\hspace*{-2mm}} & \textrm{a} & \textrm{\hspace*{-3mm}suicide\hspace*{-3mm}} \\[2pt]
+		\cf{N/N} & \cf{N} & \cf{((S[dcl]\bs NP)/NP)/NP} & \cf{NP[nb]/N} & \cf{N} & \cf{NP[nb]/N} & \cf{N} \\
+		\fapply{2} & & \fapply{2} & \fapply{2} \\
+		\mc{2}{N} & & \mc{2}{NP} & \mc{2}{NP} \\
+		\uline{2} & \fapply{3} \\
+		\mc{2}{NP} & \mc{3}{\cf{(S[dcl]\bs NP)/NP}} \\
+		& & \fapply{4} \\
+		& & \mc{4}{\cf{S[dcl]\bs NP}} \\
+		\bapply{6} \\
+		\mc{6}{\cf{S[dcl]}} \\
+	}
+}
+}
+
+\vspace{3mm}
+{\small
+A crossing constituents example:\textit{his\,\ldots{}suicide} (\ptb) crosses
+\textit{labeled \ldots death} (CCGbank).
+}
+\vspace{1cm}
+
+\qtreecenterfalse
+\vspace{-7mm}
+\begin{center}
+\scalebox{0.80}{
+\footnotesize
+\raisebox{7mm}{
+\Tree
+[.S
+	[.NP
+		{JJ \\ Italian}
+		{NNS \\ magistrates}
+	]
+	!\qsetw{1.3cm}
+	[.VP
+		{VBD \\ labeled}
+		!\qsetw{0.1cm}
+		[.S
+			[.NP
+				{PRP\$ \\ his}
+				{NN \\ death}
+				!\qsetw{1.0cm}
+			]
+			[.NP
+				{DT \\ a}
+				{NN \\ suicide}
+				!\qsetw{1.3cm}
+			]
+		]		
+		!\qsetw{3.0cm}
+	]
+	!\qsetw{5.0cm}
+]
+}
+}
+\end{center}
+\vspace{-1mm}
+
+\hspace{-6mm}
+\scalebox{0.80}{
+\footnotesize{
+	\deriv{7}{
+		\textrm{Italian} & \textrm{magistrates} & \textrm{labeled} & \textrm{his} & \textrm{\hspace*{-2mm}death\hspace*{-2mm}} & \textrm{a} & \textrm{\hspace*{-3mm}suicide\hspace*{-3mm}} \\[2pt]
+		\textrm{JJ} & \textrm{NNS} & \textrm{VBD} & \textrm{PRP\$} & \textrm{NN} & \textrm{DT} & \textrm{NN} \\[2pt]
+		\cf{N/N} & \cf{N} & \cf{((S[dcl]\bs NP)/NP)/NP} & \cf{NP[nb]/N} & \cf{N} & \cf{NP[nb]/N} & \cf{N} \\
+		\fapply{2} & & \fapply{2} & \fapply{2} \\
+		\mc{2}{N} & & \mc{2}{NP} & \mc{2}{NP} \\
+		\uline{2} & \fapply{3} \\
+		\mc{2}{NP} & \mc{3}{\cf{(S[dcl]\bs NP)/NP}} \\
+		& & \fapply{4} \\
+		& & \mc{4}{\cf{S[dcl]\bs NP}} \\
+		\bapply{6} \\
+		\mc{6}{\cf{S[dcl]}} \\
+	}
+}
+}
+
+\vspace{3mm}
+{\small
+A crossing constituents example:\textit{his\,\ldots{}suicide} (\ptb) crosses
+\textit{labeled \ldots death} (CCGbank).
+}
+\vspace{1cm}
+
+%%%\begin{pspicture}(0,0)(8,3.3)
+%%%\psline[linewidth=0.3pt]{}(0.05,-0.57)(0.05,1.0)
+%%%\rput(0.05,1.17){\scriptsize \scalebox{0.90}{JJ}}
+%%%\psline[linewidth=0.3pt]{}(1.12,-0.57)(1.12,1.0)
+%%%\rput(1.12,1.17){\scriptsize \scalebox{0.90}{NNS}}
+%%%\psline[linewidth=0.3pt]{}(0.05,1.29)(0.6,1.6)(1.12,1.29)
+%%%\psline[linewidth=0.3pt]{}(5.17,-0.57)(5.17,-0.3)
+%%%\rput(5.17,-0.1306){\scriptsize \scalebox{0.90}{PRP\$}}
+%%%\psline[linewidth=0.3pt]{}(6.0,-0.57)(6.0,-0.3)
+%%%\rput(6.0,-0.13){\scriptsize \scalebox{0.90}{NN}}
+%%%\psline[linewidth=0.3pt]{}(5.15,0)(5.575,0.3)(6.0,0)
+%%%\psline[linewidth=0.3pt]{}(6.85,-0.57)(6.85,-0.3)
+%%%\rput(6.85,-0.13){\scriptsize \scalebox{0.90}{DT}}
+%%%\psline[linewidth=0.3pt]{}(7.65,-0.57)(7.65,-0.3)
+%%%\rput(7.65,-0.13){\scriptsize \scalebox{0.90}{NN}}
+%%%\psline[linewidth=0.3pt]{}(6.85,0)(7.25,0.3)(7.65,0)
+%%%\rput(5.575,0.47){\scriptsize \scalebox{0.90}{NP}}
+%%%\rput(7.25,0.47){\scriptsize \scalebox{0.90}{NP}}
+%%%\psline[linewidth=0.3pt]{}(5.575,0.6)(6.4125,1.0)(7.25,0.6)
+%%%\psline[linewidth=0.3pt]{}(3.1,-0.57)(3.1,1.0)
+%%%\rput(3.1,1.17){\scriptsize \scalebox{0.90}{VBD}}
+%%%\rput(6.4125,1.17){\scriptsize \scalebox{0.90}{S}}
+%%%\psline[linewidth=0.3pt]{}(3.1,1.29)(4.756,1.6)(6.4125,1.29)
+%%%\rput(0.6,1.77){\scriptsize \scalebox{0.90}{NP}}
+%%%\rput(4.756,1.77){\scriptsize \scalebox{0.90}{VP}}
+%%%\psline[linewidth=0.3pt]{}(0.6,1.9)(2.678,2.2)(4.756,1.9)
+%%%\rput(2.678,2.37){\scriptsize \scalebox{0.90}{S}}
+%%%\end{pspicture}
+
+\vspace{3.5mm}
+\hspace{-6mm}
+\scalebox{0.80}{
+\footnotesize{
+	\deriv{7}{
+		\textrm{JJ} & \textrm{NNS} & \textrm{VBD} & \textrm{PRP\$} & \textrm{NN} & \textrm{DT} & \textrm{NN} \\[2pt]
+		\textrm{Italian} & \textrm{magistrates} & \textrm{labeled} & \textrm{his} & \textrm{\hspace*{-2mm}death\hspace*{-2mm}} & \textrm{a} & \textrm{\hspace*{-3mm}suicide\hspace*{-3mm}} \\[3pt]
+		\cf{N/N} & \cf{N} & \cf{((S[dcl]\bs NP)/NP)/NP} & \cf{NP[nb]/N} & \cf{N} & \cf{NP[nb]/N} & \cf{N} \\
+		\fapply{2} & & \fapply{2} & \fapply{2} \\
+		\mc{2}{N} & & \mc{2}{NP} & \mc{2}{NP} \\
+		\uline{2} & \fapply{3} \\
+		\mc{2}{NP} & \mc{3}{\cf{(S[dcl]\bs NP)/NP}} \\
+		& & \fapply{4} \\
+		& & \mc{4}{\cf{S[dcl]\bs NP}} \\
+		\bapply{6} \\
+		\mc{6}{\cf{S[dcl]}} \\
+	}
+}
+}
+
+\vspace{3mm}
+{\small
+A crossing constituents example:\textit{his\,\ldots{}suicide} (\ptb) crosses
+\textit{labeled \ldots death} (CCGbank).
+}
+\end{figure}
+
+%%% Short sentences with crossing derivations:
+%%% I want them to stand alone
+%%% We want them to buy more of their wardrobe here
+%%% They both called it a welcome home gathering
+%%% Many economists expect the weakness to continue
+%%% Some economists found the mixture ominous
+%%% Italian magistrates labelled his death a suicide
+%
+%%% Two in one:
+%%% And they want the U.S. to help them sell overseas
+%%% It also asked Mesa keep the proposal confidential
+%%% 
+%%% Sub-NP
+%%% Only two of 111 transplants have been rejected
+%
+%%% Co-ordination
+%%% The book employs 8,000 people in Spain and 2,000 abroad
+
+% Further info on plots
+
+%%%Perfect on gold and deps, but 0 converted
+%%%New York City :
+%%%New Jersey :
+%%%+6 more
+%%%Missing an NP bracket over the whole thing (had just an N, which was remoed)
+%%%
+%%%Moved above the diagonal (from left to right)
+%%%100 <100 100
+%%%That year the Apple II , Commodore Pet and Tandy TRS-80 came to market .
+%%%For the first time , the October survey polled members on imports .
+%%%Argentine negotiator Carlos Carballo was in Washington and New York this week to meet with banks .
+%%%Mostly just NPs, but is 'to market' an argument of 'came' or a modifier? Parser gets it wrong, but conversion 'fixes' it.
+%%% X/PP + PP
+%%%     v 
+%%%  X   + X\X
+%%%prepositions in general
+
+%%%Moved above the diagonal (right plot)
+%%%The Japanese industrial companies should know better .
+%%%They do n't have plans to cut back .
+%%%ADVP v ADJP (is my schema wrong? Or maybe it just gets lucky?)
+%%%Ask Matt, is there an inconsistency in the labelling of these sentences?
+%%%Is there documentation that makes this difference clearer
+
+%%%Moreover , the Japanese government , now the world's largest aid donor , is
+%%%pumping far more assistance into the region than the U.S. is .
+%%%Extra nested NPs because of modifier, rather than argument
+

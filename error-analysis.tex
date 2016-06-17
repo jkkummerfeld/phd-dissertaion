@@ -1,13 +1,21 @@
 \chapter{Automatic Error Analysis}
 
+\begin{center}
+\textit{
+  A preliminary version of this chapter appeared as \textcite{Kummerfeld:2012:EMNLP}.
+}
+\end{center}
+
+Constituency parser performance is primarily interpreted through a single metric, F-score on \wsj section 23, that conveys no linguistic information regarding the remaining errors.
+In this chapter, we descibe a new error analysis method that classifies errors within a set of linguistically meaningful types using tree transformations that repair groups of errors together.
+We use this analysis to answer a range of questions about parser behaviour, including what linguistic constructions are difficult for state-of-the-art parsers, what types of errors are being resolved by rerankers, and what types are introduced when parsing out-of-domain text.
+
 %%% TODO:
 %%% - Add 'treebank', 'parser' sideways labels to figures
 %%%	Something else to think about - this paper is about 'what',
 %%%	not 'why', so we don't use concepts like subcategorisation
 %%%	Errors related to temporal structures would be a sensible
 %%%	part though
-
-Previously published as "Parser Showdown at the Wall Street Corral: An Empirical Investigation of Error Types in Parser Output", Jonathan K. Kummerfeld, David Hall, James R. Curran and Dan Klein.
 
 \section{Parsers}
 
@@ -279,14 +287,14 @@ to the gold tree.  Next we classify each group as one of the error types below.
 
 \begin{description}\itemsep1pt
 	\item[ PP Attachment] Any case in which the transformation involved moving
-	a Prepositional Phrase, or the incorrect bracket is over a PP, \eg \\ 
+	a Prepositional Phrase, or the incorrect bracket is over a PP, \myeg \\ 
 	\emph{He was} (VP \emph{named chief executive officer of} \\
 	\textcolor{white}{fill}(NP \emph{Applied} (PP \emph{in 1986}))) \\
 	where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Applied}.
 
 	\item[ NP Attachment] Several cases in which NPs had to be moved,
 	particularly for mistakes in appositive constructions and incorrect
-	attachments within a verb phrase, \eg \\ \emph{The bonds} (VP \emph{go} (PP
+	attachments within a verb phrase, \myeg \\ \emph{The bonds} (VP \emph{go} (PP
 	\emph{on} \emph{sale} (NP \emph{Oct.\@\xspace 19}))) \\
 	where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 \end{description}
@@ -504,7 +512,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 
 	\item[ Modifier Attachment] Cases involving incorrectly placed adjectives
 	and adverbs, including errors corrected by subtree movement and errors
-	requiring only creation of a node, \eg \\ (NP (ADVP \emph{even more})
+	requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
 	\emph{severe setbacks}) \\ where there should be an extra ADVP node over
 	\emph{even more severe}.
 	\item[ Clause Attachment] Any group that involves movement of some form of
@@ -527,7 +535,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	group the two node errors, (one extra, one missing), as a single error.
 
 	\item[ Single word phrase] A range of node errors that span a single word,
-	with checks to ensure this is not linked to another error (\eg one part of a
+	with checks to ensure this is not linked to another error (\myeg one part of a
 	set of internal noun phrase errors).
 
 	\item[ Other] There is a long tail of other errors.  Some could be placed
@@ -671,7 +679,7 @@ about the test set that could bias future work.
 	Breakdown of errors on section 23 for the Charniak parser with self-trained
 	model and reranker.  Errors are sorted by the number of times they occur.
 	Ratio is the average number of node errors caused by each error we identify
-	(\ie Nodes Involved / Occurrences).
+	(\myie Nodes Involved / Occurrences).
 }
 \vspace{-6mm}
 \end{table}
@@ -683,7 +691,7 @@ lengths, and to output for out-of-domain parsing (following sections).
 
 In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on
 \wsj section 23.  The shaded area of each bar indicates the frequency of parse
-errors (\ie empty means fewest errors).  The area filled in is determined by
+errors (\myie empty means fewest errors).  The area filled in is determined by
 the expected number of node errors per sentence that are attributed to that
 type of error.  The average number of node errors per sentence for a completely
 full bar is indicated by the Worst row, and the value for a completely empty
@@ -694,7 +702,7 @@ We use counts of node errors to make the contributions of each type of error
 more interpretable.  As Table~\ref{tab:charniak-breakdown} shows, some errors
 typically cause only a single node error, where as others, such as
 coordination, generally cause several.  This means that considering counts of
-error groups would over-emphasise some error types, \eg single word phrase
+error groups would over-emphasise some error types, \myeg single word phrase
 errors are second most important by number of groups (in
 Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors
 (in Table~\ref{tab:wsj23-comp}).
@@ -712,7 +720,7 @@ conjunction.}
 
 By looking at the performance of the Collins parser we can see the development
 over the past fifteen years.  There has been improvement across
-the board, but in some cases, \eg clause attachment errors and different label
+the board, but in some cases, \myeg clause attachment errors and different label
 errors, the change has been more limited (24\% and 29\% reductions respectively).  We
 investigated the breakdown of the different label errors by label, but no
 particular cases of label confusion stand out, and we found that the most
