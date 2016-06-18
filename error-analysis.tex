@@ -53,20 +53,18 @@ For all parsers we used the publicly available version, with the standard parame
 \end{description}
 
 \begin{table}
-%%%\small
-%%%\renewcommand{\tabcolsep}{1.7mm}
 \begin{center}
 \begin{tabular}{|lccccr|}
 	\hline
 		System & F & P & R & Exact & Speed \\
 	\hline
 	\hline
-		\multicolumn{6}{|c|}{enhanced training / systems} \\
+		\multicolumn{6}{|c|}{Enhanced Training / Systems} \\
 		Charniak-SR & 92.07 & 92.44 & 91.70 & 44.87 & 1.8 \\
 		Charniak-R & 91.41 & 91.78 & 91.04 & 44.04 & 1.8 \\
 		Charniak-S & 91.02 & 91.16 & 90.89 & 40.77 & 1.8 \\
 	\hline
-		\multicolumn{6}{|c|}{standard parsers} \\
+		\multicolumn{6}{|c|}{Standard Parsers} \\
 		Berkeley & 90.06 & 90.30 & 89.81 & 36.59 & 4.2 \\
 		Charniak & 89.71 & 89.88 & 89.55 & 37.25 & 1.8 \\
 		SSN & 89.42 & 89.96 & 88.89 & 32.74 & 1.8 \\
@@ -118,7 +116,6 @@ not show which constructions are the source of those variations.
 							[PP [.t in 1986]]]]]]]]]
 }
 
-\small
 (a) Parser output
 \vspace{3mm}
 
@@ -141,7 +138,6 @@ not show which constructions are the source of those variations.
 			[PP [.t in 1986]]]]]
 }
 
-\small
 (b) Gold tree
 \end{center}
 \derivspace
@@ -282,20 +278,9 @@ We began with a large set of node errors, in the first stage they were placed
 into groups, one group per tree transformation used to get from the test tree
 to the gold tree.  Next we classify each group as one of the error types below.
 
-\begin{description}\itemsep1pt
-	\item[ PP Attachment] Any case in which the transformation involved moving
-	a Prepositional Phrase, or the incorrect bracket is over a PP, \myeg \\ 
-	\emph{He was} (VP \emph{named chief executive officer of} \\
-	\textcolor{white}{fill}(NP \emph{Applied} (PP \emph{in 1986}))) \\
-	where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Applied}.
-
-	\item[ NP Attachment] Several cases in which NPs had to be moved,
-	particularly for mistakes in appositive constructions and incorrect
-	attachments within a verb phrase, \myeg \\ \emph{The bonds} (VP \emph{go} (PP
-	\emph{on} \emph{sale} (NP \emph{Oct.\@\xspace 19}))) \\
-	where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
-\end{description}
-
+\paragraph{PP Attachment} Any case in which the transformation involved moving a Prepositional Phrase, or the incorrect bracket is over a PP, \myeg \\ 
+\emph{He was} (VP \emph{named chief executive officer of} (NP \emph{Applied} (PP \emph{in 1986}))) \\
+where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Applied}.
 
 \begin{figure}
 \begin{center}
@@ -313,7 +298,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 			[NN [today]]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
 \vspace{3mm}
@@ -333,7 +318,6 @@ to the gold tree.  Next we classify each group as one of the error types below.
 					[NN [today]]]]]]
 }
 
-\small
 (b) Gold tree
 \end{center}
 \derivspace
@@ -345,6 +329,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 }
 \derivaftercompress
 \end{figure}
+
+\paragraph{NP Attachment} Several cases in which NPs had to be moved, particularly for mistakes in appositive constructions and incorrect attachments within a verb phrase, \myeg \\
+\emph{The bonds} (VP \emph{go} (PP \emph{on sale} (NP \emph{Oct.\@\xspace 19}))) \\
+where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 
 \begin{figure}
 \begin{center}
@@ -361,10 +349,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	[ADVP [.t ahead of time]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -379,7 +367,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 				[ADVP [.t ahead of time]]]]]]
 }
 
-\small
+\vspace{3mm}
 (b) Gold tree
 \end{center}
 \derivspace
@@ -391,6 +379,12 @@ to the gold tree.  Next we classify each group as one of the error types below.
 }
 \derivaftercompress
 \end{figure}
+
+\paragraph{Modifier Attachment} Cases involving incorrectly placed adjectives
+and adverbs, including errors corrected by subtree movement and errors
+requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
+\emph{severe setbacks}) \\ where there should be an extra ADVP node over
+\emph{even more severe}.
 
 \begin{figure}
 \begin{center}
@@ -407,10 +401,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 				[SBAR [.t unless the agency \ldots]]]]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -425,7 +419,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	[SBAR [.t unless the agency \ldots]]]
 }
 
-\small
+\vspace{3mm}
 (b) Gold tree
 \end{center}
 \derivspace
@@ -437,6 +431,9 @@ to the gold tree.  Next we classify each group as one of the error types below.
 }
 \derivaftercompress
 \end{figure}
+
+\paragraph{Clause Attachment}
+Any group that involves movement of some form of S node.
 
 \begin{figure}
 \begin{center}
@@ -451,10 +448,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 		[PP [.t of major market activity]]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -469,10 +466,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 			[PP [.t of major market activity]]]]]
 }
 
-\small
+\vspace{3mm}
 (b) Gold tree
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -490,7 +487,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	[$\colon$ [$\colon$]]]
 }
 
-\small
+\vspace{3mm}
 (c) Gold tree with traces and function tags
 \end{center}
 \derivspace
@@ -504,40 +501,9 @@ to the gold tree.  Next we classify each group as one of the error types below.
 \derivaftercompress
 \end{figure}
 
-
-\begin{description}\itemsep1pt
-
-	\item[ Modifier Attachment] Cases involving incorrectly placed adjectives
-	and adverbs, including errors corrected by subtree movement and errors
-	requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
-	\emph{severe setbacks}) \\ where there should be an extra ADVP node over
-	\emph{even more severe}.
-	\item[ Clause Attachment] Any group that involves movement of some form of
-	S node.
-
-	\item[ Unary] Mistakes involving unary productions that are not linked to
-	a nearby error  such as a matching extra or missing node.  We do not include
-	a breakdown by unary type, though we did find that clause labeling (S, SINV,
-	etc) accounted for a large proportion of the errors.
-
-	\item[ Coordination] Cases in which a conjunction is an immediate sibling
-	of the nodes being moved, or is the leftmost or rightmost node being moved.
-
-	\item[ NP Internal Structure]  While most NP structure is not annotated in
-	the \ptb, there is some use of ADJP, NX, NAC and QP nodes.  We form a single
-	group for each NP that has one or more errors involving these types of nodes.
-
-	\item[ Different label] In many cases a node is present in the tree that
-	spans the correct set of words, but has the wrong label, in which case we
-	group the two node errors, (one extra, one missing), as a single error.
-
-	\item[ Single word phrase] A range of node errors that span a single word,
-	with checks to ensure this is not linked to another error (\myeg one part of a
-	set of internal noun phrase errors).
-
-	\item[ Other] There is a long tail of other errors.  Some could be placed
-	within the categories above, but would require far more specific rules.
-\end{description}
+\paragraph{Unary}
+Mistakes involving unary productions that are not linked to a nearby error  such as a matching extra or missing node.
+We do not include a breakdown by unary type, though we did find that clause labeling (S, SINV, etc) accounted for a large proportion of the errors.
 
 \begin{figure}
 \begin{center}
@@ -553,10 +519,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 			[NP [.t Dresdner AG's 10\% decline]]]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -570,7 +536,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	[NP [.t Dresdner AG's 10\% decline]]]
 }
 
-\small
+\vspace{3mm}
 (b) Gold tree
 \end{center}
 \derivspace
@@ -581,6 +547,9 @@ to the gold tree.  Next we classify each group as one of the error types below.
 }
 \derivaftercompress
 \end{figure}
+
+\paragraph{Coordination}
+Cases in which a conjunction is an immediate sibling of the nodes being moved, or is the leftmost or rightmost node being moved.
 
 \begin{figure}
 \begin{center}
@@ -595,10 +564,10 @@ to the gold tree.  Next we classify each group as one of the error types below.
 			[NNP [Baker]]]]]
 }
 
-\small
+\vspace{3mm}
 (a) Parser output
 
-\vspace{3mm}
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -611,7 +580,7 @@ to the gold tree.  Next we classify each group as one of the error types below.
 	[NNP [Baker]]]
 }
 
-\small
+\vspace{3mm}
 (b) Gold tree
 \end{center}
 \derivspace
@@ -623,30 +592,35 @@ to the gold tree.  Next we classify each group as one of the error types below.
 \derivaftercompress
 \end{figure}
 
-For many of these error types it would be difficult to extract a meaningful
-understanding from only the list of node errors involved.  Even for error types
-that can be measured by counting node errors or rule production errors, our
-approach has the advantage that we identify groups of errors with a single
-cause.  For example, a missing unary production may correspond to an extra
-bracket that contains a subtree that attached incorrectly.
+\paragraph{NP Internal Structure}
+While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
+We form a single group for each NP that has one or more errors involving these types of nodes.
+
+\paragraph{Different label}
+In many cases a node is present in the tree that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error.
+
+\paragraph{Single word phrase}
+A range of node errors that span a single word, with checks to ensure this is not linked to another error (\myeg one part of a set of internal noun phrase errors).
+
+\paragraph{Other}
+There is a long tail of other errors.
+Some could be placed within the categories above, but would require far more specific rules.
+
+For many of these error types it would be difficult to extract a meaningful understanding from only the list of node errors involved.
+Even for error types that can be measured by counting node errors or rule production errors, our approach has the advantage that we identify groups of errors with a single cause.
+For example, a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
 
 \subsection{Methodology}
 
-We used sections 00 and 24 as development data while constructing the tree
-transformation and error group classification methods.  All of our examples in
-text come from these sections as well, but for all tables of results we ran our
-system on section 23.  We chose to run our analysis on section 23 as it is the
-only section we are sure was not used in the development of any of the parsers,
-either for tuning or feature development.  Our evaluation is entirely focused
-on the errors of the parsers, so unless there is a particular construction that
-is unusually prevalent in section 23, we are not revealing any information
-about the test set that could bias future work.
+We used sections 00 and 24 as development data while constructing the tree transformation and error group classification methods.
+All of our examples in text come from these sections as well, but for all tables of results we ran our system on section 23.
+We chose to run our analysis on section 23 as it is the only section we are sure was not used in the development of any of the parsers, either for tuning or feature development.
+Our evaluation is entirely focused on the errors of the parsers, so unless there is a particular construction that is unusually prevalent in section 23, we are not revealing any information about the test set that could bias future work.
 
 \section{Results}
 
 \begin{table}
-\small
-\renewcommand{\tabcolsep}{1.7mm}
+\begin{center}
 \begin{tabular}{|lrrr|}
 	\hline
 		                        &             & Nodes    &       \\
@@ -675,43 +649,28 @@ about the test set that could bias future work.
 	Ratio is the average number of node errors caused by each error we identify
 	(\myie Nodes Involved / Occurrences).
 }
+\end{center}
 \end{table}
 
-Our system enables us to answer questions about parser behaviour that could
-previously only be probed indirectly.  We demonstrate its usefulness by
-applying it to a range of parsers (here), to reranked K-best lists of various
-lengths, and to output for out-of-domain parsing (following sections).
+Our system enables us to answer questions about parser behaviour that could previously only be probed indirectly.
+We demonstrate its usefulness by applying it to a range of parsers (here), to reranked K-best lists of various lengths, and to output for out-of-domain parsing (following sections).
 
 \begin{landscape}
 \input{figures/wsj23_comparison.tex}
 \end{landscape}
 
-In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on
-\wsj section 23.  The shaded area of each bar indicates the frequency of parse
-errors (\myie empty means fewest errors).  The area filled in is determined by
-the expected number of node errors per sentence that are attributed to that
-type of error.  The average number of node errors per sentence for a completely
-full bar is indicated by the Worst row, and the value for a completely empty
-bar is indicated by the Best row. Exact error counts are available at
-http://code.google.com/p/berkeley-parser-analyser/.
+In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on \wsj section 23.
+The shaded area of each bar indicates the frequency of parse errors (\myie empty means fewest errors).
+The area filled in is determined by the expected number of node errors per sentence that are attributed to that type of error.
+The average number of node errors per sentence for a completely full bar is indicated by the Worst row, and the value for a completely empty bar is indicated by the Best row.
 
-We use counts of node errors to make the contributions of each type of error
-more interpretable.  As Table~\ref{tab:charniak-breakdown} shows, some errors
-typically cause only a single node error, where as others, such as
-coordination, generally cause several.  This means that considering counts of
-error groups would over-emphasise some error types, \myeg single word phrase
-errors are second most important by number of groups (in
-Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors
-(in Table~\ref{tab:wsj23-comp}).
+We use counts of node errors to make the contributions of each type of error more interpretable.
+As Table~\ref{tab:charniak-breakdown} shows, some errors typically cause only a single node error, where as others, such as coordination, generally cause several.
+This means that considering counts of error groups would over-emphasise some error types, \myeg single word phrase errors are second most important by number of groups (in Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors (in Table~\ref{tab:wsj23-comp}).
 
-As expected, PP attachment is the largest contributor to errors, across all
-parsers.  Interestingly, coordination is sixth on the list, though that is
-partly due to the fact that there are fewer coordination decisions to be made
-in the treebank.\footnote{This is indicated by the frequency of CCs and PPs in
-sections 02--21 of the treebank, 16,844 and 95,581 respectively.  These counts
-are only an indicator of the number of decisions as the nodes can be used in
-ways that do not involve a decision, such as sentences that start with a
-conjunction.}
+As expected, PP attachment is the largest contributor to errors, across all parsers.
+Interestingly, coordination is sixth on the list, though that is partly due to the fact that there are fewer coordination decisions to be made in the treebank.\footnote{This is indicated by the frequency of CCs and PPs in sections 02--21 of the treebank, 16,844 and 95,581 respectively.
+These counts are only an indicator of the number of decisions as the nodes can be used in ways that do not involve a decision, such as sentences that start with a conjunction.}
 
 By looking at the performance of the Collins parser we can see the development
 over the past fifteen years.  There has been improvement across
@@ -814,8 +773,7 @@ determine the results in Table~\ref{tab:charniak-domains}, rather than by the
 number of sentences, as in previous figures.
 
 \begin{table}
-\small
-\renewcommand{\tabcolsep}{1.6mm}
+\begin{center}
 \begin{tabular}{|llrr|}
 	\hline
 		Corpus & Description & Sentences & Av. Length \\
@@ -840,6 +798,7 @@ number of sentences, as in previous figures.
 	average sentence lengths skews the results for errors per sentences, and so
 	in Table~\ref{tab:charniak-domains} we consider errors per word.
 }
+\end{center}
 \end{table}
 
 There are several interesting features in the table.  First, on the Brown
