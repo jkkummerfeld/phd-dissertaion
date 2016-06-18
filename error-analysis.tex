@@ -88,7 +88,6 @@ For all parsers we used the publicly available version, with the standard parame
 	self-trained model (S), and both (SR).
 }
 \end{center}
-%%%\vspace{-3mm}
 \end{table}
 
 Table~\ref{tab:standard-results} shows the standard performance metrics,
@@ -246,7 +245,6 @@ extra nodes.  Together, the criteria and transformation form a template.
 %%%\small named$\;$ chief$\;$ executive$\;$ officer$\;$ of$\;$ Applied$\;$ in$\;$ 1986
 %%%\end{pspicture}
 \end{center}
-\vspace{-5mm}
 \caption{
 	\label{fig:template}
 	Templates are defined in terms of extra and missing spans, shown here with
@@ -257,7 +255,6 @@ extra nodes.  Together, the criteria and transformation form a template.
 	span is deleted during the move as it creates an NP$\rightarrow$NP unary
 	production.
 }
-\vspace{-3.5mm}
 \end{figure}
 
 Once a suitable template is identified we correct the error by moving subtrees,
@@ -633,8 +630,6 @@ approach has the advantage that we identify groups of errors with a single
 cause.  For example, a missing unary production may correspond to an extra
 bracket that contains a subtree that attached incorrectly.
 
-\input{figures/wsj23_comparison.tex}
-
 \subsection{Methodology}
 
 We used sections 00 and 24 as development data while constructing the tree
@@ -674,20 +669,22 @@ about the test set that could bias future work.
 		Unclassified & 655 & 734 & 1.1 \\
 	\hline
 \end{tabular}
-\vspace{-2mm}
 \caption{\label{tab:charniak-breakdown}
 	Breakdown of errors on section 23 for the Charniak parser with self-trained
 	model and reranker.  Errors are sorted by the number of times they occur.
 	Ratio is the average number of node errors caused by each error we identify
 	(\myie Nodes Involved / Occurrences).
 }
-\vspace{-6mm}
 \end{table}
 
 Our system enables us to answer questions about parser behaviour that could
 previously only be probed indirectly.  We demonstrate its usefulness by
 applying it to a range of parsers (here), to reranked K-best lists of various
 lengths, and to output for out-of-domain parsing (following sections).
+
+\begin{landscape}
+\input{figures/wsj23_comparison.tex}
+\end{landscape}
 
 In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on
 \wsj section 23.  The shaded area of each bar indicates the frequency of parse
@@ -706,8 +703,6 @@ error groups would over-emphasise some error types, \myeg single word phrase
 errors are second most important by number of groups (in
 Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors
 (in Table~\ref{tab:wsj23-comp}).
-
-\input{figures/reranking.tex}
 
 As expected, PP attachment is the largest contributor to errors, across all
 parsers.  Interestingly, coordination is sixth on the list, though that is
@@ -749,8 +744,6 @@ fits with their observations.
 
 \subsection{Reranking}
 
-\input{figures/domains_charniak.tex}
-
 The standard dynamic programming approach to parsing limits the range of
 features that can be employed.  One way to deal with this issue is to modify
 the parser to produce the top $K$ parses, rather than just the 1-best, then use
@@ -761,6 +754,10 @@ effectively rerankers are using the set of available options.  Recent work has
 explored this question in more depth, but focusing on how variation in the
 parameters impacts performance on standard metrics
 \parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
+
+\begin{landscape}
+\input{figures/reranking.tex}
+\end{landscape}
 
 In Table~\ref{tab:reranking} we present a breakdown over error types for the
 Charniak parser, using the self-trained model and reranker.  The oracle results
@@ -802,6 +799,10 @@ node types and rule productions.  \textcite{Bender:2011:PEO:2145432.2145479}
 designed a Wikipedia test set to evaluate parsers on dependencies representing
 ten specific linguistic phenomena.
 
+\begin{landscape}
+\input{figures/domains_charniak.tex}
+\end{landscape}
+
 To provide a deeper understanding of the errors arising when parsing outside of
 the newswire domain, we analyse performance of the Charniak parser with
 reranker and self-trained model on the eight parts of the Brown corpus
@@ -833,14 +834,12 @@ number of sentences, as in previous figures.
 		G-Web Email & E-mail & 2450 & 11.9 \\
 	\hline
 \end{tabular}
-\vspace{-2mm}
 \caption{
 	\label{tab:domain-info}
 	Variation in size and contents of the domains we consider.	The variation in
 	average sentence lengths skews the results for errors per sentences, and so
 	in Table~\ref{tab:charniak-domains} we consider errors per word.
 }
-\vspace{-3mm}
 \end{table}
 
 There are several interesting features in the table.  First, on the Brown

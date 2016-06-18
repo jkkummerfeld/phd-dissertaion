@@ -25,6 +25,7 @@
 \usepackage{amsmath}
 %%%\usepackage{subfig}
 \usepackage{LI}
+\usepackage{pdflscape}
 \usepackage{qtree}
 \usepackage{rotating}
 \usepackage{color}
@@ -146,6 +147,14 @@ pdfpagelayout=OneColumn}
          {\usefield{\uline}{\currentfield}}%
          {#1}}
       {#1}}
+
+% Used for the bar diagrams in the error analysis work
+% Change these lengths inside the environment:
+%%% \setlength\fboxsep{0mm}
+%%% \setlength\fboxrule{0.05mm}
+\newcommand{\mybarheight}{2mm}
+\newcommand{\myboxwidth}{8mm}
+\newcommand{\mybar}[1]{\framebox[\myboxwidth][l]{\rule{#1mm}{\mybarheight}}}
 
 % Example of specifying allowed hyphenation within a word
 % \hyphenation{mar-gin-al-ia}
