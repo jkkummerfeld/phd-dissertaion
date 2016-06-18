@@ -155,7 +155,6 @@ Enforcing these difference involves changes throughout the deduction rules.
 \begin{figure}
 \centering
 \input{figures/picture-algorithm}
-\vspace{-10mm}
 \caption{\label{fig:alg-example}
 An example derivation.
 }
@@ -504,7 +503,7 @@ This structure does not come up in \textcite{ec}'s algorithm because of tree con
 We do not include this rule because it would be $O(n^5)$, and this specific structure is almost never observed in the treebank.
 
 Now consider the alternative, when $ps_p$ does not cross any $q$--$(pq)$ edges.
-In this case the possibilities follow a pattern: \\\vspace{-2mm}
+In this case the possibilities follow a pattern: \\
 \begin{center}
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
@@ -520,7 +519,7 @@ In this case the possibilities follow a pattern: \\\vspace{-2mm}
   \draw [out=45,in=135] (sq.north) to (q.north);
   \draw [out=20,in=160] (m0.north) to (o.north);
   \draw [out=20,in=160] (m1.north) to (o.north);
-\end{tikzpicture} \\\vspace{-2mm}
+\end{tikzpicture} \\
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
   \node (m0) at (1.5, 0) {};
@@ -537,7 +536,7 @@ In this case the possibilities follow a pattern: \\\vspace{-2mm}
   \draw [out=25,in=155] (m0.north) to (m2.north);
   \draw [out=20,in=160] (m0.north) to (o.north);
   \draw [out=20,in=160] (m1.north) to (o.north);
-\end{tikzpicture} \\\vspace{-2mm}
+\end{tikzpicture} \\
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
   \node (m0) at (1.5, 0) {};
@@ -556,7 +555,7 @@ In this case the possibilities follow a pattern: \\\vspace{-2mm}
   \draw [out=20,in=160] (m0.north) to (o.north);
   \draw [out=20,in=160] (m1.north) to (o.north);
   \draw [out=25,in=155] (s.north) to (m3.north);
-\end{tikzpicture} \\\vspace{-2mm}
+\end{tikzpicture} \\
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
   \node (m0) at (1.5, 0) {};
@@ -577,7 +576,7 @@ In this case the possibilities follow a pattern: \\\vspace{-2mm}
   \draw [out=20,in=160] (m1.north) to (o.north);
   \draw [out=25,in=155] (s.north) to (m3.north);
   \draw [out=25,in=155] (m2.north) to (m4.north);
-\end{tikzpicture} \\\vspace{-2mm}
+\end{tikzpicture} \\
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
   \node (m0) at (1.5, 0) {};
@@ -1009,7 +1008,6 @@ Once our templates are expanded to show the possible state combinations there ar
 }}
 \end{multicols}
 
-\vspace{-10mm}
 \begin{multicols}{2}
 \scalebox{\mathscale}{\parbox{\linewidth}{
 \begin{flalign*}

@@ -168,7 +168,6 @@ NP} combines with the \cf{NP} to its left to form an \cf{S[dcl]}.  More
 powerful combinators allow categories to combine with greater flexibility.
 
 \begin{figure}
-\vspace{-7mm}
 %%%\begin{pspicture}(0,0)(8,2.8)
 %%%\psline[linewidth=0.3pt]{}(0.05,-0.5)(0.05,0.8)
 %%%\rput(0.05,0.97){\scriptsize \scalebox{0.90}{JJ}}
@@ -217,12 +216,10 @@ powerful combinators allow categories to combine with greater flexibility.
 	}
 }
 }
-\vspace{-4mm}
 \caption{\label{fig:example}
 A crossing constituents example: \textit{his\,\ldots{}suicide} (\ptb) crosses
 \textit{labeled \ldots death} (CCGbank).
 }
-\vspace{-2mm}
 %%%\vspace{3mm}
 \end{figure}
 
@@ -294,7 +291,6 @@ problems, \myeg:
 ``more than'' + ``30'' \hfill(1)\hspace*{2mm}\\ % should form a QP
 ``relatively'' + ``small'' \hfill(2)\hspace*{2mm}\\ % should from an ADJP
 }
-\vspace{-3mm}
 %%% ((N/N)/(N/N))\(S[adj]\NP) IN than
 %%% (N/N)/(N/N) RB relatively
 
@@ -362,13 +358,11 @@ inconsistent, and so we cannot recover without introducing more errors elsewhere
 \begin{center}
 \includegraphics[width=0.85\linewidth]{figures/ccg-example}
 \end{center}
-\vspace{-5mm}
 \caption{\label{fig:inst-example}
 An example function application.
 Top row: \ccg rule.
 Bottom row: applying instruction (VP f a).
 }
-\vspace{-1mm}
 \end{figure}
 
 \begin{table}
@@ -390,11 +384,9 @@ Bottom row: applying instruction (VP f a).
 	\hline
 \end{tabular}
 \end{center}
-\vspace{-4.5mm}
 \caption{\label{tab:operators}
 Types of operations in instructions.
 }
-\vspace{-5mm}
 \end{table}
 
 %%%As well as creating and flattening, we define three other operators.
@@ -445,12 +437,10 @@ cases as the categories combining are the same.
 	\hline
 \end{tabular}
 \end{center}
-\vspace{-4.5mm}
 \caption{\label{tab:instructions}
 %%%\footnotesize
 Instruction sets for the categories in Figure~\ref{fig:example}.
 }
-\vspace{-2mm}
 \end{table}
 
 %% TODO: 100 hours seems like a fair amount, make it clear that this included implementation time
@@ -463,7 +453,6 @@ added instruction.
 
 \begin{table}
 \renewcommand{\tabcolsep}{1.65mm}
-%%%\vspace{-0.4mm}
 \small
 \begin{center}
 \begin{tabular}{llcccc}
@@ -483,12 +472,10 @@ added instruction.
 	\hline
 \end{tabular}
 \end{center}
-\vspace{-4.5mm}
 \caption{\label{tab:conversion-comparison}
 	\parseval Precision, Recall, F-Score, and exact sentence match for converted
 	gold \ccg derivations.
 }
-\vspace{-5mm}
 \end{table}
 
 Table~\ref{tab:conversion-comparison} compares our approach
@@ -506,14 +493,12 @@ been smoothed over or because they are genuine but rare constructions that
 were lost.
 
 \begin{figure}
-	\vspace{-0.3cm}
 	\hspace{-1.4cm}
 	\scalebox{0.8}{
 	\input{figures/ccg-graph2.tex}
 	\hspace{-2.9cm}
 	\input{figures/ccg-graph1.tex}
 	}
-	\vspace{-0.8cm}
 	\caption{
 		\label{fig:scatter_plots}
 		For each sentence in the treebank, we plot the converted parser output
@@ -525,7 +510,6 @@ were lost.
 		Right: No clear correlation is present, indicating that the set of
 		sentences that are converted best (on the far right), are not necessarily
 		easy to parse.
-	\vspace{-4.5mm}
 	}
 \end{figure}
 
@@ -589,7 +573,6 @@ argument-adjunct distinction.
 		\textcite{Charniak-Johnson:2005} & 94.8 & 91.5 & -- \\
 	\hline
 \end{tabular}
-\vspace{-3.0mm}
 \caption{
 	\label{tab:full-comp}
 	F-scores on section 23 for \ptb parsers and \ccg parsers with their output
@@ -603,7 +586,6 @@ argument-adjunct distinction.
 %%%	parsers are close to the performance of the Petrov parser.
 }
 \end{center}
-\vspace{-6mm}
 \end{table}
 
 Table~\ref{tab:full-comp} presents F-scores for three \ptb parsers and three
@@ -649,7 +631,6 @@ effective than previous work, increasing exact sentence match by more than 11\%
 %%%\rput(2.7,2.7){\scriptsize \scalebox{0.95}{S}}
 %%%\end{pspicture}
 
-\vspace{-2.5mm}
 \hspace{-6mm}
 \scalebox{0.80}{
 \footnotesize{
@@ -677,7 +658,6 @@ A crossing constituents example:\textit{his\,\ldots{}suicide} (\ptb) crosses
 \vspace{1cm}
 
 \qtreecenterfalse
-\vspace{-7mm}
 \begin{center}
 \scalebox{0.80}{
 \footnotesize
@@ -711,7 +691,6 @@ A crossing constituents example:\textit{his\,\ldots{}suicide} (\ptb) crosses
 }
 }
 \end{center}
-\vspace{-1mm}
 
 \hspace{-6mm}
 \scalebox{0.80}{

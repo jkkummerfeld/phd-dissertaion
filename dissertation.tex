@@ -130,8 +130,8 @@ pdfpagelayout=OneColumn}
 \childsidesep{1em}
 \childattachsep{0.5in}
 \newcommand{\derivscale}{0.7}
-\newcommand{\derivspace}{\vspace{-4mm}}
-\newcommand{\derivaftercompress}{\vspace{-2mm}}
+\newcommand{\derivspace}{\vspace{0mm}}
+\newcommand{\derivaftercompress}{\vspace{0mm}}
 
 \setcounter{totalnumber}{500}
 \setcounter{topnumber}{500}
@@ -141,6 +141,7 @@ pdfpagelayout=OneColumn}
 
 \DeclareFieldFormat*{booktitle}{#1}
 
+% Fixing wrapping of long booktitles in bib
 \DeclareFieldFormat*{titlecase}{%
     \ifdef{\currentfield}
       {\ifcurrentfield{booktitle}
@@ -177,7 +178,7 @@ pdfpagelayout=OneColumn}
 \campus{Berkeley}
 
 \maketitle
-%%%\approvalpage
+%%%\approvalpage % Only needed for physical hand in
 \copyrightpage
 
 \include{abstract}
