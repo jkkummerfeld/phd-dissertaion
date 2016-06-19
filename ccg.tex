@@ -155,72 +155,86 @@ from lexicalised formalisms, \myeg \hpsg \parencite{Matsuzaki-Tsujii:2008} and \
 
 \subsection{Combinatory Categorial Grammar (\ccg)}
 
-The lower half of Figure~\ref{fig:example} shows a \ccg derivation
+The lower half of Figure~\ref{fig:ccg-example} shows a \ccg derivation
 \parencite{Steedman:2000} in which each word is assigned a {\em category}, and
 {\em combinatory rules} are applied to adjacent categories until only one
 remains.  Categories can be atomic, \myeg the \cf{N} assigned to
 \textit{magistrates}, or complex functions of the form {\em result / arg}, where
 {\em result} and {\em arg} are categories and the slash indicates the argument's
 directionality.  Combinators define how adjacent categories can combine.
-Figure~\ref{fig:example} uses {\em function application}, where a complex
+Figure~\ref{fig:ccg-example} uses {\em function application}, where a complex
 category consumes an adjacent argument to form its result, \myeg \cf{S[dcl]\bs
 NP} combines with the \cf{NP} to its left to form an \cf{S[dcl]}.  More
 powerful combinators allow categories to combine with greater flexibility.
 
 \begin{figure}
-%%%\begin{pspicture}(0,0)(8,2.8)
-%%%\psline[linewidth=0.3pt]{}(0.05,-0.5)(0.05,0.8)
-%%%\rput(0.05,0.97){\scriptsize \scalebox{0.90}{JJ}}
-%%%\psline[linewidth=0.3pt]{}(1.12,-0.5)(1.12,0.8)
-%%%\rput(1.12,0.97){\scriptsize \scalebox{0.90}{NNS}}
-%%%\psline[linewidth=0.3pt]{}(0.05,1.09)(0.6,1.34)(1.12,1.09)
-%%%\psline[linewidth=0.3pt]{}(5.17,-0.5)(5.17,-0.3)
-%%%\rput(5.17,-0.1307){\scriptsize \scalebox{0.90}{PRP\$}}
-%%%\psline[linewidth=0.3pt]{}(6.0,-0.5)(6.0,-0.3)
-%%%\rput(6.0,-0.13){\scriptsize \scalebox{0.90}{NN}}
-%%%\psline[linewidth=0.3pt]{}(5.15,0)(5.575,0.25)(6.0,0)
-%%%\psline[linewidth=0.3pt]{}(6.85,-0.5)(6.85,-0.3)
-%%%\rput(6.85,-0.13){\scriptsize \scalebox{0.90}{DT}}
-%%%\psline[linewidth=0.3pt]{}(7.65,-0.5)(7.65,-0.3)
-%%%\rput(7.65,-0.13){\scriptsize \scalebox{0.90}{NN}}
-%%%\psline[linewidth=0.3pt]{}(6.85,0)(7.25,0.25)(7.65,0)
-%%%\rput(5.575,0.42){\scriptsize \scalebox{0.90}{NP}}
-%%%\rput(7.25,0.42){\scriptsize \scalebox{0.90}{NP}}
-%%%\psline[linewidth=0.3pt]{}(5.575,0.55)(6.4125,0.8)(7.25,0.55)
-%%%\psline[linewidth=0.3pt]{}(3.1,-0.5)(3.1,0.8)
-%%%\rput(3.1,0.97){\scriptsize \scalebox{0.90}{VBD}}
-%%%\rput(6.4125,0.97){\scriptsize \scalebox{0.90}{S}}
-%%%\psline[linewidth=0.3pt]{}(3.1,1.09)(4.756,1.34)(6.4125,1.09)
-%%%\rput(0.6,1.51){\scriptsize \scalebox{0.90}{NP}}
-%%%\rput(4.756,1.51){\scriptsize \scalebox{0.90}{VP}}
-%%%\psline[linewidth=0.3pt]{}(0.6,1.63)(2.678,1.88)(4.756,1.63)
-%%%\rput(2.678,2.05){\scriptsize \scalebox{0.90}{S}}
-%%%\end{pspicture}
+\small
+\begin{tikzpicture}[every text node part/.style={align=center}]
 
-\vspace{2.8mm}
-\hspace{-6mm}
-\scalebox{0.80}{
-\footnotesize{
-	\deriv{7}{
-%%%		\textrm{JJ} & \textrm{NNS} & \textrm{VBD} & \textrm{PRP\$} & \textrm{NN} & \textrm{DT} & \textrm{NN} \\[2pt]
-		\textrm{Italian} & \textrm{magistrates} & \textrm{labeled} & \textrm{his} & \textrm{\hspace*{-2mm}death\hspace*{-2mm}} & \textrm{a} & \textrm{\hspace*{-3mm}suicide\hspace*{-3mm}} \\[3pt]
-		\cf{N/N} & \cf{N} & \cf{((S[dcl]\bs NP)/NP)/NP} & \cf{NP[nb]/N} & \cf{N} & \cf{NP[nb]/N} & \cf{N} \\
-		\fapply{2} & & \fapply{2} & \fapply{2} \\
-		\mc{2}{N} & & \mc{2}{NP} & \mc{2}{NP} \\
-		\uline{2} & \fapply{3} \\
-		\mc{2}{NP} & \mc{3}{\cf{(S[dcl]\bs NP)/NP}} \\
-		& & \fapply{4} \\
-		& & \mc{4}{\cf{S[dcl]\bs NP}} \\
-		\bapply{6} \\
-		\mc{6}{\cf{S[dcl]}} \\
-	}
+  \node (w0) at (0, 0) {\strut Italian \\ \strut $\cf{N/N}$};
+  \node (w1) [right=2ex of w0.east] {\strut magistrates \\ \strut $\cf{N}$};
+  \node (w2) [right=2ex of w1.east] {\strut labeled \\ \strut $\cf{((S[dcl]\bs NP)/NP)/NP}$};
+  \node (w3) [right=2ex of w2.east] {\strut his \\ \strut $\cf{NP[nb]/N}$};
+  \node (w4) [right=2ex of w3.east] {\strut death \\ \strut $\cf{N}$};
+  \node (w5) [right=2ex of w4.east] {\strut a \\ \strut $\cf{NP[nb]/N}$};
+  \node (w6) [right=2ex of w5.east] {\strut suicide \\ \strut $\cf{N}$};
+
+% PTB above
+  \node (nt03) [above=2ex of w3.north] {PRP\$};
+  \node (nt04) [above=2ex of w4.north] {NN};
+  \node (nt05) [above=2ex of w5.north] {DT};
+  \node (nt06) [above=2ex of w6.north] {NN};
+  \path (nt03.north) -- node[above=2ex] (nt13-14) {NP} (nt04.north);
+  \path (nt05.north) -- node[above=2ex] (nt15-16) {NP} (nt06.north);
+  \path (nt13-14.north) -- node[above=2ex] (nt23-26) {S} (nt15-16.north);
+  \node (nt20) at (w0 |- nt23-26) {JJ};
+  \node (nt21) at (w1 |- nt23-26) {NNS};
+  \node (nt22) at (w2 |- nt23-26) {VBD};
+  \path (nt20.north) -- node[above=2ex] (nt30-31) {NP} (nt21.north);
+  \path (nt22.north) -- node[above=2ex] (nt32-36) {VP} (nt23-26.north);
+  \path (nt30-31.north) -- node[above=2ex] (nt40-46) {S} (nt32-36.north);
+
+  \draw (w0.north) -- (nt20.south);
+  \draw (w1.north) -- (nt21.south);
+  \draw (w2.north) -- (nt22.south);
+  \draw (w3.north) -- (nt03.south);
+  \draw (w4.north) -- (nt04.south);
+  \draw (w5.north) -- (nt05.south);
+  \draw (w6.north) -- (nt06.south);
+  \draw (nt03.north) -- (nt13-14.south) -- (nt04.north);
+  \draw (nt05.north) -- (nt15-16.south) -- (nt06.north);
+  \draw (nt13-14.north) -- (nt23-26.south) -- (nt15-16.north);
+  \draw (nt20.north) -- (nt30-31.south) -- (nt21.north);
+  \draw (nt22.north) -- (nt32-36.south) -- (nt23-26.north);
+  \draw (nt30-31.north) -- (nt40-46.south) -- (nt32-36.north);
+
+% CCG below
+  \node (c00L) at (w0.south west) {};
+  \node (c00R) at (w1.south east) {};
+  \draw [-{Straight Barb[length=2mm]}] (c00L) -- node[below=0ex] (c00) {\strut $\cf{N}$} (c00R);
+  \node (c01L) at (w3.south west) {};
+  \node (c01R) at (w4.south east) {};
+  \draw [-{Straight Barb[length=2mm]}] (c01L) -- node[below=0ex] (c01) {\strut $\cf{NP[nb]}$} (c01R);
+  \node (c02L) at (w5.south west) {};
+  \node (c02R) at (w6.south east) {};
+  \draw [-{Straight Barb[length=2mm]}] (c02L) -- node[below=0ex] (c02) {\strut $\cf{NP[nb]}$} (c02R);
+  \node (c10L) at (c00L |- c00.south) {};
+  \node (c10R) at (c00R |- c00.south) {};
+  \draw (c10L) -- node[below=0ex] (c10) {\strut $\cf{NP}$} (c10R);
+  \node (c11L) at (w2.west |- c01.south) {};
+  \node (c11R) at (w4.east |- c01.south) {};
+  \draw [-{Straight Barb[length=2mm]}] (c11L) -- node[below=0ex] (c11) {\strut $\cf{(S[dcl]\bs NP)/NP}$} (c11R);
+  \node (c20L) at (w2.west |- c11.south) {};
+  \node (c20R) at (w6.east |- c11.south) {};
+  \draw [-{Straight Barb[length=2mm]}] (c20L) -- node[below=0ex] (c20) {\strut $\cf{S[dcl]\bs NP}$} (c20R);
+  \node (c30L) at (w0.west |- c20.south) {};
+  \node (c30R) at (w6.east |- c20.south) {};
+  \draw [-{Straight Barb[reversed,length=2mm]}] (c30L) -- node[below=0ex] (c30) {\strut $\cf{S[dcl]}$} (c30R);
+\end{tikzpicture}
+
+\caption{\label{fig:ccg-example}
+A crossing constituents example: \textit{his death a suicide} (\ptb) crosses \textit{labeled his death} (CCGbank).
 }
-}
-\caption{\label{fig:example}
-A crossing constituents example: \textit{his\,\ldots{}suicide} (\ptb) crosses
-\textit{labeled \ldots death} (CCGbank).
-}
-%%%\vspace{3mm}
 \end{figure}
 
 \begin{table}[t!]
@@ -254,7 +268,7 @@ We cannot form a \ptb tree by simply relabeling the categories in a \ccg
 derivation because the mapping to phrase labels is many-to-many, \ccg
 derivations contain extra brackets due to binarisation, and there are cases
 where the constituents in the \ptb tree and the \ccg derivation cross (\myeg
-in Figure~\ref{fig:example}).
+in Figure~\ref{fig:ccg-example}).
 %%%\footnote{These differences are the result of
 %%%conscious decisions made in the construction of CCGbank, in many cases enabling
 %%%the derivation to encode extra dependencies that are not explicitly present in
@@ -270,7 +284,7 @@ leaf (lexical category) and rule (pair of combining categories) in the \ccg deri
 The \ptb tree is constructed from the \ccg bottom-up, creating leaves with
 lexical schemas, then merging/adding sub-trees using rule schemas at each step.
 
-The schemas for Figure~\ref{fig:example} are shown in Table~\ref{fig:candc09}.
+The schemas for Figure~\ref{fig:ccg-example} are shown in Table~\ref{fig:candc09}.
 These apply to create NPs over \textit{magistrates}, \textit{death}, and
 \textit{suicide}, and a VP over \textit{labeled}, and then combine the trees by
 placing one under the other at each step, and finally create an S node at the
@@ -439,7 +453,7 @@ cases as the categories combining are the same.
 \end{center}
 \caption{\label{tab:instructions}
 %%%\footnotesize
-Instruction sets for the categories in Figure~\ref{fig:example}.
+Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
 }
 \end{table}
 
