@@ -74,7 +74,7 @@ pdfpagelayout=OneColumn}
 \tikzset{% 
   required directed/.style={%
     shorten >=1pt,
-    >=stealth',
+    >=Stealth,
     ->
   }
 }
@@ -177,53 +177,43 @@ pdfpagelayout=OneColumn}
 \field{Computer Science}
 \campus{Berkeley}
 
-\maketitle
+%%%\maketitle
 %%%\approvalpage % Only needed for physical hand in
-\copyrightpage
+%%%\copyrightpage
+%%%\include{abstract}
 
-\include{abstract}
-
-\begin{frontmatter}
+%%%\begin{frontmatter}
 
 %%%\begin{dedication}
 %%%\null\vfil
 %%%\begin{center}
-%%%To Ossie Bernosky\\\vspace{12pt}
-%%%And exposition? Of go. No upstairs do fingering. Or obstructive, or purposeful.
-%%%In the glitter. For so talented. Which is confines cocoa accomplished.
-%%%Masterpiece as devoted. My primal the narcotic. For cine? To by recollection
-%%%bleeding. That calf are infant. In clause. Be a popularly. A as midnight
-%%%transcript alike. Washable an acre. To canned, silence in foreign.
+%%%Dedicate?
 %%%\end{center}
 %%%\vfil\null
 %%%\end{dedication}
 
 \tableofcontents
 \clearpage
-\listoffigures
-\clearpage
-\listoftables
+%%%\listoffigures
+%%%\clearpage
+%%%\listoftables
+%%%\include{acknowledgements}
 
-\include{acknowledgements}
-
-\end{frontmatter}
+%%%\end{frontmatter}
 
 \pagestyle{headings}
 \pagenumbering{arabic}
 
-\include{introduction}
-\include{error-analysis}
-\include{ccg}
+%%%\include{introduction}
+%%%\include{error-analysis}
+%%%\include{ccg}
 \include{algorithm}
 \include{representation}
 \include{implementation}
-\include{conclusion}
-
-\appendix
-
-\include{resources}
-\include{advice}
-
-\printbibliography
+%%%\include{conclusion}
+%%%\appendix
+%%%\include{resources}
+%%%\include{advice}
+%%%\printbibliography
 
 \end{document}

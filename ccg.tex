@@ -302,10 +302,10 @@ One of the more complex cases in the example is \textit{Italian}, which is
 assigned (NP~f~\{a\}). This creates a new bracket, inserts the functor's tree, and
 flattens and inserts the argument's tree, producing:
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent
 (NP (JJ Italian) (NNS magistrates))
-\vspace{1mm}
+\vspace{3mm}
 
 Similar operations apply for the other NPs, followed by a unary rule,
 mapping \cf{N} to \cf{NP}.  We handle this by applying one of twelve special
@@ -314,12 +314,12 @@ cases for non-combinatory unary operations in CCGbank.
 Next \textit{labeled} and \textit{his death} combine.  The verb takes three
 arguments, and so has three instructions applied as follows:
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent
 (VP (VBD labeled) (NP (PRP\$ his) (NN death))) \\
 (VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))) \\
 (S (NP (JJ Italian) (NNS magistrates)) (VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))))
-\vspace{1mm}
+\vspace{3mm}
 
 As well as creating and flattening, we define three other operators.
 The * operator takes the label for the new node from the argument,
@@ -421,12 +421,10 @@ been smoothed over or because they are genuine but rare constructions that
 were lost.
 
 \begin{figure}
-	\hspace{-2.0cm}
-	\scalebox{1.5}{
-	\input{figures/ccg-graph2.tex}
-	\hspace{-2.0cm}
-	\input{figures/ccg-graph1.tex}
-	}
+\centering
+  \scalebox{1.2}{ \input{figures/ccg-graph2.tex} }
+	\\
+  \scalebox{1.2}{ \input{figures/ccg-graph1.tex} }
 	\caption{
 		\label{fig:scatter_plots}
 		For each sentence in the treebank, we plot the converted parser output
@@ -522,7 +520,7 @@ parsers is approaching that of the Petrov parser.
 
 \section{Summary}
 
-By exploiting the generalised combinators of the \ccg formalism, we have developed a new method of converting \ccg derivations into \ptb-style trees.
+By exploiting the generalised combinators of the \ccg formalism, we developed a new method of converting \ccg derivations into \ptb-style trees.
 Our system is more effective than previous work, increasing exact sentence match by more than 11\% (absolute), and can be directly integrated with a \ccg parser.
 
 %%% Consider pusing the idea that we have found the inconsistencies in the treebank / the sentences that are inconsistent
