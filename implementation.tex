@@ -4,7 +4,27 @@ As described in the previous section, the time complexity of the new algorithm p
 In addition, that complexity was based on the assumption that we only consider compatible items.
 To parse efficiently we apply several types of pruning and design our core data structure to avoid considering incompatible items.
 
-\paragraph{Coarse to Fine Pruning \parencite{Goodman:1997}}
+\subsection{Inside-Outside}
+
+When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
+Each edge exists in only one place in the derivation, between the item without it and the item with it.
+
+Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
+This scoring is important for
+% TODO
+
+\subsection{Loss Function}
+
+- Describe how we have to account for scores when doing loss-augmented decoding
+
+\subsection{Algorithm rule pruning}
+
+- show all the rules, with prunable ones in blue
+
+- discuss what we're pruning and what the impact is
+
+\subsection{Coarse to Fine Pruning}
+\parencite{Goodman:1997}
 Rather than parsing immediately with the full model we use three passes with progressively richer structure:
 (1) projective trees without spines,
 (2) non-projective graphs without spines,
@@ -18,14 +38,17 @@ The third pass also prunes spines that are not consistent with at least one unpr
 
  - discussion of rule pruning
 
-\paragraph{State beams}
+\subsection{State beams}
+
 In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
 We ensure diversity by dividing each beam into a collection of sub-beams.
 In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
 This definition enables us to avoid considering most incompatible items.
 The third pass also includes one of the spines in the sub-beam definition for the same reason.
 
-\paragraph{Cube pruning \parencite{Chiang:2007}}
+\subsection{Cube pruning}
+\parencite{Chiang:2007}
+
 We apply the standard cube pruning approach when doing binary and ternary compositions.
 Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
 Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
@@ -37,6 +60,89 @@ Using fine sub-beams to avoid comparing incompatible items means that there are 
 - every optimisation
 
 \section{Results}
+
+\subsection{Algorithm Coverage}
+
+\begin{table}
+  \centering
+  \begin{tabular}{|lrr|}
+    \hline
+      & Acyclic & Has a cycle \\
+    \hline
+    \hline
+%%%    Projective Tree & \textbf{18,637} & 0 \\
+%%%    Projective Graph & \textbf{13,594} & 358 \\
+%%%    One-Endpoint Crossing & \textbf{6,879} & 129 \\
+%%%    Other Graph & 228  & 7 \\
+    Projective Tree & \textbf{46.8\%} & - \\
+    Projective Graph & \textbf{34.1\%} & 0.9\% \\
+    One-Endpoint Crossing & \textbf{17.3\%} & 0.3\% \\
+    Other Graph & 0.6\% & 0.01\% \\
+    \hline
+  \end{tabular}
+  \caption{\label{tab:structures}
+    Number of sentences in the training set that are of each structure type.
+    Values in bold are for structures that are recoverable using our algorithm.
+  }
+\end{table}
+
+\begin{table}
+\centering
+  \vspace{2mm}
+  \begin{tabular}{|lrr|}
+    \hline
+%%%    & \multicolumn{2}{c}{Problematic (\%)} \\
+    & \multicolumn{2}{c}{Coverage (\%)} \\
+    Approach & Sentences & Edges \\
+    \hline
+    \hline
+%%%    No traces & 56.15 & 3.73 \\
+%%%    \hline
+%%%    Core representation & 23.31 & 1.53 \\
+%%%    + Head rule changes & 3.32 & 0.45 \\
+%%%    + Null reversal & 2.28 & 0.41 \\
+%%%    + Gapping shift & 1.81 & 0.38 \\
+    Projective trees & 43.85 & 96.27 \\
+    Core representation (3.1) & 76.69 & 98.47 \\
+    + Head rule changes (3.3) & 96.68 & 99.55 \\
+    + Null reversal (3.2) & 97.72 & 99.59 \\
+    + Gapping shift (3.2) & 98.19 & 99.62 \\
+    \hline
+  \end{tabular}
+  \caption{\label{tab:coverage}
+    Coverage improvements for parts of our representation.
+    Core uses the representation proposed in this paper, with the head rules from \textcite{cck}.
+    Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
+  }
+\end{table}
+
+Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
+Structures that are recoverable using our algorithm are bolded.
+The structures we consider cover almost all sentences, while projective trees, the standard output of parsers, account for less than half of sentences.
+
+In Table~\ref{tab:coverage} we show the impact of design decisions for our representation.
+The percentages indicate how many sentences in the training set are completely recoverable by our algorithm.
+Each row shows the outcome of an addition to the previous row, starting from no traces at all, going to our representation with the head rules of \textcite{cck}, then changing the head rules, reversing null-null edges, and changing the target of edges in gapping.
+The largest gain comes from changing the head rules, which is unsurprising since \textcite{cck}'s rules were designed for trees, where any set of rules produce valid structures.
+
+\subsection{Problematic Structures}
+
+To understand what structures are still not covered by our approach we manually inspected twenty examples that contained a cycle and twenty that were not one-endpoint-crossing.
+For the cycles, eleven of the cases related to sentences containing variations of NP \emph{said} interposed between two parts of a single quote.
+A cycle was present because the top node of the parse was co-indexed with a null argument of \emph{said} while \emph{said} was an argument of the head word of the quote.
+The remaining cases were split between use of Expletive (5) and Interpret Constituent Here (4) traces.
+
+%%% 3 EXP
+%%% 5 ICH
+%%% 2 NP says
+%%% 1 Gapping
+%%% 1 list
+%%% 8 other
+For the cases where the structure was not one-endpoint-crossing it was more difficult to determine trends.
+The same three cases, ICH, EXP, and NP \emph{said} accounted for half of the issues.
+Of the rest, most involved a set of arcs like the crossing arcs in Figure~\ref{fig:not-1ec}, but there was no clear way to avoid the crossings by adjusting head rules.
+
+\subsection{Parsing Performance}
 
 We implemented a proof-of-concept system to get preliminary results using this algorithm and representation.
 We used only first-order features, \myie features do not consider pairs of edges.

@@ -1,4 +1,4 @@
-\section{Representation}
+\section{Parse Representation}
 
 \begin{figure*}
 \begin{subfigure}[b][3.75cm][b]{0.19\textwidth}
@@ -187,84 +187,72 @@ The dark edges in Figure~\ref{fig:not-1ec} show an example of how head rules can
 The trace edge from \emph{Page} to \emph{CEO of Google} does not satisfy the 1ec property because it is crossed by two edges with no endpoints in common.
 By switching the head rule for VPs to use a child VP rather than an auxiliary, we can resolve this case.
 
-\subsection{Coverage}
+\section{Algorithm Extensions}
+To handle our representation, we extend the core algorithm described above to support labels on edges and labels on words (spines).
+Additionally, we can constrain the search space to structures containing a projective tree of non-trace edges.
 
-\begin{table}
-  \centering
-  \begin{tabular}{|lrr|}
-    \hline
-      & Acyclic & Has a cycle \\
-    \hline
-    \hline
-%%%    Projective Tree & \textbf{18,637} & 0 \\
-%%%    Projective Graph & \textbf{13,594} & 358 \\
-%%%    One-Endpoint Crossing & \textbf{6,879} & 129 \\
-%%%    Other Graph & 228  & 7 \\
-    Projective Tree & \textbf{46.8\%} & - \\
-    Projective Graph & \textbf{34.1\%} & 0.9\% \\
-    One-Endpoint Crossing & \textbf{17.3\%} & 0.3\% \\
-    Other Graph & 0.6\% & 0.01\% \\
-    \hline
-  \end{tabular}
-  \caption{\label{tab:structures}
-    Number of sentences in the training set that are of each structure type.
-    Values in bold are for structures that are recoverable using our algorithm.
-  }
-\end{table}
+\subsection{Edge Labels and Spines}\label{sec:labels}
+Edge labels can be added by calculating either the sum or max over edge types when adding each edge, and recording the chosen edge in the back reference for the state.
+Spines must be added to the state definition, specifying a label for each visible word ($p$, $q$ and $o$).
+This state expansion is necessary to ensure agreement when combining items.
+\textcite{cck}'s projective tree parser uses a similar approach, while \textcite{ec}'s algorithm is for dependency parsing and so does not consider spines.
 
-\begin{table}
-\centering
-  \vspace{2mm}
-  \begin{tabular}{|lrr|}
-    \hline
-%%%    & \multicolumn{2}{c}{Problematic (\%)} \\
-    & \multicolumn{2}{c}{Coverage (\%)} \\
-    Approach & Sentences & Edges \\
-    \hline
-    \hline
-%%%    No traces & 56.15 & 3.73 \\
-%%%    \hline
-%%%    Core representation & 23.31 & 1.53 \\
-%%%    + Head rule changes & 3.32 & 0.45 \\
-%%%    + Null reversal & 2.28 & 0.41 \\
-%%%    + Gapping shift & 1.81 & 0.38 \\
-    Projective trees & 43.85 & 96.27 \\
-    Core representation (3.1) & 76.69 & 98.47 \\
-    + Head rule changes (3.3) & 96.68 & 99.55 \\
-    + Null reversal (3.2) & 97.72 & 99.59 \\
-    + Gapping shift (3.2) & 98.19 & 99.62 \\
-    \hline
-  \end{tabular}
-  \caption{\label{tab:coverage}
-    Coverage improvements for parts of our representation.
-    Core uses the representation proposed in this paper, with the head rules from \textcite{cck}.
-    Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
-  }
-\end{table}
+\subsection{Enforcing a tree backbone}
+The algorithm above constrains the space of graph structures, but we also want to restrict our search to parses containing a directed projective tree of non-trace edges.
+This requirement is satisfied if every word is the child of exactly one non-trace edge, and no non-trace edges cross.
 
-Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
-Structures that are recoverable using our algorithm are bolded.
-The structures we consider cover almost all sentences, while projective trees, the standard output of parsers, account for less than half of sentences.
+To meet the first condition we add booleans to the state, indicating whether $p$, $q$ and $o$ have non-trace parents.
+When adding edges, a non-trace edge cannot be added if the child already has a non-trace parent.
+When combining items, no word can receive multiple non-trace parents, and words in the middle of the span must have at least one.
 
-In Table~\ref{tab:coverage} we show the impact of design decisions for our representation.
-The percentages indicate how many sentences in the training set are completely recoverable by our algorithm.
-Each row shows the outcome of an addition to the previous row, starting from no traces at all, going to our representation with the head rules of \textcite{cck}, then changing the head rules, reversing null-null edges, and changing the target of edges in gapping.
-The largest gain comes from changing the head rules, which is unsurprising since \textcite{cck}'s rules were designed for trees, where any set of rules produce valid structures.
+Crossing edges are introduced in two ways:
+(1) when adding a $pq$ edge in the $N$, $L$, $R$ and $B$ items, and
+(2) when a non-$B$ item is being formed using two non-$I$ items.
+In both cases we can avoid non-trace edges crossing by using a boolean that tracks whether there are non-trace $o$--$[pq]$ edges in each item.
+The justification is complex and can be found in the supplementary material.
 
-\subsection{Problematic Structures}
+\subsection{Enforcing a tree backbone}
+The algorithm above constrains the space of graph structures, but does not say anything about the edge types being combined.
+In practice, we are only interested in parses that are composed of trace edges plus a projective tree of structural edges.
+Since prior work focused on trees, not graphs, support for this constraint has not previously been explored.
 
-To understand what structures are still not covered by our approach we manually inspected twenty examples that contained a cycle and twenty that were not one-endpoint-crossing.
-For the cycles, eleven of the cases related to sentences containing variations of NP \emph{said} interposed between two parts of a single quote.
-A cycle was present because the top node of the parse was co-indexed with a null argument of \emph{said} while \emph{said} was an argument of the head word of the quote.
-The remaining cases were split between use of Expletive (5) and Interpret Constituent Here (4) traces.
+To ensure every point gets one and only one structural parent, we add booleans to the state, indicating whether $p$, $q$ and $o$ have structural parents.
+When adding edges, a structural edge can not be added if a point already has a structural parent.
+When combining items, no point can receive more than one structural parent, and points in the middle of the span must have at least one.
+Together, these constrains ensure we have a tree.
 
-%%% 3 EXP
-%%% 5 ICH
-%%% 2 NP says
-%%% 1 Gapping
-%%% 1 list
-%%% 8 other
-For the cases where the structure was not one-endpoint-crossing it was more difficult to determine trends.
-The same three cases, ICH, EXP, and NP \emph{said} accounted for half of the issues.
-Of the rest, most involved a set of arcs like the crossing arcs in Figure~\ref{fig:not-1ec}, but there was no clear way to avoid the crossings by adjusting head rules.
+To ensure the tree is projective we need to prevent structural edges from crossing.
+Crossing edges are introduced in two ways, and in both we can avoid structural edges crossing by tracking whether there are structural $o$--$[pq]$ edges.
 
+\subsubsection{When creating edges}
+Every time we add a $pq$ edge in the $N$, $L$, $R$ and $B$ items we create a crossing with all $o$--$(pq)$ edges.
+We do not create a crossing with edges $oq$ or $op$, but our ordering of edge creation means these are definitely not present when we add a $pq$ edge, so tracking structural $o$--$[pq]$ edges gives us the information we need.
+
+We set the boolean for structural $o$--$[pq]$ edges to true if it is currently true or we are creating a structural $op$ or $oq$ edge, and false otherwise.
+
+\subsubsection{When combining items}
+In these cases we never introduce a crossing when making a $B$, or in any rule that combines a set of items with only one non-$I$.
+That leaves these cases, where the top half and bottom half are symmetrical:
+
+\scalebox{0.9}{
+\parbox{\linewidth}{
+\begin{flalign*}
+  RN\cdotp [ikl \; F \; I\overline{L} \; \overline{IK}] \;\; I[kl \; . \; .] \;\; \cdotp LNX[ljk \; .\overline{K} \; . \; \overline{L}.] \\
+  I[il \; F \; .] \;\; \cdotp LN[lki \; .\overline{I} \; .I \; F] \;\; \cdotp \uwave{N}[kjl \; \overline{JL} \; \overline{K}. \; \overline{K}.] \\
+  RNX\cdotp [ilk \; F \; .\overline{K} \; I\overline{L}] \;\; I[lk \; . \; .] \;\; \cdotp \uwave{LN}[kjl \; .\overline{L} \; . \; \overline{K}.] \\
+  LN[ikx \; .\overline{X} \; .X \; \overline{IK}] \;\; \cdotp N[kji \; \overline{JI} \; \overline{KI} \; \overline{KJ}] \\
+  LN[ikx \; .\overline{X} \; .\overline{X} \; \overline{I}K] \;\; \cdotp N[kji \; \overline{JI} \; \overline{KI} \; \overline{KJ}] \\
+  X[ikx \; .\overline{X} \; .X \; F] \;\; \cdotp LN[kji \; .\overline{I} \; .\overline{I} \; \overline{KJ}] \\
+  X[ikx \; .\overline{X} \; .\overline{X} \; \overline{I}K] \;\; \cdotp LN[kji \; .\overline{I} \; .\overline{I} \; \overline{KJ}] \\[14pt]
+  RNX\cdotp [ilk \; \overline{F} \; .\overline{K} \; .\overline{L}] \;\; I[lk \; . \; .] \;\; \cdotp LN[kjl \; J\overline{L} \; F \; \overline{KJ}] \\
+  \uwave{N}\cdotp [ikl \; \overline{KF} \; \overline{IL} \; .\overline{K}] \;\; RN\cdotp [klj \; .J \; .\overline{J} \; F] \;\; I[lj \; . \; F] \\
+  \uwave{RN}\cdotp [ikl \; \overline{F} \; .\overline{L} \; .\overline{K}] \;\; I[kl \; . \; .] \;\; \cdotp LNX[ljk \; .\overline{K} \; F \; \overline{L}J] \\
+  N\cdotp [ikj \; \overline{KJ} \; \overline{IJ} \; \overline{IK}] \;\; RN[kjx \; .X \; .\overline{X} \; \overline{KJ}] \\
+  N\cdotp [ikj \; \overline{KJ} \; \overline{IJ} \; \overline{IK}] \;\; RN[kjx \; .\overline{X} \; .\overline{X} \; K\overline{J}] \\
+  RN\cdotp [ikj \; .\overline{J} \; .\overline{J} \; \overline{IK}] \;\; X[kjx \; .X \; .\overline{X} \; F] \\
+  RN\cdotp [ikj \; .\overline{J} \; .\overline{J} \; \overline{IK}] \;\; X[kjx \; .\overline{X} \; .\overline{X} \; K\overline{J}] \\
+\end{flalign*}
+}}
+
+While in general there is the potential that an $o$--$[pq]$ boolean might be true because of an $op$ or $oq$ edge that doesn't actually participate in a crossing, the way we have set the parent constraints above means this is not the case.
+Instead, all $o$--$[pq]$ edges in each pair of items will cross, and so knowing whether any $o$--$[pq]$ edge is structural is sufficient to determine whether a structural crossing is occurring.

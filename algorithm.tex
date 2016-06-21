@@ -239,6 +239,7 @@ No, then split at $p+1$: \\
 \end{tikzpicture}
 \end{center}
 
+\noindent
 Yes, then consider $ps$, the longest $p$--$(pq)$ edge. \\
 Do any edges cross $ps$? \\
 No, then split at $s$: \\
@@ -271,6 +272,7 @@ No, then split at $s$: \\
 \end{tikzpicture}
 \end{center}
 
+\noindent
 Yes, then consider the set of edges $C$, that cross $ps$.
 If $|C| > 1$, let $t$ be the common endpoint of all edges in $C$ (they must have a common endpoint to satisfy the 1ec property for $ps$).
 If $|C| = 1$, let $t$ be the endpoint outside $ps$ (this is one source of ambiguity in \textcite{ec}).
@@ -324,6 +326,7 @@ Yes to both: \\
 \end{tikzpicture}
 \end{center}
 
+\noindent
 Yes $s < t$, no $s$--$(tq)$ edges: \\
 \begin{center}
 \begin{tikzpicture}
@@ -423,6 +426,7 @@ Yes: \\
 \end{tikzpicture}
 \end{center}
 
+\noindent
 No: \\
 \begin{center}
 \begin{tikzpicture}
@@ -537,6 +541,7 @@ The $X'$ is a slight variation on our $X$, since it has both $s_qo$ and $s_po$.
 This structure does not come up in \textcite{ec}'s algorithm because of tree constraints that apply once directionality is considered.
 We do not include this rule because it would be $O(n^5)$, and this specific structure is almost never observed in the treebank.
 
+\noindent
 Now consider the alternative, when $ps_p$ does not cross any $q$--$(pq)$ edges.
 In this case the possibilities follow a pattern: \\
 \begin{center}
@@ -883,62 +888,8 @@ No, symmetrical to the yes case.
 As in the previous section, our decomposition differs from \textcite{ec}'s to meet our altered definition of $N$.
 Here, when a sub-item is an $X$ there is only one $o$--$(pq)$ edge, and when it is an $N$ there is more than one.
 
-\subsubsection{Extensions}
-To handle our representation, we extend the core algorithm described above to support labels on edges and labels on words (spines).
-Additionally, we can constrain the search space to structures containing a projective tree of non-trace edges.
 
-\paragraph{Edge Labels and Spines}\label{sec:labels}
-Edge labels can be added by calculating either the sum or max over edge types when adding each edge, and recording the chosen edge in the back reference for the state.
-Spines must be added to the state definition, specifying a label for each visible word ($p$, $q$ and $o$).
-This state expansion is necessary to ensure agreement when combining items.
-\textcite{cck}'s projective tree parser uses a similar approach, while \textcite{ec}'s algorithm is for dependency parsing and so does not consider spines.
-
-\paragraph{Enforcing a tree backbone}
-The algorithm above constrains the space of graph structures, but we also want to restrict our search to parses containing a directed projective tree of non-trace edges.
-This requirement is satisfied if every word is the child of exactly one non-trace edge, and no non-trace edges cross.
-
-To meet the first condition we add booleans to the state, indicating whether $p$, $q$ and $o$ have non-trace parents.
-When adding edges, a non-trace edge cannot be added if the child already has a non-trace parent.
-When combining items, no word can receive multiple non-trace parents, and words in the middle of the span must have at least one.
-
-Crossing edges are introduced in two ways:
-(1) when adding a $pq$ edge in the $N$, $L$, $R$ and $B$ items, and
-(2) when a non-$B$ item is being formed using two non-$I$ items.
-In both cases we can avoid non-trace edges crossing by using a boolean that tracks whether there are non-trace $o$--$[pq]$ edges in each item.
-The justification is complex and can be found in the supplementary material.
-
-\subsubsection{Derivational ambiguity}
-
-One key difference between our algorithm and the original one-endpoint-crossing algorithm presented by \textcite{ec} is that we avoid spurious ambiguity in the ways a parse can be decomposed.
-Most of the cases in which this ambiguity arises are due to symmetry that is not explicitly broken.
-For example, the choice of $t$ in the description of Intervals.
-We resolved these issues by breaking such cases of symmetry, and altering the definitions of the items to ensure they cannot represent equivalent structures.
-By avoiding derivational ambiguity we reduce the search space, and enable efficient summing over the space.
-
-\subsubsection{Complexity}
-
-Without any labels, our algorithm is $O(n^4)$, where $n$ is the length of the sentence.
-This comes from both the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
-
-Adding edge labels changes the complexity to $O(n^4 + e n^2)$, where $e$ is the number of edge types, and the second term comes from having to score every possible edge.
-Adding spines, changes the complexity to $O(s^4 n^4 + e s^2 n^2)$, where $s$ is the number of spine types, though depending on features the second term could be simplified to either $e n^2$ or $s^2 n^2$.
-In constituency parsing $e$ and $s$ are both around a thousand, making full enumeration of the dynamic program too slow in practice.
-We resolve this issue through several types of pruning, described in the next section.
-
-Finally, there is an important constant in the complexity, relating to the number of rules.
-For any set of split points there are multiple items that could be combined.
-Once our templates are expanded to show the possible state combinations there are 49,292 rules.
-
-%%%\subsubsection{Inside-Outside}
-
-%%%When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
-%%%Each edge exists in only one place in the derivation, between the item without it and the item with it.
-
-%%%Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
-%%%This scoring is important for
-
-
-\section{Full Algorithm Derivation}
+\section{Algorithm Definition and Proof}
 
 In the paper we provide only a sketch of the algorithm, here we explain the full derivation.
 For completeness, some of the content is repeated.
@@ -2126,51 +2077,27 @@ They are enforced by the code that converts the templates into all valid deducti
 
 All three of these can be enforced in the rule creation because we have the complete set of parent connections present in the definition of what combinations are allowed.
 
-\subsection{Enforcing a tree backbone}
-The algorithm above constrains the space of graph structures, but does not say anything about the edge types being combined.
-In practice, we are only interested in parses that are composed of trace edges plus a projective tree of structural edges.
-Since prior work focused on trees, not graphs, support for this constraint has not previously been explored.
+\section{Algorithm Properties}
 
-To ensure every point gets one and only one structural parent, we add booleans to the state, indicating whether $p$, $q$ and $o$ have structural parents.
-When adding edges, a structural edge can not be added if a point already has a structural parent.
-When combining items, no point can receive more than one structural parent, and points in the middle of the span must have at least one.
-Together, these constrains ensure we have a tree.
+\subsection{Derivational ambiguity}
 
-To ensure the tree is projective we need to prevent structural edges from crossing.
-Crossing edges are introduced in two ways, and in both we can avoid structural edges crossing by tracking whether there are structural $o$--$[pq]$ edges.
+One key difference between our algorithm and the original one-endpoint-crossing algorithm presented by \textcite{ec} is that we avoid spurious ambiguity in the ways a parse can be decomposed.
+Most of the cases in which this ambiguity arises are due to symmetry that is not explicitly broken.
+For example, the choice of $t$ in the description of Intervals.
+We resolved these issues by breaking such cases of symmetry, and altering the definitions of the items to ensure they cannot represent equivalent structures.
+By avoiding derivational ambiguity we reduce the search space, and enable efficient summing over the space.
 
-\subsubsection{When creating edges}
-Every time we add a $pq$ edge in the $N$, $L$, $R$ and $B$ items we create a crossing with all $o$--$(pq)$ edges.
-We do not create a crossing with edges $oq$ or $op$, but our ordering of edge creation means these are definitely not present when we add a $pq$ edge, so tracking structural $o$--$[pq]$ edges gives us the information we need.
+\subsection{Complexity}
 
-We set the boolean for structural $o$--$[pq]$ edges to true if it is currently true or we are creating a structural $op$ or $oq$ edge, and false otherwise.
+Without any labels, our algorithm is $O(n^4)$, where $n$ is the length of the sentence.
+This comes from both the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
 
-\subsubsection{When combining items}
-In these cases we never introduce a crossing when making a $B$, or in any rule that combines a set of items with only one non-$I$.
-That leaves these cases, where the top half and bottom half are symmetrical:
+Adding edge labels changes the complexity to $O(n^4 + e n^2)$, where $e$ is the number of edge types, and the second term comes from having to score every possible edge.
+Adding spines, changes the complexity to $O(s^4 n^4 + e s^2 n^2)$, where $s$ is the number of spine types, though depending on features the second term could be simplified to either $e n^2$ or $s^2 n^2$.
+In constituency parsing $e$ and $s$ are both around a thousand, making full enumeration of the dynamic program too slow in practice.
+We resolve this issue through several types of pruning, described in the next section.
 
-\scalebox{0.9}{
-\parbox{\linewidth}{
-\begin{flalign*}
-  RN\cdotp [ikl \; F \; I\overline{L} \; \overline{IK}] \;\; I[kl \; . \; .] \;\; \cdotp LNX[ljk \; .\overline{K} \; . \; \overline{L}.] \\
-  I[il \; F \; .] \;\; \cdotp LN[lki \; .\overline{I} \; .I \; F] \;\; \cdotp \uwave{N}[kjl \; \overline{JL} \; \overline{K}. \; \overline{K}.] \\
-  RNX\cdotp [ilk \; F \; .\overline{K} \; I\overline{L}] \;\; I[lk \; . \; .] \;\; \cdotp \uwave{LN}[kjl \; .\overline{L} \; . \; \overline{K}.] \\
-  LN[ikx \; .\overline{X} \; .X \; \overline{IK}] \;\; \cdotp N[kji \; \overline{JI} \; \overline{KI} \; \overline{KJ}] \\
-  LN[ikx \; .\overline{X} \; .\overline{X} \; \overline{I}K] \;\; \cdotp N[kji \; \overline{JI} \; \overline{KI} \; \overline{KJ}] \\
-  X[ikx \; .\overline{X} \; .X \; F] \;\; \cdotp LN[kji \; .\overline{I} \; .\overline{I} \; \overline{KJ}] \\
-  X[ikx \; .\overline{X} \; .\overline{X} \; \overline{I}K] \;\; \cdotp LN[kji \; .\overline{I} \; .\overline{I} \; \overline{KJ}] \\[14pt]
-  RNX\cdotp [ilk \; \overline{F} \; .\overline{K} \; .\overline{L}] \;\; I[lk \; . \; .] \;\; \cdotp LN[kjl \; J\overline{L} \; F \; \overline{KJ}] \\
-  \uwave{N}\cdotp [ikl \; \overline{KF} \; \overline{IL} \; .\overline{K}] \;\; RN\cdotp [klj \; .J \; .\overline{J} \; F] \;\; I[lj \; . \; F] \\
-  \uwave{RN}\cdotp [ikl \; \overline{F} \; .\overline{L} \; .\overline{K}] \;\; I[kl \; . \; .] \;\; \cdotp LNX[ljk \; .\overline{K} \; F \; \overline{L}J] \\
-  N\cdotp [ikj \; \overline{KJ} \; \overline{IJ} \; \overline{IK}] \;\; RN[kjx \; .X \; .\overline{X} \; \overline{KJ}] \\
-  N\cdotp [ikj \; \overline{KJ} \; \overline{IJ} \; \overline{IK}] \;\; RN[kjx \; .\overline{X} \; .\overline{X} \; K\overline{J}] \\
-  RN\cdotp [ikj \; .\overline{J} \; .\overline{J} \; \overline{IK}] \;\; X[kjx \; .X \; .\overline{X} \; F] \\
-  RN\cdotp [ikj \; .\overline{J} \; .\overline{J} \; \overline{IK}] \;\; X[kjx \; .\overline{X} \; .\overline{X} \; K\overline{J}] \\
-\end{flalign*}
-}}
-
-While in general there is the potential that an $o$--$[pq]$ boolean might be true because of an $op$ or $oq$ edge that doesn't actually participate in a crossing, the way we have set the parent constraints above means this is not the case.
-Instead, all $o$--$[pq]$ edges in each pair of items will cross, and so knowing whether any $o$--$[pq]$ edge is structural is sufficient to determine whether a structural crossing is occurring.
-
-%TODO: Flesh this out
+Finally, there is an important constant in the complexity, relating to the number of rules.
+For any set of split points there are multiple items that could be combined.
+Once our templates are expanded to show the possible state combinations there are 49,292 rules.
 
