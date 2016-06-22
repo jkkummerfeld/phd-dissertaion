@@ -22,12 +22,12 @@ We use this analysis to answer a range of questions about parser behaviour, incl
 Our evaluation is over a wide range of \ptb constituency parsers and their variants from the past fifteen years.
 For all parsers we used the publicly available version, with the standard parameter settings.
 
-\begin{description}\itemsep1pt
+\begin{description}
 	\item[ Berkeley] \parencite{Petrov-etal:2006,Petrov-Klein:2007}. An
 	unlexicalised parser with a grammar constructed with automatic state
 	splitting.
 
-	\item[ Bikel] (2004)\nocite{Bikel:2004} implementation of Collins (1997).
+	\item[ Bikel] (\citeyear{Bikel:2004}) implementation of \textcite{Collins:1997}.
 
 	\item[ BUBS]
 	\parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
@@ -35,12 +35,12 @@ For all parsers we used the publicly available version, with the standard parame
 	but parses with various pruning techniques to improve speed, at the cost of
 	accuracy.
 
-	\item[ Charniak] (2000)\nocite{Charniak:2000}. A generative parser with a
+	\item[ Charniak] (\citeyear{Charniak:2000}). A generative parser with a
 	maximum entropy-inspired model.  We also use the reranker
 	\parencite{Charniak-Johnson:2005}, and the self-trained model
 	\parencite{McClosky-Charniak-Johnson:2006}.
 
-	\item[ Collins] (1997)\nocite{Collins:1997}. A generative lexicalised parser, with
+	\item[ Collins] (\citeyear{Collins:1997}). A generative lexicalised parser, with
 	three models, a base model, a model that uses subcategorisation
 	frames for head words, and a model that takes into account traces.
 
@@ -176,9 +176,7 @@ The tree transformation stage corresponds to the main loop, while the second
 stage corresponds to the final loop.
 
 \begin{algorithm}[t]
-\small
 \begin{algorithmic}
-\small
 \State $U =$ initial set of node errors
 \State Sort $U$ by the depth of the error in the tree, deepest first
 \State $G = \emptyset$
@@ -202,7 +200,7 @@ stage corresponds to the final loop.
 	\State Classify $g$ based on properties of the group
 \EndFor
 \end{algorithmic}
-\caption{\small
+\caption{
 \label{alg:code}
 	Tree transformation error classification
 }
@@ -232,6 +230,7 @@ extra nodes.  Together, the criteria and transformation form a template.
 
 \begin{figure}
 \begin{center}
+% TODO: Make figure
 %%%\begin{pspicture}(-0.07,-0.6)(7.9,0.6)
 %%%\psline(1.02,0.16)(1.02,0.75)(7.85,0.75)(7.85,0.16)
 %%%\psline(4.52,0.16)(4.52,0.65)(7.75,0.65)(7.75,0.16)
@@ -657,6 +656,10 @@ We demonstrate its usefulness by applying it to a range of parsers (here), to re
 
 \begin{landscape}
 \input{figures/wsj23_comparison.tex}
+
+\input{figures/reranking.tex}
+
+\input{figures/domains_charniak.tex}
 \end{landscape}
 
 In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on \wsj section 23.
@@ -714,10 +717,6 @@ explored this question in more depth, but focusing on how variation in the
 parameters impacts performance on standard metrics
 \parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
 
-\begin{landscape}
-\input{figures/reranking.tex}
-\end{landscape}
-
 In Table~\ref{tab:reranking} we present a breakdown over error types for the
 Charniak parser, using the self-trained model and reranker.  The oracle results
 use the parse in each K-best list with the highest F-score.  While this may not
@@ -757,10 +756,6 @@ parser was trained on \parencite{Gildea:2001}.
 node types and rule productions.  \textcite{Bender:2011:PEO:2145432.2145479}
 designed a Wikipedia test set to evaluate parsers on dependencies representing
 ten specific linguistic phenomena.
-
-\begin{landscape}
-\input{figures/domains_charniak.tex}
-\end{landscape}
 
 To provide a deeper understanding of the errors arising when parsing outside of
 the newswire domain, we analyse performance of the Charniak parser with
