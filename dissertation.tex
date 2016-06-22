@@ -1,9 +1,10 @@
 % dissertaion.tex
 %
 % Based on the example from Paul Vojta.
+% Note: Requires the Noto Sans Mono CJK TC font, download the .otf definition (free online) and on OS X install by double clicling, then selecting install.
 
 \documentclass{ucbthesis}
-\usepackage[style=authoryear-icomp,backref,sorting=ynt]{biblatex}
+\usepackage[style=authoryear-icomp,backref,sorting=ynt,backend=biber]{biblatex}
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -23,7 +24,6 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
-%%%\usepackage{subfig}
 \usepackage{LI}
 \usepackage{pdflscape}
 \usepackage{qtree}
@@ -35,15 +35,30 @@
 \usepackage{array}
 \usepackage{arydshln}
 \usepackage{xcolor,colortbl}
-\usepackage{graphicx}
 \usepackage{multicol}
-\usepackage{ulem}
+\usepackage[normalem]{ulem}
 \usepackage{framed}
 \usepackage{tikz}
 \usepackage{pgf}
 \usepackage{subcaption}
 \usepackage{mdwlist}
 \usepackage{pstricks}
+% Chinese handling
+\usepackage{ifxetex}
+\ifxetex
+    \usepackage{xeCJK}
+    \setCJKmainfont{Noto Sans Mono CJK TC} % A freely available font made by Google and Adobe
+    \setmainfont[Ligatures=TeX,Mapping=tex-text]{Times}
+    \usepackage[final,protrusion=true]{microtype}
+    \SetProtrusion{encoding=*,family=rm*}{
+    {,}={,800},
+    {-}={,850},
+    {.}={,500},
+    {;}={,500},
+    {:}={,500}
+    }
+\fi
+\usepackage{linguex}
 % Last intentionally
 \usepackage{hyperref}
 
@@ -92,7 +107,7 @@ pdfpagelayout=OneColumn}
 \newcommand{\ccg}{\textsc{ccg}\xspace}
 \newcommand{\cfg}{\textsc{cfg}\xspace}
 \newcommand{\cky}{\textsc{cky}\xspace}
-\newcommand{\dg}{\textsc{dg}\xspace}
+\newcommand{\depgr}{\textsc{dg}\xspace}
 \newcommand{\dop}{\textsc{dop}\xspace}
 \newcommand{\evalb}{\textsc{evalb}\xspace}
 \newcommand{\gb}{\textsc{gb}\xspace}
@@ -104,11 +119,19 @@ pdfpagelayout=OneColumn}
 \newcommand{\parseval}{\textsc{parseval}\xspace}
 \newcommand{\pos}{\textsc{pos}\xspace}
 \newcommand{\ptb}{\textsc{ptb}\xspace}
+\newcommand{\pctb}{\textsc{pctb}\xspace}
 \newcommand{\wsj}{\textsc{wsj}\xspace}
 
 \newcommand{\myeg}{e.g.\@\xspace}
 \newcommand{\myie}{i.e.\@\xspace}
 \newcommand{\myvs}{vs.\@\xspace}
+
+% For showing translations (e.g. Chinese)
+\newcommand{\Trans}[1]{\textit{#1}}
+\newcommand{\glos}[2]{{#1} \Trans{#2}}
+ 
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
  
 \newcommand{\mathscale}{0.8}
 \newcommand{\textexample}[1]{\textsf{#1}}
@@ -177,43 +200,44 @@ pdfpagelayout=OneColumn}
 \field{Computer Science}
 \campus{Berkeley}
 
-%%%\maketitle
+\maketitle
 %%%\approvalpage % Only needed for physical hand in
-%%%\copyrightpage
-%%%\include{abstract}
+\copyrightpage
+\include{abstract}
 
-%%%\begin{frontmatter}
+\begin{frontmatter}
 
-%%%\begin{dedication}
-%%%\null\vfil
-%%%\begin{center}
-%%%Dedicate?
-%%%\end{center}
-%%%\vfil\null
-%%%\end{dedication}
+\begin{dedication}
+\null\vfil
+\begin{center}
+Dedicate?
+\end{center}
+\vfil\null
+\end{dedication}
 
 \tableofcontents
 \clearpage
-%%%\listoffigures
-%%%\clearpage
-%%%\listoftables
-%%%\include{acknowledgements}
+\listoffigures
+\clearpage
+\listoftables
+\include{acknowledgements}
 
-%%%\end{frontmatter}
+\end{frontmatter}
 
 \pagestyle{headings}
 \pagenumbering{arabic}
 
-%%%\include{introduction}
-%%%\include{error-analysis}
-%%%\include{ccg}
+\include{introduction}
+\include{error-analysis}
+%%%\include{chinese}
+\include{ccg}
 \include{algorithm}
 \include{representation}
 \include{implementation}
-%%%\include{conclusion}
-%%%\appendix
-%%%\include{resources}
-%%%\include{advice}
-%%%\printbibliography
+\include{conclusion}
+\appendix
+\include{resources}
+\include{advice}
+\printbibliography
 
 \end{document}

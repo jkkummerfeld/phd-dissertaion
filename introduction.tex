@@ -63,7 +63,7 @@ For the purposes of this thesis, it is important to understand a few general pro
 Each theory encodes relationships between words using structure, but the form of those structures varies considerably.
 Figure~\ref{fig:syntax} shows how the sentence \textexample{Ellen enjoys running} is represented in the three syntactic formalisms we use.
 
-In the leftmost case, which uses dependency grammar \parencite[\dg][]{dependency-grammar}, each edge indicates a relationship between two words.
+In the leftmost case, which uses dependency grammar \parencite[\depgr][]{dependency-grammar}, each edge indicates a relationship between two words.
 The label expresses the type of dependency, out of 40-50 types \parencite{ud,sd}.
 The arrow points from the word that is the \textit{dependent} / \textit{child} to the word that is the \textit{head} / \textit{parent}\footnote{The direction of the arrow is a convention we are following from linguistics. Note that this is the reverse of the convention in graph theory.}.
 The dashed edge is often excluded in order to make the edges form a tree (a structure that connects all words, but does not contain a cycle).
@@ -86,13 +86,13 @@ This is possible because the relation has been threaded through the tree via the
 %%%Comparing these three representations of syntax we can see some axes of variation:
 %%%\begin{itemize}
 %%%  \item[Lexical heads]
-%%%  Explicit in \dg. Implicitly encoded by \ccg via the direction of composition. Not represented in \gb.
+%%%  Explicit in \depgr. Implicitly encoded by \ccg via the direction of composition. Not represented in \gb.
 %%%  \item[Constituents]
-%%%  Explicit in \gb and \ccg. Can be inferred in \dg by considering all descendants of a word (note, not necessarily a continuous span).
+%%%  Explicit in \gb and \ccg. Can be inferred in \depgr by considering all descendants of a word (note, not necessarily a continuous span).
 %%%  \item[Number of rules vs. number of labels]
-%%%  \ccg has a small set of general combinators, but many categories. \gb has many rules, but only a few labels. \dg has a small number of both.
+%%%  \ccg has a small set of general combinators, but many categories. \gb has many rules, but only a few labels. \depgr has a small number of both.
 %%%  \item[Structural properties]
-%%%  \ccg derivations are always trees, but have spurious ambiguity, while \dg and \gb do not have spurious ambiguity but cannot represent all relations in a tree.
+%%%  \ccg derivations are always trees, but have spurious ambiguity, while \depgr and \gb do not have spurious ambiguity but cannot represent all relations in a tree.
 %%%\end{itemize}
 
 While syntactic formalisms are used in a variety of ways, our focus is on the automatic production of syntactic structures by computer programs.
@@ -110,7 +110,7 @@ The standard measure of constituent parser performance is the F-Score, the harmo
 Performance on \wsj section 23 has exceeded $90$ F\textsubscript{1} \parencite{Petrov-Klein:2007}, and $92$ F\textsubscript{1} when using self-training and reranking \parencite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
 While these results give a useful measure of overall performance, they provide no information about the nature, or relative importance, of the remaining errors.
 
-Broad investigations of parser errors beyond the \parseval metric \parencite{Black-etal:1991} have either focused on specific parsers, \myeg \parencite{Collins:2003}, or have involved conversion to \dg \parencite{Carroll-etal:1998,King:2003}.
+Broad investigations of parser errors beyond the \parseval metric \parencite{Black-etal:1991} have either focused on specific parsers, \myeg \parencite{Collins:2003}, or have involved conversion to \depgr \parencite{Carroll-etal:1998,King:2003}.
 In all of these cases, the analysis has not taken into consideration how a set of errors can have a common cause, \myeg a single mis-attachment can create multiple node errors.
 
 In the first part of the thesis, we propose a new method of error classification using tree transformations.

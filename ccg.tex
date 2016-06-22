@@ -424,8 +424,8 @@ were lost.
 \centering
   \hfill
   \scalebox{0.85}{ \includegraphics[trim={110mm 25mm 10mm 15mm},clip]{figures/heat-converted} }
-  \scalebox{0.85}{ \includegraphics[trim={15mm 0 55mm 40mm},clip]{figures/heat-converted} }
   \hfill
+  \scalebox{0.85}{ \includegraphics[trim={15mm 0 55mm 40mm},clip]{figures/heat-converted} }
 	\\
   \scalebox{0.85}{ 
     \includegraphics[trim={15mm 0 50mm 40mm},clip]{figures/heat-native}
@@ -440,7 +440,8 @@ were lost.
 		For each sentence in the treebank, we plot the converted parser output against gold conversion (top), the original parser evaluation against gold conversion (left), and the converted parser output against the original parser evaluation against (right).
 		A diagonal line indicating $x=y$ is also included.
 		Top: Most points lie below the diagonal, indicating that the quality of converted parser output (y) is upper bounded by the quality of conversion on gold parses (x).
-		Bottom: No clear correlation is present, indicating that the set of sentences that are converted best (on the far right), are not necessarily easy to parse.
+		Left: No clear correlation is present, indicating that the set of sentences that are converted best (on the far right), are not necessarily easy to parse.
+		Right: In general, accuracy on the native metric is correlated with accuracy after conversion.
 	}
 \end{figure}
 

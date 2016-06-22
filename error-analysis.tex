@@ -2,7 +2,7 @@
 
 \begin{center}
 \textit{
-  A preliminary version of this chapter appeared as \textcite{Kummerfeld:2012:EMNLP}.
+  Preliminary versions of this chapter appeared as \textcite{Kummerfeld-etal:2012:EMNLP} and \textcite{Kummerfeld-etal:2013:ACL}.
 }
 \end{center}
 
@@ -843,18 +843,404 @@ Some of these issues, such as URL handling, could be resolved with suitable
 training data.  Other issues, such as ungrammatical language and
 unconventional use of words, pose a greater challenge.
 
-\section{Conclusion}
+%%%  ============================================================================
+%%%  
+%%%  This paper reports on the results of systematic analysis of errors
+%%%  made by Chinese parsers.
+%%%  
+%%%  The experimental results are very interesting.
+%%%  Though the basic methodology used in the paper builds directly
+%%%  on a previous work, it is adapted well to Chinese through careful
+%%%  analysis of error types.
+%%%  
+%%%  It would be nice to give more in-depth comparison with previous
+%%%  findings on the difficulty of Chinese parsing, but I understand
+%%%  the authors have already done well within the limited space.
+%%%  
+%%%  ============================================================================
+%%%  
+%%%  The paper is a thorough analysis of problems in Chinese parsing. I like it that
+%%%  a variety of parsers were used. The paper is generally well written. The
+%%%  results do not seem particularly surprising but it is good to have empirical
+%%%  evidence to support them. The analysis and software should support future
+%%%  research into the problematic areas.
+%%%  However, I would suggest adding statistical significance tests, and reworking
+%%%  Section 4. I understand that not all error categories can be discussed in
+%%%  detail but the selection was unsatisfactory. Table 1 shows which error types
+%%%  are new in this work, but not all of them are explained. It's not clear how the
+%%%  order of subsections is determined. Some types are presented mostly to say that
+%%%  they are less important than in English (PP attachment), while the second
+%%%  biggest error type (coordination) is not discussed in this section at all, and
+%%%  the third-highest only very briefly (not enough to make me understand why this
+%%%  is substantially different from English).
+%%%  Maybe for those categories that are comparable to Kummerfeld, you could add the
+%%%  English percentages to Table 1?
+%%%  I'm not so convinced by the final conclusion, NP internal structure is an issue
+%%%  in English as well, just not in the PTB annotation. Coordination is still not
+%%%  properly solved for English.
+%%%  
+%%%  ============================================================================
+%%%  
+%%%  This paper presents a comprehensive analysis of errors in Chinese Parsing,
+%%%  and releases an open-source code for it.
+%%%  
+%%%  The author adapt the system from Kummerfeld et al.2012 to Chinese,
+%%%  and examine a wide range of Chinese constitute Parsers.
+%%%  Experimental results show a series of interesting findings,
+%%%  mainly on verb-argument-attach-error and coordination errors.
+%%%  The idea is clear and the paper is well written.
+%%%  
+%%%  What I miss is a more specific conclusion: I think it's not as deep as
+%%%  Kummerfeld in 2012. Yes, empirically we can see the coord and verb args fields
+%%%  are not quite improved even with gold POS tag. But I think it would be clearer
+%%%  if the author can give some examples to explain why gold POS can't do that. And
+%%%  this would help us to find the right direction to address these problems.
 
-The single F-score objective over brackets or dependencies obscures important
-differences between statistical parsers. For instance, a single attachment
-error can lead to one or many mismatched brackets.
+\section{Chinese Parsing}
 
-We have created a novel tree-transformation methodology for
+Aspects of Chinese syntax result in a distinctive mix of parsing challenges.
+However, the contribution of individual sources of error to overall difficulty is not well understood.  
+We conduct a comprehensive automatic analysis of error types made by Chinese parsers, covering a broad range of error types for large sets of sentences, enabling the first empirical ranking of Chinese error types by their performance impact.  
+To accommodate error classes that are absent in English, we augment the system to recognize Chinese-specific parse errors.
+To understand the impact of tagging errors on different error types, we also performed a part-of-speech ablation experiment, in which particular confusions are introduced in isolation.
+By analyzing the distribution of errors in the system output with and without gold part-of-speech tags, we are able to isolate and quantify the error types that can be resolved by improvements in tagging accuracy.
+Our analysis shows that improvements in tagging accuracy can only address a subset of the challenges of Chinese syntax.
+Further improvement in Chinese parsing performance will require research addressing other challenges, in particular, determining coordination scope.
+
+\subsection{Background}
+
+A decade of Chinese parsing research, enabled by the Penn Chinese Treebank \parencite[\pctb;][]{Xue:2005:NLE}, has seen Chinese parsing performance improve from 76.7 F$_1$ \parencite{Bikel-Chiang:2000:CLP} to 84.1 F$_1$ \parencite{Qian-Liu:2012:EMNLP}.
+While recent advances have focused on understanding and reducing the errors that occur in segmentation and part-of-speech tagging \parencite{Qian-Liu:2012:EMNLP,Jiang-etal:2009:ACL,Forst-Fang:2009:EACL}, a range of substantial issues remain that are purely syntactic.
+
+The closest previous work is the detailed manual analysis performed by \textcite{Levy-Manning:2003:ACL}.
+While their focus was on issues faced by their factored PCFG parser \parencite{Klein-Manning:2002:NIPS}, the error types they identified are general issues presented by Chinese syntax in the \pctb.
+They presented several Chinese error types that are rare or absent in English, including noun/verb ambiguity, NP-internal structure and coordination ambiguity due to \emph{pro}-drop.
+They attributed some of these differences to treebank annotation decisions and others to meaningful differences in syntax, suggesting that closing the English-Chinese parsing gap demands techniques beyond those currently used for English.
+Based on this analysis they considered how to modify their parser to capture the information necessary to model the syntax within the \pctb.
+However, as noted in their final section, their manual analysis of parse errors in 100 sentences only covered a portion of a single parser's output, limiting the conclusions they could reach regarding the distribution of errors in Chinese parsing.
+
+\subsection{Adapting Error Analysis to Chinese} \label{sec:adapting_automatic_error_analysis_to_chinese}
+
+Our analysis builds on the system described above, which finds the shortest path from the system output to the gold annotations, then classifies each transformation step into one of several error types.
+When directly applied to Chinese parser output, the system placed over 27\% of the errors in the catch-all `Other' type.
+Many of these errors clearly fall into one of a small set of error types, motivating an adaptation to Chinese syntax.
+
+To adapt the system to Chinese, we developed a new version of the second stage of the system, which assigns an error category to each tree transformation step.
+
+To characterize the errors the original system placed in the `Other' category,
+we looked through one hundred sentences, identifying error types generated by
+Chinese syntax that the existing system did not account for.
+With these observations we were able to implement new rules to catch the
+previously missed cases, leading to the set shown in Table~\ref{tab:errors}.
+To ensure the accuracy of our classifications, we alternated between refining
+the classification code and looking at affected classifications to identify
+issues.  We also periodically changed the sentences from the development set
+we manually checked, to avoid over-fitting.
+
+Where necessary, we also expanded the information available during
+classification.  For example, we use the structure of the final gold standard
+tree when classifying errors that are a byproduct of sense disambiguation
+errors.
+
+\subsection{Chinese Parsing Errors} \label{sec:chinese_parsing_errors}
+
+\begin{table}
+\centering
+\begin{tabular}{lrr}
+  \hline
+  Error Type & Brackets & \% of total \\
+  \hline
+  \hline
+              NP-internal* & 6019 & 22.70\% \\
+              Coordination & 2781 & 10.49\% \\
+   Verb taking wrong args* & 2310 &  8.71\% \\
+                     Unary & 2262 &  8.53\% \\
+       Modifier Attachment & 1900 &  7.17\% \\
+             One Word Span & 1560 &  5.88\% \\
+           Different label & 1418 &  5.35\% \\
+            Unary A-over-A & 1208 &  4.56\% \\
+   Wrong sense/bad attach* & 1018 &  3.84\% \\
+      Noun boundary error* &  685 &  2.58\% \\
+             VP Attachment &  626 &  2.36\% \\
+         Clause Attachment &  542 &  2.04\% \\
+             PP Attachment &  514 &  1.94\% \\
+      Split Verb Compound* &  232 &  0.88\% \\
+              Scope error* &  143 &  0.54\% \\
+             NP Attachment &  109 &  0.41\% \\
+                     Other & 3186 & 12.02\% \\
+\hline
+\end{tabular}
+\caption{
+    \label{tab:errors}
+    Errors made when parsing Chinese. Values are the number of bracket errors
+    attributed to that error type. The values shown are for the Berkeley parser,
+		evaluated on the development set. * indicates error types that were added or
+		substantially changed as part of this work.
+}
+\end{table}
+
+Table~\ref{tab:errors} presents the errors made by the Berkeley parser.
+Below we describe the error types that are either new in this analysis, have had their definition altered, or have an interesting distribution.
+
+In all of our results we follow the same approach as earlier, presenting the number of bracket errors (missing or extra) attributed to each error type.
+Bracket counts are more informative than a direct count of each error type, because the impact on EVALB F-score varies between errors, \myeg a single attachment error can cause 20 bracket errors, while a unary error causes only one.
+
+\begin{figure}
+\centering
+  \scalebox{1.2}{ \includegraphics{figures/chinese-tree2} }
+  \caption{NP-internal structure errors, gold structure (left) and parser hypothesis (right).}\label{fig:np_internal}
+\end{figure}
+
+\paragraph{NP-internal} (Figure~\ref{fig:np_internal})
+Unlike the Penn Treebank \parencite{Marcus-Santorini-Marcinkiewicz:1994:CL}, the \pctb annotates some NP-internal structure.
+We assign this error type when a transformation involves words whose parts of speech in the gold tree are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
+
+We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-termianl phrasal bracket.
+These errors arise when a parser proposes a tree in which POS tags (for instance, JJ or NN) occur as siblings of phrasal tags (such as NP), a configuration used by the PCTB bracketing guidelines to indicate complementation as opposed to adjunction \parencite{Xue:2005:NLE}.
+
+\begin{figure}
+\centering
+  \scalebox{1.2}{ \includegraphics{figures/chinese-treebush} }
+  \caption{Verb taking wrong arguments, gold structure (left) and parser hypothesis (right).}\label{fig:wrong_arg}
+\end{figure}
+
+\paragraph{Verb taking wrong args} (Figure~\ref{fig:wrong_arg})
+This error type
+arises when a verb \mbox{(\myeg~\glos{扭转}{reverse})} is hypothesized to take
+an incorrect argument (\mbox{\glos{布什}{Bush}} instead of
+\mbox{\glos{地位}{position}}).  Note that this also covers some of the errors
+that were classified as NP Attachment for English, changing
+the distribution for that type.
+
+\paragraph{Unary}
+For mis-application of unary rules we separate out instances in which the two brackets in the production have the the same label (A-over-A).
+This cases is created when traces are eliminated, a standard step in evaluation.
+More than a third of unary errors made by the Berkeley parser are of the A-over-A type.
+This can be attributed to two factors: (i) the \pctb annotates non-local dependencies using traces, and (ii) Chinese syntax generates more traces than English syntax, such as \emph{pro}-drop, the omission of arguments where the referent is recoverable from discourse \parencite{Guo-Wang-VanGenabith:2007:EMNLP}.
+However, for parsers that do not return traces they are a benign error.
+
+\begin{figure}
+\centering
+  \scalebox{1.2}{ \includegraphics{figures/chinese-treemodatt} }
+  \caption{Modifier attachment ambiguity, gold structure (left) and parser hypothesis (right).}\label{fig:mod_att}
+\end{figure}
+
+\paragraph{Modifier attachment} (Figure~\ref{fig:mod_att})  Incorrect modifier
+scope caused by modifier phrase attachment level. This is less frequent in
+Chinese than in English: while English VP modifiers occur in pre- and
+post-verbal positions, Chinese only allows pre-verbal modification.
+
+\begin{figure}
+\centering
+  \scalebox{1.2}{ \includegraphics{figures/chinese-tree1} }
+  \caption{Sense confusion, gold structure (left) and parser hypothesis (right).}\label{fig:sense}
+\end{figure}
+
+\paragraph{Wrong sense/bad attach} (Figure~\ref{fig:sense})
+This applies
+when the head word of a phrase receives the wrong POS, leading to an attachment
+error.  This error type is common in Chinese because of POS fluidity, \myeg the
+well-known Chinese verb/noun ambiguity often causes mis-attachments that are
+classified as this error type.
+
+In Figure~\ref{fig:sense}, the word \mbox{\glos{投资}{invest}} has both noun and
+verb senses. While the gold standard interpretation is the relative clause
+\mbox{\Trans{firms that Macau invests in}}, the parser returned an NP
+interpretation \mbox{\Trans{Macau investment firms}}.
+
+\paragraph{Noun boundary error}  In this error type, a span is moved to a
+position where the POS tags of its new siblings all belong to the
+list of NP-internal structure tags which we identified above, reflecting
+the inclusion of additional material into an NP.
+
+\paragraph{Split verb compound} The \pctb annotations recognize several
+Chinese verb compounding strategies, such as the serial verb construction
+(\mbox{\glos{规划建设}{plan [and] build}}) and the resultative construction
+(\mbox{\glos{煮熟}{cook [until] done}}), which join a bare verb to another
+lexical item.  We introduce an error type specific to Chinese, in which such
+verb compounds are split, with the two halves of the compound placed in
+different phrases.
+
+\paragraph{Scope error}
+These are cases in which a new span must be added to
+more closely bind a modifier phrase (ADVP, ADJP, and PP).
+
+\paragraph{PP attachment} 
+This error type is rare in Chinese, as adjunct PPs are pre-verbal.  It does
+occur near coordinated VPs, where ambiguity arises about which of the conjuncts
+the PP has scope over.  Whether this particular case is PP attachment or
+coordination is debatable; we follow the approach above and
+label it PP attachment.
+
+\begin{landscape}
+\begin{table*}
+\centering
+\setlength\fboxsep{0mm}
+\setlength\fboxrule{0.05mm}
+\begin{tabular}{|lccccccccccccc|}
+	\hline
+	    & NP &  & Verb &  & Mod. & 1-Word & Diff & Wrong & Noun & VP & Clause & PP & \\
+	System \hfill F$_1$ & Int. & Coord & Args & Unary & Attach & Span & Label & Sense & Edge & Attach & Attach & Attach & Other \\
+	\hline
+	\hline
+	\emph{Best}    & 1.54 & 1.25 & 1.01 & 0.76 & 0.72 & 0.21 & 0.30 & 0.05 & 0.21 & 0.26 & 0.22 & 0.18 & 1.87 \\
+	Berk-G$\;$ \hfill 86.8 &  \mybar{3.117775} &  \mybar{5.719997} &  \mybar{4.868075} &  \mybar{4.092204} &  \mybar{3.414187} &  \mybar{1.560478} &  \mybar{2.304226} &  \mybar{0.417061} &  \mybar{3.003337} &  \mybar{4.124765} &  \mybar{4.199998} &  \mybar{3.250795} &  \mybar{3.627305} \\
+	Berk-2 \hfill 81.8 &  \mybar{5.106060} &  \mybar{5.726296} &  \mybar{4.657457} &  \mybar{5.602480} &  \mybar{3.889412} &  \mybar{5.874318} &  \mybar{5.465338} &  \mybar{4.259078} &  \mybar{4.180596} &  \mybar{4.645864} &  \mybar{3.974996} &  \mybar{4.055024} &  \mybar{4.120634} \\
+	Berk-1 \hfill 81.1 &  \mybar{5.637080} &  \mybar{5.854733} &  \mybar{4.914895} &  \mybar{5.637384} &  \mybar{4.160972} &  \mybar{5.409644} &  \mybar{5.105299} &  \mybar{4.288569} &  \mybar{4.581930} &  \mybar{4.594485} &  \mybar{4.516671} &  \mybar{4.351321} &  \mybar{4.375378} \\
+	ZPAR \hfill 78.1 &  \mybar{5.603375} &  \mybar{6.374733} &  \mybar{5.487246} &  \mybar{7.386910} &  \mybar{5.851629} &  \mybar{5.863920} &  \mybar{6.833466} &  \mybar{4.423375} &  \mybar{5.725748} &  \mybar{5.299080} &  \mybar{6.791682} &  \mybar{6.653960} &  \mybar{5.833838} \\
+	Bikel \hfill 76.1 &  \mybar{6.464990} &  \mybar{7.357862} &  \mybar{6.227640} &  \mybar{6.372585} &  \mybar{6.280885} &  \mybar{6.602543} &  \mybar{5.609351} &  \mybar{6.904680} &  \mybar{8.000000} &  \mybar{5.790822} &  \mybar{6.700012} &  \mybar{6.484650} &  \mybar{5.983631} \\
+	Stan-F \hfill 76.0 &  \mybar{6.824621} &  \mybar{8.000000} &  \mybar{6.340422} &  \mybar{6.721463} &  \mybar{6.291805} &  \mybar{6.949312} &  \mybar{6.977479} &  \mybar{4.827803} &  \mybar{5.886282} &  \mybar{7.060545} &  \mybar{7.166674} &  \mybar{6.933336} &  \mybar{5.501970} \\
+	Stan-P \hfill 70.0 &  \mybar{8.000000} &  \mybar{7.035766} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{7.464874} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} \\
+	\emph{Worst}   & 3.94 & 1.75 & 1.73 & 1.48 & 1.68 & 1.06 & 1.02 & 0.88 & 0.55 & 0.50 & 0.44 & 0.44 & 4.11 \\
+	\hline
+\end{tabular}
+\caption{\label{tab:comparison}
+Error breakdown for the development set of \pctb 6.  The area filled in for
+each bar indicates the average number of bracket errors per sentence attributed
+to that error type, where an empty bar is no errors and a full bar has
+the value indicated in the bottom row.  The parsers are:
+the Berkeley parser with gold POS tags as input,
+the Berkeley parser,
+\parencite[Berk-G and Berk-1][]{Petrov-etal:2006,Petrov-Klein:2007:NAACL},
+the Berkeley product parser with two grammars \parencite[Berk-2][]{Petrov:2010:NAACLHLT},
+the parser of \textcite[][ZPAR]{Zhang-Clark:2009:ICPT},
+the Bikel parser \parencite[Bikel][]{Bikel-Chiang:2000:CLP},
+the Stanford Factored parser \parencite[Stan-F][]{Levy-Manning:2003:ACL,Klein-Manning:2002:NIPS},
+and the Stanford Unlexicalized PCFG parser \parencite[Stan-P][]{Klein-Manning:2003:ACL}.
+}
+\end{table*}
+\end{landscape}
+
+\subsection{Chinese-English Comparison} \label{subsec:chinese_english_comparison}
+
+It is difficult to directly compare error analysis results for Chinese and
+English parsing because of substantial changes in the classification method,
+and differences in treebank annotations.
+
+As described in the previous section, the set of error categories considered
+for Chinese is very different to the set of categories for English.  Even for
+	some of the categories that were not substantially changed, errors may be
+	classified differently because of cross-over between categories between two
+	categories (\myeg between Verb taking wrong args and NP Attachment).
+
+Differences in treebank annotations also present a challenge for cross-language
+error comparison.  The most common error type in Chinese, NP-internal
+structure, is rare in the English results, but
+the datasets are not comparable because the \ptb has very limited NP-internal
+structure annotated.  Further characterization of the impact of annotation
+differences on errors is beyond the scope of this paper.
+
+Three conclusions that can be made are that (i) coordination is a major issue in
+both languages, (ii) PP attachment is a much greater problem in English, and
+(iii) a higher frequency of trace-generating
+syntax in Chinese compared to English poses substantial challenges.
+
+\subsection{Cross-Parser Analysis} \label{sec:cross_parser_analysis}
+The previous section described the error types and their distribution for a single Chinese parser.
+Here we confirm that these are general trends, by showing that the same pattern
+is observed for several different parsers on the \pctb 6 dev set.\footnote{
+    We use the standard data split suggested by the \pctb 6 file manifest.
+    As a result, our results differ from those previously reported on other splits.
+		All analysis is on the dev set, to avoid revealing specific information
+		about the test set.
+}
+We include results for
+a transition-based parser \parencite[ZPAR;][]{Zhang-Clark:2009:ICPT},
+a split-merge PCFG parser \parencite{Petrov-etal:2006,Petrov-Klein:2007:NAACL,Petrov:2010:NAACLHLT},
+a lexicalized parser \parencite{Bikel-Chiang:2000:CLP},
+and a factored PCFG and dependency parser
+\parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2002:NIPS}.
+\footnote{These parsers represent a variety of parsing methods, though exclude
+some recently developed parsers that are not publicly
+available \parencite{Qian-Liu:2012:EMNLP,Xiong-etal:2005:IJCNLP}.}
+
+Comparing the two Stanford parsers in Table~\ref{tab:comparison}, the factored
+model provides clear improvements on sense disambiguation, but performs
+slightly worse on coordination.
+
+The Berkeley product parser we include uses only two grammars because we found,
+in contrast to the English results \parencite{Petrov:2010:NAACLHLT}, that further
+grammars provided limited benefits.  Comparing the performance with the
+standard Berkeley parser it seems that the diversity in the grammars only
+assists certain error types, with most of the improvement occurring in four of
+the categories, while there is no improvement, or a slight decrease, in five categories.
+
+\subsection{Tagging Error Impact} \label{sec:pos_ablation_study}
+
+The challenge of accurate POS tagging in Chinese has been a major part of
+several recent papers
+\parencite{Qian-Liu:2012:EMNLP,Jiang-etal:2009:ACL,Forst-Fang:2009:EACL}.  The
+Berk-G row of Table~\ref{tab:comparison} shows the performance of the Berkeley
+parser when given gold POS tags.\footnote{We used the Berkeley parser as it was
+the best of the parsers we considered.  Note that the Berkeley parser
+occasionally prunes all of the parses that use the gold POS tags,
+and so returns the best available alternative.  This leads to a POS accuracy of
+99.35\%, which is still well above the parser's standard POS accuracy of
+93.66\%.}
+While the F$_1$ improvement is unsurprising, for the
+first time we can clearly show that the gains are only in a subset of the error
+types.  In particular, tagging improvement will not help for two of the most
+significant challenges: coordination scope errors, and verb argument
+selection.
+
+To see which tagging confusions contribute to which error reductions, we adapt the POS
+ablation approach of \textcite{Tse-Curran:2012:NAACL-HLT}.  We consider the POS
+tag pairs shown in Table~\ref{tab:pos-confusion}.  To isolate the effects of
+each confusion we start from the gold tags and introduce the output of the
+Stanford tagger whenever it returns one of the two tags being
+considered.\footnote{We introduce errors to gold tags, rather than removing
+errors from automatic tags, isolating the effect of a single confusion
+by eliminating interaction between tagging decisions.}
+We then feed these ``semi-gold'' tags to the
+Berkeley parser, and run the fine-grained error analysis on its output.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|llrr|}
+    \hline
+      \multicolumn{2}{c}{Confused tags} & Errors & $\Delta$ F$_1$ \\
+    \hline
+    \hline
+      VV  & NN  & 1055 & -2.72 \\
+      DEC & DEG &  526 & -1.72 \\
+      JJ  & NN  &  297 & -0.57 \\
+      NR  & NN  &  320 & -0.05 \\
+    \hline
+  \end{tabular}
+  \caption{\label{tab:pos-confusion}
+    The most frequently confused POS tag pairs.
+    Each $\Delta$ F$_1$ is relative to Berk-G.
+  }
+\end{table}
+
+\paragraph{VV/NN}  This confusion has been consistently shown to be a major
+contributor to parsing errors
+\parencite{Levy-Manning:2003:ACL,Tse-Curran:2012:NAACL-HLT,Qian-Liu:2012:EMNLP},
+and we find a drop of over 2.7 $F_1$ when the output of the tagger is
+introduced.  We found that while most error types have contributions from a
+range of POS confusions, verb/noun confusion was responsible for virtually all of
+the noun boundary errors corrected by using gold tags.
+
+\paragraph{DEG/DEC}  This confusion between the relativizer and subordinator
+senses of the particle \glos{的}{de} is the primary
+source of improvements on modifier attachment when using gold tags.
+
+\paragraph{NR/NN and JJ/NN}  Despite their frequency, these confusions have
+little effect on parsing performance.  Even within the NP-internal error type
+their impact is limited, and almost all of the errors do not change the
+logical form.
+
+\section{Summary}
+
+The single F-score objective over brackets or dependencies obscures important differences between statistical parsers.
+For instance, one or many mismatched brackets could be caused by a single attachment error.
+
+We created a novel tree-transformation methodology for
 evaluating parsers that categorises errors into linguistically meaningful
 types.  Using this approach, we presented the first detailed examination of the
 errors produced by a wide range of constituency parsers for
-English.  We found that PP attachment and clause attachment are the most
-challenging constructions, while coordination turns out to be less problematic
+English and Chinese.  We found that PP attachment and clause attachment are the most
+challenging constructions in English, while coordination turns out to be less problematic
 than previously thought.  We also noted interesting variations in error types
 for parsers variants.
 
@@ -863,6 +1249,17 @@ domains. We found that the Charniak rerankers improved most error types, but
 made little headway on improving PP attachment.  Changing domain has an impact
 on all error types, except NP internal structure.
 
+We also quantified the relative impacts of a comprehensive set of error types
+in Chinese parsing.  Our analysis has shown that while improvements in
+Chinese POS tagging can make a substantial difference for some error types,
+it will not address two high-frequency error types: incorrect verb argument
+attachment and coordination scope.  The frequency of these two error types is
+also unimproved by the use of products of latent variable grammars.  These
+observations suggest that resolving the core challenges of Chinese parsing
+will require new developments that suit the distinctive properties of Chinese
+syntax.
+
 We have released our system so that future constituent parsers can be evaluated
 using our methodology.  Our analysis provides new insight into the development
 of parsers over the past fifteen years, and the challenges that remain.
+
