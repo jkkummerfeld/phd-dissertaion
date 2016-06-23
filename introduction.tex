@@ -32,13 +32,86 @@ We define a new representation that is compatible with the algorithm while repre
 \label{sec:syntax}
 
 \begin{figure}
-  TODO FIGURE
+  \scalebox{0.7}{
+  \begin{tikzpicture}
+    \node (w0) at (0, 0) {\strut Ellen};
+    \node (root) [left=3ex of w0.west] {\strut ROOT};
+    \node (w1) [right=3ex of w0.east] {\strut enjoys};
+    \node (w2) [right=3ex of w1.east] {\strut running};
+    \draw [-Stealth] (w0.north east) to [out=45,in=135] node[midway,above=-1pt] {\small nsubj} (w1.north west);
+    \draw [dashed,-Stealth] (w0.north) to [out=60,in=120] node[midway,above=-1pt] {\small nsubj} (w2.north);
+    \draw [Stealth-] (w1.north east) to [out=45,in=135] node[midway,above=-1pt] {\small xcomp} (w2.north west);
+    \draw [-Stealth] (w1.north) to [out=120,in=60] node[midway,above=-1pt] {\small root} (root);
+  \end{tikzpicture}
+  }
+  \hfill
+  \scalebox{0.7}{
+  \begin{tikzpicture}
+    \node (w0) at (0, 0) {\strut Ellen};
+    \node (w1) [right=3ex of w0.east] {\strut enjoys};
+    \node (w2) [right=3ex of w1.east] {\strut};
+    \node (w3) [right=3ex of w2.east] {\strut running};
+
+    \node (v0) [above=2ex of w0.north] {\strut};
+    \node (v1) [above=2ex of v0.north] {\strut};
+    \node (v2) [above=2ex of v1.north] {\strut};
+    \node (v3) [above=2ex of v2.north] {\strut};
+    \node (v4) [above=2ex of v3.north] {\strut};
+
+    \node (nt2) at (v0 -| w2) {\strut *-1};
+    \node (nt2b) at (v1 -| w2) {\strut NP};
+    \node (nt3) at (v1 -| w3) {\strut VP};
+    \path (nt2b) -- node[midway] (h2-3) {} (nt3);
+    \node (nt2-3) at (v2 -| h2-3) {\strut S};
+    \node (nt0) at (v3 -| w0) {\strut NP-1};
+    \path (w1 |- v3) -- node[midway] (h1-3) {} (nt2-3);
+    \node (nt1-3) at (v3 -| h1-3) {\strut VP};
+    \path (nt0) -- node[midway] (h0-3) {} (nt1-3);
+    \node (nt0-3) at (v4 -| h0-3) {\strut S};
+    \draw (nt2.north) -- (nt2b.south);
+    \draw (w3.north) -- (nt3.south);
+    \draw (w0.north) -- (nt0.south);
+    \draw (nt2b.north) -- (nt2-3.south) -- (nt3.north);
+    \draw (w1.north) -- (w1 |- nt2-3.north) -- (nt1-3.south) -- (nt2-3.north);
+    \draw (nt0.north) -- (nt0-3.south) -- (nt1-3.north);
+  \end{tikzpicture}
+  }
+  \hfill
+  \scalebox{0.7}{
+  \begin{tikzpicture}[every text node part/.style={align=center}]
+    \node (w0) at (0, 0) {\strut Ellen \\ \strut $\cf{NP}$};
+    \node (w1) [right=2ex of w0.east] {\strut enjoys \\ \strut $\cf{(S\bs NP)/(S\bs NP)}$};
+    \node (w2) [right=2ex of w1.east] {\strut running \\ \strut $\cf{S\bs NP}$};
+
+    \node (c00L) at (w1.south west) {};
+    \node (c00R) at (w2.south east) {};
+    \draw [-{Straight Barb[length=2mm]}] (c00L) -- node[below=0ex] (c00) {\strut $\cf{S\bs NP}$} (c00R);
+
+    \node (c10L) at (w0.south west |- c00.south) {};
+    \node (c10R) at (c00R |- c00.south) {};
+    \draw [{Straight Barb[length=2mm]}-] (c10L) -- node[below=0ex] (c10) {\strut $\cf{S}$} (c10R);
+
+%%%  % Alternative
+%%%    \node (w0b) at (0, -4) {\strut Ellen \\ \strut $\cf{NP}$};
+%%%    \node (w1b) [right=2ex of w0b.east] {\strut enjoys \\ \strut $\cf{(S\bs NP)/(S\bs NP)}$};
+%%%    \node (w2b) [right=2ex of w1b.east] {\strut running \\ \strut $\cf{S\bs NP}$};
+
+%%%    \node (c00Lb) at (w0b.south west) {};
+%%%    \node (c00Rb) at (w0b.south east) {};
+%%%    \draw [-] (c00Lb) -- node[at end] {\small \textbf{T}} node[below=0ex] (c00b) {\strut $\cf{S/(S\bs NP)}$} (c00Rb);
+
+%%%    \node (c10Lb) at (w0b.south west |- c00b.south) {};
+%%%    \node (c10Rb) at (w1b.south east |- c00b.south) {};
+%%%    \draw [-{Straight Barb[length=2mm]}] (c10Lb) -- node[pos=1.03] {\small \textbf{B}} node[below=0ex] (c10b) {\strut $\cf{S/(S\bs NP)}$} (c10Rb);
+
+%%%    \node (c20Lb) at (w0b.south west |- c10b.south) {};
+%%%    \node (c20Rb) at (w2b.south east |- c10b.south) {};
+%%%    \draw [-{Straight Barb[length=2mm]}] (c20Lb) -- node[below=0ex] (c20b) {\strut $\cf{S}$} (c20Rb);
+  \end{tikzpicture}
+  }
   \caption{
   \label{fig:syntax}
   dependency, 
-%%%  Ellen nsubj (x2), one dashed
-%%%  enjoys 
-%%%  reading xcomp
   constituency, 
 %%%  (ROOT
 %%%    (S
@@ -78,7 +151,8 @@ The rightmost case, categorial grammar \parencite{categorial-grammar}, also has 
 This particular example uses Combinatory Categorial Grammar \parencite[\ccg][]{Steedman:2000}, a variant in which combinatory logic is used to construct both syntactic and semantic forms in parallel.
 Immediately beneath each word is its lexical category, which can either by an atomic symbol, or a complex structured combination of symbols.
 A small set of generic combinators define how pairs of adjacent categories can be combined to produce a new structure.
-The two structures shown have different surface structures, but produce the same semantic expression.
+Along with the syntactic derivation, \ccg builds up a lambda expression denoting the semantic structure of the sentence (not shown in this figure).
+One interesting property of the formalism is that a sentence can have multiple different derivations with the same semantic representation.
 This ability to have different structures encode the same meaning is a form of derivational or spurious ambiguity\footnote{\textcite{Steedman:2000} explores the possibility that this ambiguity could encode variations in prosody.}.
 Note that unlike the previous two approaches, here the connection between \textexample{Ellen} and \textexample{running} is retained while keeping the structure a tree.
 This is possible because the relation has been threaded through the tree via the categories.
