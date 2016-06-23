@@ -1,29 +1,41 @@
 \section{Implementation}
 
-As described in the previous section, the time complexity of the new algorithm poses a challenge for efficient parsing.
-In addition, that complexity was based on the assumption that we only consider compatible items.
-To parse efficiently we apply several types of pruning and design our core data structure to avoid considering incompatible items.
+While the core algorithm is fully described in the previous sections, a range of further ideas are needed to enable efficient parsing and modern training methods.
+Each section below describes one component of the system, its optimisations and the motivation behind them.
 
-\subsection{Inside-Outside}
+\section{Overall Architecture}
 
-When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
-Each edge exists in only one place in the derivation, between the item without it and the item with it.
+- overall structure
 
-Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
-This scoring is important for
-% TODO
+- every optimisation
 
-\subsection{Loss Function}
+\subsection{Learning}
+
+We use a discriminative model, trained with loss-augmented decoding, using an update schedule defined by AdaGrad (TODO CITE), and lazy updates as described in (TODO CITE).
+
+
+\subsubsection{Loss Function}
 
 - Describe how we have to account for scores when doing loss-augmented decoding
 
-\subsection{Algorithm rule pruning}
+\subsection{Inference}
 
-- show all the rules, with prunable ones in blue
+\subsubsection{State beams}
 
-- discuss what we're pruning and what the impact is
+In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
+We ensure diversity by dividing each beam into a collection of sub-beams.
+In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
+This definition enables us to avoid considering most incompatible items.
+The third pass also includes one of the spines in the sub-beam definition for the same reason.
 
-\subsection{Coarse to Fine Pruning}
+\subsubsection{Cube pruning}
+\parencite{Chiang:2007}
+
+We apply the standard cube pruning approach when doing binary and ternary compositions.
+Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
+Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
+
+\subsubsection{Coarse to Fine Pruning}
 \parencite{Goodman:1997}
 Rather than parsing immediately with the full model we use three passes with progressively richer structure:
 (1) projective trees without spines,
@@ -38,26 +50,26 @@ The third pass also prunes spines that are not consistent with at least one unpr
 
  - discussion of rule pruning
 
-\subsection{State beams}
+\subsubsection{Outside Pass Calculations}
 
-In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
-We ensure diversity by dividing each beam into a collection of sub-beams.
-In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
-This definition enables us to avoid considering most incompatible items.
-The third pass also includes one of the spines in the sub-beam definition for the same reason.
+There are two main classes of algorithms for parsing that our algorithm can be used within: Viterbi and Inside--Outside.
+The first of these finds the optimal structure for a sentence under a given model and in the process determines the optimal substructure for every span of the sentence.
+That's sufficient for parsing, 
 
-\subsection{Cube pruning}
-\parencite{Chiang:2007}
 
-We apply the standard cube pruning approach when doing binary and ternary compositions.
-Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
-Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
+When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
+Each edge exists in only one place in the derivation, between the item without it and the item with it.
 
-\subsection{Parser Architecture}
+Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
+This scoring is important for
+% TODO
 
-- overall structure
+\subsubsection{Algorithm rule pruning}
 
-- every optimisation
+- show all the rules, with prunable ones in blue
+
+- discuss what we're pruning and what the impact is
+
 
 \section{Results}
 
