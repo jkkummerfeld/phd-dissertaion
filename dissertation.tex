@@ -4,7 +4,7 @@
 % Note: Requires the Noto Sans Mono CJK TC font, download the .otf definition (free online) and on OS X install by double clicling, then selecting install.
 
 \documentclass{ucbthesis}
-\usepackage[style=authoryear-icomp,backref,sorting=ynt,backend=biber]{biblatex}
+\usepackage[style=authoryear-icomp,backref,sorting=nyt,sortcase=false,backend=biber,maxbibnames=999]{biblatex}
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -20,7 +20,11 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
-\usepackage{LI}
+
+\usepackage{ulem}
+%%%\normalem
+%%%\usepackage{LI}
+
 \usepackage{pdflscape}
 \usepackage{qtree}
 \usepackage{rotating}
@@ -32,7 +36,6 @@
 \usepackage{arydshln}
 \usepackage{xcolor,colortbl}
 \usepackage{multicol}
-\usepackage[normalem]{ulem}
 \usepackage{framed}
 \usepackage{tikz}
 \usepackage{pgf}
@@ -202,16 +205,6 @@ pdfpagelayout=OneColumn}
 \setcounter{bottomnumber}{500}
  
 \newcommand{\wrongnode}[1]{\textbf{\fbox{#1}}}
-
-\DeclareFieldFormat*{booktitle}{#1}
-
-% Fixing wrapping of long booktitles in bib
-\DeclareFieldFormat*{titlecase}{%
-    \ifdef{\currentfield}
-      {\ifcurrentfield{booktitle}
-         {\usefield{\uline}{\currentfield}}%
-         {#1}}
-      {#1}}
 
 % Used for the bar diagrams in the error analysis work
 % Change these lengths inside the environment:

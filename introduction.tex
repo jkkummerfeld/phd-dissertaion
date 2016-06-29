@@ -175,7 +175,7 @@ Individually considering every possible structure for a sentence is infeasible.
 Instead, programs incrementally build the parse, and as a result they either lose the guarantee of finding the optimal parse according to the model, or give up flexibility in the definition of the model.
 This work follows the second approach, with models being restricted to give the complete structure a score that is the sum of individual scores for each of its components.
 With this restriction we can apply dynamic programming methods, where the larger problem (find the optimal parse) is decomposed into independent sub-problems (find the optimal parse for part of the sentence) whose solutions can be used to solve the original problem (take the best solution from one half of the sentence and combine it with the best solution from the other half).
-The specific form of dynamic programming applied to the task of finding optimal parses structures is the CKY algorithm (CITE).
+The specific form of dynamic programming applied to the task of finding optimal parses structures is the CKY algorithm \parencite{Cocke:1969,Kasami:1966,Younger:1967}.
 
 \section{Error Analysis}
 
