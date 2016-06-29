@@ -150,6 +150,10 @@ pdfpagelayout=OneColumn}
 \newcommand{\myie}{i.e.\@\xspace}
 \newcommand{\myvs}{vs.\@\xspace}
 
+% To get URL breaking in bib working always
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+
 % For showing translations (e.g. Chinese)
 \newcommand{\Trans}[1]{\textit{#1}}
 \newcommand{\glos}[2]{{#1} \Trans{#2}}
