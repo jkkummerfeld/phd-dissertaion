@@ -10,10 +10,6 @@
 % be indented (like the others), then include this line:
 % \usepackage{indentfirst}
 
-% TODO: Packages to look into:
-% Fancy Header http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/fancyhdr/fancyhdr.pdf (for easy changes to header and footer)
-% Fancy Ref http://ctan.unsw.edu.au/macros/latex/contrib/fancyref/fancyref.pdf (for "the Figure on the next page")
-
 \newtheorem{theorem}{Jibberish}
 
 \bibliography{dissertation}
@@ -42,7 +38,14 @@
 \usepackage{pgf}
 \usepackage{subcaption}
 \usepackage{mdwlist}
-\usepackage{pstricks}
+\usepackage{makeidx}
+
+%%%\usepackage{showframe}
+
+\usepackage{fix-cm}
+\usepackage{etoolbox}
+\usepackage{mdframed}
+
 % Chinese handling
 \usepackage{ifxetex}
 \ifxetex
@@ -104,23 +107,41 @@ pdfpagelayout=OneColumn}
 \definecolor{mygrey}{rgb}{0.8,0.8,0.8}
 
 \newcommand{\candc}{{\small C\&C}\xspace}
-\newcommand{\ccg}{\textsc{ccg}\xspace}
-\newcommand{\cfg}{\textsc{cfg}\xspace}
-\newcommand{\cky}{\textsc{cky}\xspace}
-\newcommand{\depgr}{\textsc{dg}\xspace}
-\newcommand{\dop}{\textsc{dop}\xspace}
-\newcommand{\evalb}{\textsc{evalb}\xspace}
-\newcommand{\gb}{\textsc{gb}\xspace}
-\newcommand{\hpsg}{\textsc{hpsg}\xspace}
-\newcommand{\lfg}{\textsc{lfg}\xspace}
-\newcommand{\ltag}{\textsc{ltag}\xspace}
-\newcommand{\mytag}{\textsc{tag}\xspace}
-\newcommand{\nlp}{\textsc{nlp}\xspace}
-\newcommand{\parseval}{\textsc{parseval}\xspace}
-\newcommand{\pos}{\textsc{pos}\xspace}
-\newcommand{\ptb}{\textsc{ptb}\xspace}
-\newcommand{\pctb}{\textsc{pctb}\xspace}
-\newcommand{\wsj}{\textsc{wsj}\xspace}
+%%%\newcommand{\ccg}{\textsc{ccg}\xspace}
+%%%\newcommand{\cfg}{\textsc{cfg}\xspace}
+%%%\newcommand{\cky}{\textsc{cky}\xspace}
+%%%\newcommand{\depgr}{\textsc{dg}\xspace}
+%%%\newcommand{\dop}{\textsc{dop}\xspace}
+%%%\newcommand{\evalb}{\textsc{evalb}\xspace}
+%%%\newcommand{\gb}{\textsc{gb}\xspace}
+%%%\newcommand{\hpsg}{\textsc{hpsg}\xspace}
+%%%\newcommand{\lfg}{\textsc{lfg}\xspace}
+%%%\newcommand{\ltag}{\textsc{ltag}\xspace}
+%%%\newcommand{\mytag}{\textsc{tag}\xspace}
+%%%\newcommand{\nlp}{\textsc{nlp}\xspace}
+%%%\newcommand{\parseval}{\textsc{parseval}\xspace}
+%%%\newcommand{\pos}{\textsc{pos}\xspace}
+%%%\newcommand{\ptb}{\textsc{ptb}\xspace}
+%%%\newcommand{\pctb}{\textsc{pctb}\xspace}
+%%%\newcommand{\wsj}{\textsc{wsj}\xspace}
+
+\newcommand{\ccg}{CCG\xspace}
+\newcommand{\cfg}{CFG\xspace}
+\newcommand{\cky}{CKY\xspace}
+\newcommand{\depgr}{DG\xspace}
+\newcommand{\dop}{DOP\xspace}
+\newcommand{\evalb}{EVALB\xspace}
+\newcommand{\gb}{GB\xspace}
+\newcommand{\hpsg}{HPSG\xspace}
+\newcommand{\lfg}{LFG\xspace}
+\newcommand{\ltag}{LTAG\xspace}
+\newcommand{\mytag}{TAG\xspace}
+\newcommand{\nlp}{NLP\xspace}
+\newcommand{\parseval}{PARSEVAL\xspace}
+\newcommand{\pos}{POS\xspace}
+\newcommand{\ptb}{PTB\xspace}
+\newcommand{\pctb}{PCTB\xspace}
+\newcommand{\wsj}{WSJ\xspace}
 
 \newcommand{\myeg}{e.g.\@\xspace}
 \newcommand{\myie}{i.e.\@\xspace}
@@ -129,13 +150,33 @@ pdfpagelayout=OneColumn}
 % For showing translations (e.g. Chinese)
 \newcommand{\Trans}[1]{\textit{#1}}
 \newcommand{\glos}[2]{{#1} \Trans{#2}}
+
+% Like a framebox, but with only some sides
+\newmdenv[bottomline=false,rightline=false]{lefttopbot}
+\mdfdefinestyle{mdftight}{skipabove=0pt,innerleftmargin=3pt,innerrightmargin=0pt,innertopmargin=0pt,innerbottommargin=0pt}
+
+\DeclareMathOperator{\abs}{abs}
+
+% Modifying Algorithm to have a comment below
+\makeatletter
+\AfterEndEnvironment{algorithm}{\let\@algcomment\relax}
+\AtEndEnvironment{algorithm}{\kern2pt\hrule\relax\vskip3pt\@algcomment}
+\let\@algcomment\relax
+\newcommand\algcomment[1]{\def\@algcomment{\footnotesize#1}}
+\renewcommand\fs@ruled{\def\@fs@cfont{\bfseries}\let\@fs@capt\floatc@ruled
+  \def\@fs@pre{\hrule height.8pt depth0pt \kern2pt}%
+  \def\@fs@post{}%
+  \def\@fs@mid{\kern2pt\hrule\kern2pt}%
+  \let\@fs@iftopcapt\iftrue}
+\makeatother
  
 \newcolumntype{x}[1]{%
 >{\raggedleft\hspace{0pt}}p{#1}}%
  
-\newcommand{\mathscale}{0.8}
+\newcommand{\mathscale}{0.75}
+\newcommand{\invmathscale}{1.3}
 \newcommand{\textexample}[1]{\textsf{#1}}
-\newcommand{\onlygraphs}[1]{\textcolor{blue}{\scalebox{0.9}{\fbox{$#1$}}}}
+\newcommand{\onlygraphs}[1]{\textcolor{blue}{\scalebox{0.95}{\fbox{$#1$}}}}
 \newcommand{\cf}[1]{\mbox{$#1$}}   % category font
 
 \newcommand{\finalequation}[1]{
@@ -207,13 +248,13 @@ pdfpagelayout=OneColumn}
 
 \begin{frontmatter}
 
-\begin{dedication}
-\null\vfil
-\begin{center}
-Dedicate?
-\end{center}
-\vfil\null
-\end{dedication}
+%%%\begin{dedication}
+%%%\null\vfil
+%%%\begin{center}
+%%%Dedicate?
+%%%\end{center}
+%%%\vfil\null
+%%%\end{dedication}
 
 \tableofcontents
 \clearpage
@@ -229,13 +270,13 @@ Dedicate?
 
 \include{introduction}
 \include{error-analysis}
-%%%\include{chinese}
 \include{ccg}
 \include{algorithm}
 \include{representation}
 \include{implementation}
 \include{conclusion}
 \appendix
+\include{glossary}
 \include{resources}
 \include{advice}
 \printbibliography

@@ -3,73 +3,249 @@
 While the core algorithm is fully described in the previous sections, a range of further ideas are needed to enable efficient parsing and modern training methods.
 Each section below describes one component of the system, its optimisations and the motivation behind them.
 
-\section{Overall Architecture}
+\subsection{Model}
 
-- overall structure
-
-- every optimisation
+We use a discriminative model, which assigns scores to parses using a linear combination of weights.
+Each weight corresponds to some feature of the parse and input data, \myeg the spine being added is NP and the word to the left is \textexample{the}.
+Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 
 \subsection{Learning}
 
-We use a discriminative model, trained with loss-augmented decoding, using an update schedule defined by AdaGrad (TODO CITE), and lazy updates as described in (TODO CITE).
+\newcommand{\Lone}{$L_1$\@\xspace}
+\newcommand{\Ltwo}{$L_2$\@\xspace}
+\newcommand*{\argmax}{\operatornamewithlimits{argmax}\limits}
+\newcommand{\pluseq}{\mathrel{+}=}
+\renewcommand{\algorithmicrequire}{\textbf{Parameters:}}
+\renewcommand{\algorithmicensure}{}
+\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} #1}{}
+\algblockdefx[MyFor]{MyFor}{EndMyFor}[1]{\textbf{for} #1 \textbf{do}}{}
 
+\begin{algorithm}
+\caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
+\algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
+\label{alg:ops}
+\vspace{-5mm}
+\setlength\columnsep{-15pt}
+\begin{multicols}{2}
+\begin{algorithmic}[]
+    \State \textbf{Parameters:} \textcolor{white}{g} \\
+        \begin{tabular}{ll}
+            $\mathrm{iters}$ & \textcolor{gray}{Number of iterations} \\
+            C & \textcolor{gray}{Regularization constant ($10^{-1}$ to $10^{-8}$)} \\
+            $\eta$ & \textcolor{gray}{Learning rate ($10^0$ to $10^{-4}$)} \\
+            $\delta$ & \textcolor{gray}{Initializer for $q$ ($10^{-6}$)} \\[5pt]
+        \end{tabular}
+    \vspace{1mm}
+    \State
+    \hspace{-2.5mm}\begin{tabular}{ll}
+        $\mathbf{w} = \mathbf{0} $ & \textcolor{gray}{Weight vector} \\
+        $\mathbf{q} = \boldsymbol{\delta} $ & \textcolor{gray}{Cumulative squared gradient} \\
+        $\mathbf{u} = \mathbf{0} $ & \textcolor{gray}{Time of last update for each weight} \\
+        $n = 0$ & \textcolor{gray}{Number of updates so far} \\
+    \end{tabular}
+    \MyFor{$\mathrm{iter} \in [1, \mathrm{iters}]$}
+        \MyFor{$\mathrm{batch} \in \mathrm{data}$}
+            \State \textcolor{gray}{Sum gradients from loss-aug. decodes}
+            \State $\mathbf{g} = \mathbf{0}$
+            \State \textbf{for} $(x_i,y_i) \in \mathrm{batch}$ \textbf{do}
+                \State \textcolor{white}{\textbf{for}} $y = \argmax_{y' \in Y(x_i)} [$SCORE$(y') + \mathbf{L}(y', y_i) ]$
+                \State \textcolor{white}{\textbf{for}}  $\mathbf{g} \pluseq (\mathbf{f}(y) - \mathbf{f}(y_i))$
+            \State \textcolor{gray}{Update the active features}
+            \State $\mathbf{q} \pluseq \mathbf{g}^2$\textcolor{white}{......}\textcolor{gray}{Element-wise square}
+            \State $n \pluseq 1$
+            \MyFor{$f \in \mathrm{nonzero} \; \mathrm{features} \; \mathrm{in} \; \mathbf{g}$}
+                \State $w_f =$ UPDATE-ACTIVE($w_f$, $g_f$, $q_f$)
+                \State $u_f = n$
+    \EndMyFor
+    \EndMyFor
+    \EndMyFor
+    \columnbreak
+    \State \textcolor{gray}{The AdaGrad update}
+    \MyFunction{UPDATE-ACTIVE}($w$, $g$, $q$) \\
+        \hspace{4mm}\begin{tabular}{ll}
+            $\mathbf{return} \; \frac{w \sqrt{q} - \eta g}{\eta \mathrm{C} + \sqrt{q}}$
+            & \textcolor{gray}{$\;\;\,[\ell_2]$} \\
+            $\mathrm{d} = |w - \frac{\eta}{\sqrt{q}} g| - \frac{\eta}{\sqrt{q}} \mathrm{C}$
+            & \textcolor{gray}{$\;\;\,[\ell_1]$} \\
+            $\mathbf{return} \; \mathrm{sign}(w - \frac{\eta}{\sqrt{q}} g) \cdot \max(0, \mathrm{d})$
+            & \textcolor{gray}{$\;\;\,[\ell_1]$} \\
+        \end{tabular}
+    \EndMyFunction
+    \vspace{1mm}
+    \begin{lefttopbot}[style=mdftight]
+    \vspace{-1mm}
+    \State \textcolor{gray}{Functions only needed for sparse updates}
+    \vspace{1mm}
+    \State \textcolor{gray}{A single update equivalent to a series of AdaGrad updates where the weight's subgradient was zero}
+    \MyFunction{UPDATE-CATCHUP}($w$, $q$, $t$) \\
+        \vspace{1mm}\hspace{4mm}\begin{tabular}{ll}
+            $\mathbf{return} \; w \left(\frac{\sqrt{q}}{\eta \mathrm{C} + \sqrt{q}}\right)^{t}$
+            & \textcolor{gray}{$[\ell_2]$} \\
+            $\mathbf{return} \; \mathrm{sign}(w) \cdot \max(0, |w| - \frac{\eta \mathrm{C}}{\sqrt{q}} t)$
+            & \textcolor{gray}{$[\ell_1]$} \\
+        \end{tabular}
+    \EndMyFunction
+    \vspace{-1mm}
+    \State \textcolor{gray}{Compute $\mathbf{w}^\top \mathbf{f}(y')$, but for each weight, apply an update to catch up on the steps in which the gradient for that weight was zero}
+    \MyFunction{SCORE}($y'$)
+        \State $s = 0$
+        \State \textbf{for} $f \in \mathbf{f}(y')$ \textbf{do}
+        \State \textcolor{white}{\textbf{for}} $w_f = $ UPDATE-CATCHUP($w_f, q_f, n - u_f$)
+        \State \textcolor{white}{\textbf{for}} $u_f = n$
+        \State \textcolor{white}{\textbf{for}} $s \pluseq w_f$
+        \State $\mathbf{return} \; s$
+    \EndMyFunction
+    \vspace{-3mm}
+    \end{lefttopbot}
+\end{algorithmic}
+\end{multicols}
+\vspace{-12mm}
+\end{algorithm}
+
+We train with an online primal subgraidnet approach \parencite{Ratliff:2007} as described in \textcite{Kummerfeld-etal:2015:EMNLP}.
+We compute the subgradient of the margin objective on each instance by performing a structured loss-augmented decode, then uses these instance-wise subgradients to optimize the global objective using AdaGrad \parencite{Duchi:2011} with either \Lone or \Ltwo regularization.
+To improve speed, we use sparse updates and batch processing, as described below.
+
+\subsubsection{Batches}
+
+Instead of updating the model with subgradients calculated for single sentences, we consider the sum over a small number of sentences (a batch).
+In each pass through the training data we make fewer updates to our model, but each update is based on a more accurate subgradient.
+This has the advantage that we can parse all of the sentences in the batch in parallel.
+Since most of our time is spent in parsing, this can produce improvements proportional to the number of CPU cores available.
+In practise, memory is also a constraint, and CPU utilization is limited by a limited memory bandwidth and the Java Virtual Machine.
+
+\subsubsection{Sparse Updates}
+
+Not every weight contributes to the score of every parse, but the simplest implementation of AdaGrad modifiess every weight in the model when doing an update.
+To save time, we distinguish between two different types of update.
+When the subgradient for a weight is nonzero, we apply the usual update.
+When the subgradient for a weight is zero, we apply a numerically equivalent update later, at the next time the weight is queried.
+This saves time, as we only touch the weights corresponding to the (usually sparse) nonzero directions in the current batch's subgradient.
+The update that occurs later is fast because we can combine more than one update together in a simple closed form calculation.
+Algorithm~\ref{alg:ops} gives pseudocode for our implementation.
+
+Sparse updates also have memory and computation costs.
+First, when accessing weights and applying the delayed updates, we need to use synchronization to ensure an exact update.
+Second, we need to use memory to track the last time each weight was updated and to provide a lock for each weight (used for synchronization).
+However, if we are willing to give up exactness we can avoid these costs by applying a lock-free approach \parencite{hogwild}.
+We found that avoiding locks did not impact accuracy, but also did not substantially impact speed.
+
+% TODO: Explain my hogwild-esque approach
 
 \subsubsection{Loss Function}
 
-- Describe how we have to account for scores when doing loss-augmented decoding
+In loss-augmented decoding, we find the parse with the highest score when adding the loss of the parse to the model score.
+In this context, loss is a measure of the difference between a given parse and the correct parse.
+To efficiently find the top scoring parse in this case we need the loss function to decompose in a way that matches our dynamic program.
+
+The performance metric we want to optimize, F-score, cannot be decomposed.
+The simplest alternative would be to use the number of incorrect arcs, as we can adjust the score when adding an arc based on whether the arc is correct or not.
+For parsing without traces that would be fine, as we are making a fixed number of decisions: one arc and spine per word (\myie the denominator of the metric we are optimizing is constant).
+However, when parsing with traces, if there is supposed to be a trace and we leave it out, the mistake is not penalized by the number-of-incorrect-arcs metric.
+
+Instead we use hamming distance, the number of incorrect arcs plus the number of missing arcs.
+As above, incorrect arcs are easy to account for.
+For missing arcs, we must be careful to count each mistake exactly once.
+We can be certain an arc will not be created when a deduction rule is applied that leaves one of the ends in the middle of a span (\myeg when two items are combined the middle point is now in the middle of the span produced).
+To avoid counting twice (once for each end) we have a few options:
+
+\begin{itemize}
+  \item When combining two halves that would lead to double counting, subtract off to avoid it (at the point of combination we have all the information needed to do so)
+  \item Assign half to each end
+  \item Only count on one end (options include the left end, the right end, the parent, or the child)
+\end{itemize}
+% TODO: Switch to option 2!
+
+In our system we use the first approach.
 
 \subsection{Inference}
+
+One of the core contributions of this entire chapter is the inference algorithm presented in the previous section.
+The core idea behind the algorithm is to constrain the space to consider so that it can be explored efficiently, while still covering the structures observed in language.
+Here we describe modifications at various scales that further improve speed by pruning the space further.
 
 \subsubsection{State beams}
 
 In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
 We ensure diversity by dividing each beam into a collection of sub-beams.
 In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
-This definition enables us to avoid considering most incompatible items.
-The third pass also includes one of the spines in the sub-beam definition for the same reason.
+This subdivision enables us to avoid considering most incompatible items.
+The pass with spines also includes one of the spines in the sub-beam definition for the same reason.
 
 \subsubsection{Cube pruning}
-\parencite{Chiang:2007}
 
-We apply the standard cube pruning approach when doing binary and ternary compositions.
+We apply the standard cube pruning approach when doing binary and ternary compositions \parencite{Chiang:2007}.
 Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
 Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
 
 \subsubsection{Coarse to Fine Pruning}
-\parencite{Goodman:1997}
-Rather than parsing immediately with the full model we use three passes with progressively richer structure:
-(1) projective trees without spines,
-(2) non-projective graphs without spines,
-(3) full structure.
-Each pass prunes using max-marginals from the preceding pass.
+
+Rather than parsing immediately with the full model we use several passes with progressively richer structure \parencite{Goodman:1997}:
+
+\begin{enumerate}
+  \item Projective parser without traces or spines, and a trace classifier
+  \item Non-projective parser without spines, and a spine classifier
+  \item Full structure
+\end{enumerate}
+
+Each pass prunes using max-marginals from the preceding pass and scores from the preceding classifier.
 The third pass also prunes spines that are not consistent with at least one unpruned edge from the second pass.
-
- - discussion of the trace pruning
-
- - discussion of the spine pruning
-
- - discussion of rule pruning
 
 \subsubsection{Outside Pass Calculations}
 
 There are two main classes of algorithms for parsing that our algorithm can be used within: Viterbi and Inside--Outside.
 The first of these finds the optimal structure for a sentence under a given model and in the process determines the optimal substructure for every span of the sentence.
-That's sufficient for parsing, 
+While that is sufficient for parsing, it does not provide the information we need for pruning.
+Instead we use the inside--outside algorithm, which computes for each item either the sum or max over all parses that include that item.
 
-
-When using our algorithm with a model that only places weights on the edges, computing max-marginals and sum-marginals is straightforward.
+When using our algorithm with a model that only places weights on the edges, calculation of the scores for these algorithms is straightforward.
 Each edge exists in only one place in the derivation, between the item without it and the item with it.
-
 Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
-This scoring is important for
-% TODO
+This scoring is important for the beams and cube pruning to be effective, if we only scored spines in one of the items they appear in there would be ties in the beams.
+
+For the projective algorithm case each spine is introduced in exactly two items in the derivation, and so we can simply assign half the score to each.
+For the non-projective version the spine may appear in more locations because it needs to be introduced when we add external points.
+To correctly calculate the score, and also have effective pruning, we add the complete score every time the spine is introduced and then subtract the score when two items with a spine in common are combined.
 
 \subsubsection{Algorithm rule pruning}
 
-- show all the rules, with prunable ones in blue
+\begin{figure*}
+\vspace{-5mm}
+\input{rules-pruned}
+\vspace{-12mm}
+\caption{\label{fig:rules-pruned}
+Full dynamic program with rules unseen in training boxed and colored.
+}
+\end{figure*}
 
-- discuss what we're pruning and what the impact is
+Many structures that can be generated by our dynamic program are not seen in the data we consider.
+To improve speed, we leave out all rules that are not used in the derivation of sentences in the training set.
+Of the 49,292 specific rules in the algorithm, only 158 are needed to generate all sentences in the training set.
+Narrowing down to these does have implications for coverage, but looking at the development set we found only one rule in one parse that was not in the set of 158.
 
+Figure~\ref{fig:rules-pruned} shows the complete dynamic program from Figure~\ref{fig:complete-dp}, but with rules that can be completely eliminated boxed and colored blue.
+We can see several properties:
+
+\begin{itemize}
+  \item $B$ items are never created.
+  \item $L$ and $R$ items are always immediately combined with other items to create an $I$.
+  \item The external point can be a parent or child when an $X$ is created, but additional edges always have it as the parent, and are only added in $N$ items, not $L$ or $R$ items.
+\end{itemize}
+
+Pruning the rules in this way further constrains the space of structures that can be formed to some subset of one-endpoint cross graphs.
+This subset more closely describes the structures observed in langauge.
+Unfortunately, it is difficult to describe this space, aside from saying it is the set of structures generated by the deduction rules in Figure~\ref{fig:rules-pruned}.
+
+%%%\subsection{Engineering Details}
+% TODO
+
+%%%The system is implemented in the Scala language, with several custom data structures and modules.
+
+%%%\subsubsection{Map}
+
+%%%\subsubsection{Array}
+
+%%%\subsubsection{Hash}
 
 \section{Results}
 
@@ -115,10 +291,10 @@ This scoring is important for
 %%%    + Null reversal & 2.28 & 0.41 \\
 %%%    + Gapping shift & 1.81 & 0.38 \\
     Projective trees & 43.85 & 96.27 \\
-    Core representation (3.1) & 76.69 & 98.47 \\
-    + Head rule changes (3.3) & 96.68 & 99.55 \\
-    + Null reversal (3.2) & 97.72 & 99.59 \\
-    + Gapping shift (3.2) & 98.19 & 99.62 \\
+    Core representation (\ref{sec:rep-core}) & 76.69 & 98.47 \\
+    + Head rule changes (\ref{sec:rep-head}) & 96.68 & 99.55 \\
+    + Null reversal (\ref{sec:rep-other}) & 97.72 & 99.59 \\
+    + Gapping shift (\ref{sec:rep-other}) & 98.19 & 99.62 \\
     \hline
   \end{tabular}
   \caption{\label{tab:coverage}

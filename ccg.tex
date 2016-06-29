@@ -1,5 +1,3 @@
-\chapter{Formalism Conversion}
-
 %%% Possible todos:
 %%% - Make it clearer what 'robustness' means
 %%% - Average distance from the diagonal in the plots (all, and just below):
@@ -95,7 +93,15 @@
 %%%  inclusion of the source code is helpful, but does not really solve the problem.
 %%%  However, this complaint is relatively minor since the overall story was= clear.
 
-\newcommand{\old}{\candc{}-\textsc{conv}\xspace}
+\newcommand{\old}{\candc{}-Conv\xspace}
+
+\chapter{Formalism Conversion}
+
+\begin{center}
+\textit{
+  A preliminary version of this chapter appeared as \textcite{Kummerfeld-etal:2012:ACL}.
+}
+\end{center}
 
 In this chapter, we propose an improved, bottom-up method for converting \ccg derivations into \ptb-style phrase structure trees.
 In contrast with past work \parencite{Clark-Curran:2009}, which used simple transductions on category pairs, our approach uses richer transductions attached to single categories.
@@ -391,7 +397,7 @@ For unannotated categories, we use the instructions of the result category with 
 	\hline
 		 & 00 (all) & 95.37 & 93.67 & 94.51 & 39.6 \\
 		\candc & 00 (len $\le 40$) & 95.85 & 94.39 & 95.12 & 42.1 \\
-		\textsc{conv} & 23 (all) & 95.33 & 93.95 & 94.64 & 39.7 \\
+		Conv & 23 (all) & 95.33 & 93.95 & 94.64 & 39.7 \\
 		 & 23 (len $\le 40$) & 95.44 & 94.04 & 94.73 & 41.9 \\
 	\hline
 		 & 00 (all) & 96.69 & 96.58 & 96.63 & 51.1 \\
@@ -452,14 +458,14 @@ will contain errors created by our conversion as well as by the parser. In this
 section we are interested in comparing parsers, so we need to factor out errors
 created by our conversion.
 
-One way to do this is to calculate a projected score (\textsc{proj}), as the
+One way to do this is to calculate a projected score (Proj), as the
 parser result over the oracle result, but this is a very rough approximation.
 Another way is to evaluate only on the 51\% of sentences for which our
-conversion from gold \ccg derivations is perfect (\textsc{clean}).  However,
+conversion from gold \ccg derivations is perfect (Clean).  However,
 even on this set our conversion introduces errors, as the parser output may
 contain categories that are harder to convert.
 
-Parser F-scores are generally higher on \textsc{clean}, which could mean that this
+Parser F-scores are generally higher on Clean, which could mean that this
 set is easier to parse, or it could mean that these sentences don't contain
 annotation inconsistencies, and so the parsers aren't incorrect for returning
 the true parse (as opposed to the one in the \ptb).  To test this distinction
@@ -480,7 +486,7 @@ Some sentences are higher in the right plot than the left because there are dist
 \centering
 \begin{tabular}{lrr|r}
 	\hline
-	Sentences & \textsc{clean} & \textsc{all} & \textsc{proj} \\
+	Sentences & Clean & All & Proj \\
 	\hline
 	\hline
 		\multicolumn{2}{l}{Converted gold \ccg} & & \\
@@ -499,13 +505,10 @@ Some sentences are higher in the right plot than the left because there are dist
 \end{tabular}
 \caption{
 	\label{tab:full-comp}
-	F-scores on section 23 for \ptb parsers and \ccg parsers with their output
-	converted by our method.
-	\textsc{clean} is only on sentences that are converted perfectly from gold
-	\ccg (51\%).
-	\textsc{all} is over all sentences.  
-	\textsc{proj} is a projected F-score (\textsc{all} result / CCGbank
-	\textsc{all} result).
+	F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.
+	Clean is only on sentences that are converted perfectly from gold \ccg (51\%).
+	All is over all sentences.
+	Proj is a projected F-score (All result / CCGbank All result).
 }
 \end{table}
 
@@ -518,9 +521,9 @@ not recoverable from CCGbank, but probably also indicates that the split-merge
 model is less effective in \ccg, which has far more symbols than the \ptb.
 
 It is difficult to make conclusive claims about the performance of the parsers.
-As shown earlier, \textsc{clean} does not completely factor out the errors
+As shown earlier, Clean does not completely factor out the errors
 introduced by our conversion, as the parser output may be more difficult to
-convert, and the calculation of \textsc{proj} only roughly factors out the
+convert, and the calculation of Proj only roughly factors out the
 errors.  However, the results do suggest that the performance of the \ccg
 parsers is approaching that of the Petrov parser.
 

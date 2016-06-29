@@ -1,43 +1,50 @@
 \section{Parse Representation}
 
-\begin{figure*}
-\begin{subfigure}[b][3.75cm][b]{0.19\textwidth}
+\begin{figure}
+\hfill
+\begin{subfigure}[b]{0.39\textwidth}
   \centering
-  \scalebox{0.5}{\input{figures/picture-null-to-null-flat}}
+  \scalebox{0.8}{\input{figures/picture-null-to-null-flat}}
   \caption{\label{fig:null-null}
     Null to null
   }
 \end{subfigure}
-\hspace{4mm}
-\begin{subfigure}[b][3.75cm][b]{0.24\textwidth}
+\hfill
+\begin{subfigure}[b]{0.5\textwidth}
   \centering
-  \scalebox{0.5}{ \input{figures/picture-gapping-flat}}
-  \caption{\label{fig:gapping}
-    Gapping
-  }
-\end{subfigure}
-\hspace{4mm}
-\begin{subfigure}[b][3.75cm][b]{0.16\textwidth}
-  \centering
-  \scalebox{0.5}{ \input{figures/picture-cycle-flat}}
-  \caption{\label{fig:cycle}
-    Cycle
-  }
-\end{subfigure}
-\hspace{4mm}
-\begin{subfigure}[b][3.75cm][b]{0.29\textwidth}
-  \centering
-  \scalebox{0.5}{ \input{figures/picture-non1ec-flat}}
+  \scalebox{0.8}{\input{figures/picture-non1ec-flat}}
   \caption{\label{fig:not-1ec}
     Not One-Endpoint Crossing
   }
 \end{subfigure}
+\hfill
+\strut
+
+\vspace{5mm}
+\hfill
+\begin{subfigure}[b]{0.33\textwidth}
+  \centering
+  \scalebox{0.8}{\input{figures/picture-cycle-flat}}
+  \caption{\label{fig:cycle}
+    Cycle
+  }
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.46\textwidth}
+  \centering
+  \scalebox{0.8}{\input{figures/picture-gapping-flat}}
+  \caption{\label{fig:gapping}
+    Gapping
+  }
+\end{subfigure}
+\hfill
+\strut
 \caption{
 Examples of syntactic phenomena.
 Dashed edges are traces, solid edges are structural.
 Some edges are fainter to more clearly show the key edges for each case.
 }
-\end{figure*}
+\end{figure}
 
 The algorithm we define cannot operate directly on the standard constituent parse representation.
 Instead, we define a new representation in which each non-terminal symbol is associated with a specific word (the head).
@@ -48,14 +55,13 @@ Our representation is based on \textcite{cck}'s tree representation, with three 
 (2) we add representations of null elements and co-indexation,
 (3) we modify the head rules to avoid complex structures.
 
-\subsection{Core Structure}
+\subsection{Core Structure} \label{sec:rep-core}
+
 We represent parses with two components.
 Every word is assigned a spine, and every word is the child of one non-trace edge.
 Together, these form the base tree structure of the parse.
 
-\parbox{0.44\textwidth}{
-\centering
-\scalebox{0.7}{
+\begin{center}
 \begin{tikzpicture}
 [ every node/.style={
     node distance=2ex,
@@ -106,7 +112,7 @@ Together, these form the base tree structure of the parse.
   \draw [structural,out=120,in=60] (snt50.north) to (snt11.north);
   \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
 \end{tikzpicture}
-}}
+\end{center}
 
 \paragraph{Spines}
 Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
@@ -124,7 +130,7 @@ We resolve this issue by using more articulated spines that have the complete se
 The potential drawback of our approach is that coverage of spines is more limited by the training set than their approach.
 In practice, coverage is high, with $99.93\%$ of spines in the development set observed in the training set.
 
-\subsection{Additional Structure}
+\subsection{Additional Structure} \label{sec:rep-other}
 
 The base tree representation described above does not cover null elements or co-indexation, and so only fully represents $26.6\%$ of sentences.
 
@@ -165,7 +171,7 @@ These are distinct from the previous cases because neither index is on a null el
 We considered two approaches for these cases: (1) add edges from the repetition to the first occurrence (shown in Figure~\ref{fig:gapping}), (2) add edges from the repetition to the parent of the first occurrence, \myeg the left VP in Figure~\ref{fig:gapping}.
 The second approach produces more structures that fall within the graph space we consider and explicitly represents all predicates, but only implicitly captures the original treebank structure.
 
-\subsection{Head Rules}
+\subsection{Head Rules} \label{sec:rep-head}
 
 To construct the spines we use head rules that consider the type of a non-terminal and its children.
 In many cases different head word options represent more syntactic or semantic aspects of the span.
@@ -196,20 +202,6 @@ Edge labels can be added by calculating either the sum or max over edge types wh
 Spines must be added to the state definition, specifying a label for each visible word ($p$, $q$ and $o$).
 This state expansion is necessary to ensure agreement when combining items.
 \textcite{cck}'s projective tree parser uses a similar approach, while \textcite{ec}'s algorithm is for dependency parsing and so does not consider spines.
-
-\subsection{Enforcing a tree backbone}
-The algorithm above constrains the space of graph structures, but we also want to restrict our search to parses containing a directed projective tree of non-trace edges.
-This requirement is satisfied if every word is the child of exactly one non-trace edge, and no non-trace edges cross.
-
-To meet the first condition we add booleans to the state, indicating whether $p$, $q$ and $o$ have non-trace parents.
-When adding edges, a non-trace edge cannot be added if the child already has a non-trace parent.
-When combining items, no word can receive multiple non-trace parents, and words in the middle of the span must have at least one.
-
-Crossing edges are introduced in two ways:
-(1) when adding a $pq$ edge in the $N$, $L$, $R$ and $B$ items, and
-(2) when a non-$B$ item is being formed using two non-$I$ items.
-In both cases we can avoid non-trace edges crossing by using a boolean that tracks whether there are non-trace $o$--$[pq]$ edges in each item.
-The justification is complex and can be found in the supplementary material.
 
 \subsection{Enforcing a tree backbone}
 The algorithm above constrains the space of graph structures, but does not say anything about the edge types being combined.
