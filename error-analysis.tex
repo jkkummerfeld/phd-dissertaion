@@ -47,7 +47,7 @@ For all parsers we used the publicly available version, with the standard parame
 	\item[ SSN] \parencite{Henderson:2003,Henderson:2004}. A statistical left-corner
 	parser, with probabilities estimated by a neural network.
 
-	\item[ Stanford] \parencite{Klein-Manning:2003,Klein-Manning:2003:NIPS}. We
+	\item[ Stanford] \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}. We
 	consider both the unlexicalised PCFG parser (-U) and the factored parser
 	(-F), which combines the PCFG parser with a lexicalised dependency parser.
 \end{description}
@@ -760,7 +760,7 @@ ten specific linguistic phenomena.
 To provide a deeper understanding of the errors arising when parsing outside of
 the newswire domain, we analyse performance of the Charniak parser with
 reranker and self-trained model on the eight parts of the Brown corpus
-\parencite{Marcus-Marcinkiewicz-Santorini:1993}, and two parts of the Google Web
+\parencite{ptb}, and two parts of the Google Web
 corpus \parencite{Petrov:2012}.  Table~\ref{tab:domain-info} shows statistics for
 the corpora.  The variation in average sentence lengths skew the results for
 errors per sentence.  To handle this we divide by the number of words to
@@ -908,7 +908,7 @@ A decade of Chinese parsing research, enabled by the Penn Chinese Treebank \pare
 While recent advances have focused on understanding and reducing the errors that occur in segmentation and part-of-speech tagging \parencite{Qian-Liu:2012:EMNLP,Jiang-etal:2009:ACL,Forst-Fang:2009:EACL}, a range of substantial issues remain that are purely syntactic.
 
 The closest previous work is the detailed manual analysis performed by \textcite{Levy-Manning:2003:ACL}.
-While their focus was on issues faced by their factored PCFG parser \parencite{Klein-Manning:2002:NIPS}, the error types they identified are general issues presented by Chinese syntax in the \pctb.
+While their focus was on issues faced by their factored PCFG parser \parencite{Klein-Manning:2003:NIPS}, the error types they identified are general issues presented by Chinese syntax in the \pctb.
 They presented several Chinese error types that are rare or absent in English, including noun/verb ambiguity, NP-internal structure and coordination ambiguity due to \emph{pro}-drop.
 They attributed some of these differences to treebank annotation decisions and others to meaningful differences in syntax, suggesting that closing the English-Chinese parsing gap demands techniques beyond those currently used for English.
 Based on this analysis they considered how to modify their parser to capture the information necessary to model the syntax within the \pctb.
@@ -987,7 +987,7 @@ Bracket counts are more informative than a direct count of each error type, beca
 \end{figure}
 
 \paragraph{NP-internal} (Figure~\ref{fig:np_internal})
-Unlike the Penn Treebank \parencite{Marcus-Santorini-Marcinkiewicz:1994:CL}, the \pctb annotates some NP-internal structure.
+Unlike the Penn Treebank \parencite{ptb}, the \pctb annotates some NP-internal structure.
 We assign this error type when a transformation involves words whose parts of speech in the gold tree are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
 
 We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-termianl phrasal bracket.
@@ -1096,11 +1096,11 @@ to that error type, where an empty bar is no errors and a full bar has
 the value indicated in the bottom row.  The parsers are:
 the Berkeley parser with gold POS tags as input,
 the Berkeley parser,
-\parencite[Berk-G and Berk-1][]{Petrov-etal:2006,Petrov-Klein:2007:NAACL},
+\parencite[Berk-G and Berk-1][]{Petrov-etal:2006,Petrov-Klein:2007},
 the Berkeley product parser with two grammars \parencite[Berk-2][]{Petrov:2010:NAACLHLT},
 the parser of \textcite[][ZPAR]{Zhang-Clark:2009:ICPT},
 the Bikel parser \parencite[Bikel][]{Bikel-Chiang:2000:CLP},
-the Stanford Factored parser \parencite[Stan-F][]{Levy-Manning:2003:ACL,Klein-Manning:2002:NIPS},
+the Stanford Factored parser \parencite[Stan-F][]{Levy-Manning:2003:ACL,Klein-Manning:2003:NIPS},
 and the Stanford Unlexicalized PCFG parser \parencite[Stan-P][]{Klein-Manning:2003:ACL}.
 }
 \end{table*}
@@ -1141,10 +1141,10 @@ is observed for several different parsers on the \pctb 6 dev set.\footnote{
 }
 We include results for
 a transition-based parser \parencite[ZPAR;][]{Zhang-Clark:2009:ICPT},
-a split-merge PCFG parser \parencite{Petrov-etal:2006,Petrov-Klein:2007:NAACL,Petrov:2010:NAACLHLT},
+a split-merge PCFG parser \parencite{Petrov-etal:2006,Petrov-Klein:2007,Petrov:2010:NAACLHLT},
 a lexicalized parser \parencite{Bikel-Chiang:2000:CLP},
 and a factored PCFG and dependency parser
-\parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2002:NIPS}.
+\parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
 \footnote{These parsers represent a variety of parsing methods, though exclude
 some recently developed parsers that are not publicly
 available \parencite{Qian-Liu:2012:EMNLP,Xiong-etal:2005:IJCNLP}.}
