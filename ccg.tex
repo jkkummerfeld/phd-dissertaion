@@ -268,6 +268,13 @@ These disadvantages are a consequence of failing to exploit the generalisations
 that \ccg combinators define.  We return to this example below to show how our
 approach handles both cases correctly.
 
+\subsection{\textcite{zhang-zhao-hui:2012:DEMOS}}
+
+\textcite{zhang-zhao-hui:2012:DEMOS} considered a statistical approach to conversion from \ccg to \ptb.
+Their system works by classifying each step in the \ccg derivation as either being a \ptb node or being a dummy node, to be flattened in the final structure.
+This approach has the limitation that it cannot handle sentences where the structure of the \ccg derivation crosses the structure of the \ptb parse, such as the example in Figure~\ref{fig:ccg-example}.
+These cases account for 10\% of sentences, but the method is still fairly effective because they are able to recover most of the structure for such sentences.
+
 \section{Our Approach}
 
 \begin{table}
@@ -391,20 +398,25 @@ For unannotated categories, we use the instructions of the result category with 
 \begin{table}
 \centering
 \begin{tabular}{llcccc}
-	\hline
-		System & Data & P & R & F & Sent. \\
-	\hline
-	\hline
-		 & 00 (all) & 95.37 & 93.67 & 94.51 & 39.6 \\
-		\candc & 00 (len $\le 40$) & 95.85 & 94.39 & 95.12 & 42.1 \\
-		Conv & 23 (all) & 95.33 & 93.95 & 94.64 & 39.7 \\
-		 & 23 (len $\le 40$) & 95.44 & 94.04 & 94.73 & 41.9 \\
-	\hline
-		 & 00 (all) & 96.69 & 96.58 & 96.63 & 51.1 \\
-		This & 00 (len $\le 40$) & 96.98 & 96.77 & 96.87 & 53.6 \\
-		Work & 23 (all) & 96.49 & 96.11 & \textbf{96.30} & \textbf{51.4} \\
-		 & 23 (len $\le 40$) & 96.57 & 96.21 & 96.39 & 53.8 \\
-	\hline
+  \hline
+    System & Data & P & R & F & Sent. \\
+  \hline
+  \hline
+           & 00 (all)          & 93.67 & 95.37 & 94.51 & 39.6 \\
+    \candc & 00 (len $\le 40$) & 94.39 & 95.85 & 95.12 & 42.1 \\
+    Conv   & 23 (all)          & 93.95 & 95.33 & 94.64 & 39.7 \\
+           & 23 (len $\le 40$) & 94.04 & 95.44 & 94.73 & 41.9 \\
+  \hline
+           & 00 (all)          & 96.92 & 94.82 & 95.86 & -- \\
+    Zhang  & 00 (len $\le 40$) & 97.09 & 95.40 & 96.24 & -- \\
+    (2012) & 23 (all)          & 96.67 & 94.77 & 95.71 & -- \\
+           & 23 (len $\le 40$) & 96.69 & 94.79 & 95.73 & -- \\
+  \hline
+           & 00 (all)          & 96.69 & 96.58 & 96.63 & 51.1 \\
+    This   & 00 (len $\le 40$) & 96.98 & 96.77 & 96.87 & 53.6 \\
+    Work   & 23 (all)          & 96.49 & 96.11 & \textbf{96.30} & \textbf{51.4} \\
+           & 23 (len $\le 40$) & 96.57 & 96.21 & 96.39 & 53.8 \\
+  \hline
 \end{tabular}
 \caption{\label{tab:conversion-comparison}
 	\parseval Precision, Recall, F-Score, and exact sentence match for converted
@@ -412,19 +424,13 @@ For unannotated categories, we use the instructions of the result category with 
 }
 \end{table}
 
-Table~\ref{tab:conversion-comparison} compares our approach
-with \old on gold \ccg derivations.  The results shown are 
-as reported by \evalb
-\parencite{Black-etal:1991} using the \textcite{Collins:1997} parameters.
-Our approach leads to increases on all metrics of at least 1.1\%, and
-increases exact sentence match by over 11\% (both absolute).
+Table~\ref{tab:conversion-comparison} compares our approach with \old and \textcite{zhang-zhao-hui:2012:DEMOS} on gold \ccg derivations.
+The results shown are as reported by \evalb \parencite{Black-etal:1991} using the \textcite{Collins:1997} parameters.
+Our approach leads to increases over \old on all metrics of at least 1.1\%, and increases exact sentence match by over 11\% (both absolute).
 
-Many of the remaining errors relate to missing and extra clause nodes and a
-range of rare structures, such as QPs, NACs, and NXs. The only other prominent
-errors are single word spans, \myeg extra or missing ADVPs.  Many of these errors
-are unrecoverable from CCGbank, either because inconsistencies in the \ptb have
-been smoothed over or because they are genuine but rare constructions that
-were lost.
+Many of the remaining errors relate to missing and extra clause nodes and a range of rare structures, such as QPs, NACs, and NXs.
+The only other prominent errors are single word spans, \myeg extra or missing ADVPs.
+Many of these errors are unrecoverable from CCGbank, either because inconsistencies in the \ptb have been smoothed over or because they are genuine but rare constructions that were lost.
 
 \begin{figure}
 \centering

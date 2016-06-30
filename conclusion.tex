@@ -1,3 +1,20 @@
 \chapter{Conclusion}
 
-I conclude
+This dissertation has explored new algorithms for manipulating syntactic structure.
+These have extended our understanding and expanded the capacity of our tools.
+First, we looked at improving our understanding of the mistakes automatic parsers make.
+Our error analysis method gives a summary of the types of errors in system output, with categories that are easily interpretable.
+We applied the technique to a range of systems, writing styles, and languages, confirming previously anecdotal claims such as the prevlance of prepositional phrase attachment errors.
+Next, we considered the connections between syntactic representations.
+Our method of converting from \ccg into \ptb-style trees improved significantly over prior work.
+Finally, we explored parsing with aspects of syntax that are typically ignored.
+Our algorithm is the first two incorporate virtually all aspects of structure in the \ptb into a single inference method.
+
+There are a range of possible extensions for each component of this work.
+Both the error analysis and conversion systems are designed around trees, and could be extended to cover graph structures.
+Doing so would require breaking assumptions built-in to the algorithms, but would be particularly illuminating regarding the challenge of long-distance dependencies.
+In the structure of this dissertation, the parsing algorithm we propose is kept separate from the definition of the syntactic representation we use.
+That choice was intentional, as the algorithm is a general parsing approach that could also be applied to exciting new resources like the Abstract Meaning Representation.
+Having non-local structure available also opens new opportunities for downstream applications.
+Finally, in the implementation of the algorithm we found that the vast majority of the deduction rules are not needed to cover the structures seen in language.
+More tightly characterizing the space of structures remains a fasinating open question.
