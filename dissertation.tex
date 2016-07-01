@@ -5,6 +5,7 @@
 
 \documentclass{ucbthesis}
 \usepackage[style=authoryear-icomp,backref,sorting=nyt,sortcase=false,backend=biber,maxbibnames=999]{biblatex}
+% TODO: Work out how to always have author last name only (no initials)
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -26,7 +27,7 @@
 \usepackage{qtree}
 \usepackage{rotating}
 \usepackage{color}
-\usepackage{algorithm}
+\usepackage[chapter]{algorithm}
 \usepackage{algpseudocode}
 \usepackage{synttree}
 \usepackage{array}
@@ -179,8 +180,8 @@ pdfpagelayout=OneColumn}
 \newcolumntype{x}[1]{%
 >{\raggedleft\hspace{0pt}}p{#1}}%
  
-\newcommand{\mathscale}{0.75}
-\newcommand{\invmathscale}{1.3}
+\newcommand{\mathscale}{0.7}
+\newcommand{\invmathscale}{1.42}
 \newcommand{\textexample}[1]{\textsf{#1}}
 \newcommand{\onlygraphs}[1]{\textcolor{blue}{\scalebox{0.95}{\fbox{$#1$}}}}
 \newcommand{\cf}[1]{\mbox{$#1$}}   % category font
@@ -218,7 +219,7 @@ pdfpagelayout=OneColumn}
 \newcommand{\mybar}[1]{\framebox[\myboxwidth][l]{\rule{#1mm}{\mybarheight}}}
 
 % Example of specifying allowed hyphenation within a word
-% \hyphenation{mar-gin-al-ia}
+\hyphenation{ana-ly-sis}
 
 \begin{document}
 
@@ -254,6 +255,9 @@ pdfpagelayout=OneColumn}
 
 \tableofcontents
 \clearpage
+\listofalgorithms
+\addcontentsline{toc}{chapter}{List of Algorithms}
+\clearpage
 \listoffigures
 \clearpage
 \listoftables
@@ -272,9 +276,9 @@ pdfpagelayout=OneColumn}
 \include{implementation}
 \include{conclusion}
 \appendix
-%%%\include{glossary}
+\include{glossary}
 \include{resources}
-%%%\include{advice}
+\include{advice}
 \printbibliography
 
 \end{document}

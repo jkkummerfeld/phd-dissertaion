@@ -198,7 +198,9 @@ powerful combinators allow categories to combine with greater flexibility.
 \end{tikzpicture}
 
 \caption{\label{fig:ccg-example}
-A crossing constituents example: \textit{his death a suicide} (\ptb) crosses \textit{labeled his death} (CCGbank).
+  A crossing constituents example for \ccg and \ptb.
+}{
+  A crossing constituents example: \textit{his death a suicide} (\ptb) crosses \textit{labeled his death} (CCGbank).
 }
 \end{figure}
 
@@ -219,7 +221,9 @@ Categories & Schema \\
 \hline
 \end{tabular}
 \caption{\label{fig:candc09}
-Example \old lexical and rule schemas.
+  Exmple rules from \textcite{Clark-Curran:2009}.
+}{
+  Example \old lexical and rule schemas.
 }
 \end{table}
 
@@ -293,8 +297,9 @@ These cases account for 10\% of sentences, but the method is still fairly effect
 	\hline
 \end{tabular}
 \caption{\label{tab:instructions}
-%%%\footnotesize
-Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
+  Example instructions for our \ccg to \ptb conversion.
+}{
+  Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
 }
 \end{table}
 
@@ -348,6 +353,8 @@ However, for this particular construction the \ptb annotations are inconsistent,
 \centering
 \includegraphics[width=0.85\linewidth]{figures/ccg-example}
 \caption{\label{fig:inst-example}
+An example function application during \ccg to \ptb conversion.
+}{
 An example function application.
 Top row: \ccg rule.
 Bottom row: applying instruction (VP f a).
@@ -358,18 +365,18 @@ Bottom row: applying instruction (VP f a).
 \centering
 \begin{tabular}{lll}
 	\hline
-		Symbol & Meaning & Example \\
+		Symbol & Meaning & Example Instruction \\
 	\hline
 	\hline
-		(X f a) & Add an X bracket around & (VP$\;$ f$\;$ a) \\
-		& functor and argument \\
+		(X f a) & Add an X bracket around functor and argument & (VP$\;$ f$\;$ a) \\
 		\{ \} & Flatten enclosed node & (N$\;$ f$\;$ \{a\}) \\
-		X* & Use same label as arg. & (S*$\;$ f$\;$ \{a\}) \\
-		& or default to X \\
+		X* & Use same label as argument or default to X & (S*$\;$ f$\;$ \{a\}) \\
 		f$_i$ & Place subtrees &  (PP$\;$ f$_0$$\;$ (S$\;$ f$_{1..k}$$\;$ a)) \\
 	\hline
 \end{tabular}
 \caption{\label{tab:operators}
+Types of operations in instructions in our \ccg to \ptb conversion.
+}{
 Types of operations in instructions.
 }
 \end{table}
@@ -387,7 +394,7 @@ have different lexical categories: {\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}}
 on \textit{than} and {\small \cf{(N/N)/(N/N)}} on \textit{relatively}.  This
 lexical difference means we can assign different instructions to correctly
 recover the QP and ADJP nodes, whereas \old applies the same schema in both
-cases because after the first function application for \textit{than} the category becomes the same as the category for \textit{relaitvely}.
+cases because after the first function application for \textit{than}, the category becomes the same as the category for \textit{relaitvely}.
 
 \section{Evaluation}
 
@@ -402,6 +409,7 @@ For unannotated categories, we use the instructions of the result category with 
     System & Data & P & R & F & Sent. \\
   \hline
   \hline
+  % TODO: Move 'len 40' to the left, for a wider table
            & 00 (all)          & 93.67 & 95.37 & 94.51 & 39.6 \\
     \candc & 00 (len $\le 40$) & 94.39 & 95.85 & 95.12 & 42.1 \\
     Conv   & 23 (all)          & 93.95 & 95.33 & 94.64 & 39.7 \\
@@ -449,6 +457,8 @@ Many of these errors are unrecoverable from CCGbank, either because inconsistenc
 %%%  }
 	\caption{
 		\label{fig:scatter_plots}
+		Heatmaps comparing gold conversion accuracy, \ccg native evaluation, and converted evaluation.
+  }{
 		For each sentence in the treebank, we plot the converted parser output against gold conversion (top), the original parser evaluation against gold conversion (left), and the converted parser output against the original parser evaluation against (right).
 		A diagonal line indicating $x=y$ is also included.
 		Top: Most points lie below the diagonal, indicating that the quality of converted parser output (y) is upper bounded by the quality of conversion on gold parses (x).
@@ -468,7 +478,7 @@ One way to do this is to calculate a projected score (Proj), as the
 parser result over the oracle result, but this is a very rough approximation.
 Another way is to evaluate only on the 51\% of sentences for which our
 conversion from gold \ccg derivations is perfect (Clean).  However,
-even on this set our conversion introduces errors, as the parser output may
+even on this set our conversion introduces errors, as when the parser output differs from the gold derivation, it may
 contain categories that are harder to convert.
 
 Parser F-scores are generally higher on Clean, which could mean that this
@@ -476,16 +486,17 @@ set is easier to parse, or it could mean that these sentences don't contain
 annotation inconsistencies, and so the parsers aren't incorrect for returning
 the true parse (as opposed to the one in the \ptb).  To test this distinction
 we look for correlation between conversion quality and parse difficulty on
-another metric.  In particular, Figure~\ref{fig:scatter_plots} (right) shows
+another metric.  In particular, Figure~\ref{fig:scatter_plots} (bottom left) shows
 \ccg labeled dependency performance for the \candc parser \myvs CCGbank
 conversion \parseval scores. The lack of a strong correlation, and the spread
 on the line $x=100$, supports the theory that these sentences are not
 necessarily easier to parse, but rather have fewer annotation inconsistencies.
 
-In the left plot, the y-axis is \parseval on converted \candc parser output.
+In the top plot, the y-axis is \parseval on converted \candc parser output.
 Conversion quality essentially bounds the performance of the parser.
 The few points above the diagonal are mostly short sentences on which the \candc parser uses categories that lead to one extra correct node (a common case is ADVP v ADJP).
 The main constructions on which parse errors occur, \myeg PP attachment, are rarely converted incorrectly, and so we expect the number of errors to be cumulative.
+The bottom right plot shows three noteworthy properties, (1) in general the two evaluation metrics are correlated, (2) the \ccg evaluation is slightly harsher, with fewer points below the diagonal line than above it\footnote{This is consistent with prior work, and the fact that \ccg makes some additional distinctions, such as between arguments and adjuncts.}, (3) there are some very common cases on the far right, where the \ccg evaluation is perfect, but conversion mistakes mean the \ptb score is not perfect.
 Some sentences are higher in the right plot than the left because there are distinctions in \ccg that are not always present in the \ptb, \myeg the argument-adjunct distinction.
 
 \begin{table}
@@ -512,6 +523,8 @@ Some sentences are higher in the right plot than the left because there are dist
 \caption{
 	\label{tab:full-comp}
 	F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.
+}{
+	F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.
 	Clean is only on sentences that are converted perfectly from gold \ccg (51\%).
 	All is over all sentences.
 	Proj is a projected F-score (All result / CCGbank All result).
@@ -531,12 +544,13 @@ As shown earlier, Clean does not completely factor out the errors
 introduced by our conversion, as the parser output may be more difficult to
 convert, and the calculation of Proj only roughly factors out the
 errors.  However, the results do suggest that the performance of the \ccg
-parsers is approaching that of the Petrov parser.
+parsers is somewhere between the Stanford and Petrov parsers.
 
 \section{Summary}
 
 By exploiting the generalised combinators of the \ccg formalism, we developed a new method of converting \ccg derivations into \ptb-style trees.
 Our system is more effective than previous work, increasing exact sentence match by more than 11\% (absolute), and can be directly integrated with a \ccg parser.
+The system is available online, see Appendix~\ref{chp:resources}.
 
 %%% Consider pusing the idea that we have found the inconsistencies in the treebank / the sentences that are inconsistent
 

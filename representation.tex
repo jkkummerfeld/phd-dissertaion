@@ -40,6 +40,8 @@
 \hfill
 \strut
 \caption{
+Examples of graph structured syntactic phenomena.
+}{
 Examples of syntactic phenomena.
 Dashed edges are traces, solid edges are structural.
 Some edges are fainter to more clearly show the key edges for each case.
@@ -53,7 +55,7 @@ Unlike dependency parsing, we retain all the information required to reconstruct
 Our representation is based on \textcite{cck}'s tree representation, with three key differences:
 (1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
 (2) we add representations of null elements and co-indexation,
-(3) we modify the head rules to avoid complex structures.
+(3) we modify the head rules to avoid problematic structures.
 
 \subsection{Core Structure} \label{sec:rep-core}
 
@@ -61,58 +63,71 @@ We represent parses with two components.
 Every word is assigned a spine, and every word is the child of one non-trace edge.
 Together, these form the base tree structure of the parse.
 
-\begin{center}
-\begin{tikzpicture}
-[ every node/.style={
-    node distance=2ex,
-    inner sep=0pt
-  },
-  structural/.style={
-    ->,
-    >=Stealth,
-    thin,
-  },
-  trace/.style={
-    ->,
-    >=Stealth,
-    thin,
-    dashed
-  },
-]
+\begin{figure}
+  \centering
+  \scalebox{1.0}{
+    \input{figures/picture-simple-flat}
+    % TODO: Change the people in the example
+  }
+  \caption{\label{fig:repr2}
+    Parse representations for graph structures.
+  }{
+    Parse representations for graph structures: (a) constituency (b) ours.
+  }
+\end{figure}
 
-  \node (sntR0) at (0, 1.8) {\strut ROOT};
+%%%\begin{center}
+%%%\begin{tikzpicture}
+%%%[ every node/.style={
+%%%    node distance=2ex,
+%%%    inner sep=0pt
+%%%  },
+%%%  structural/.style={
+%%%    ->,
+%%%    >=Stealth,
+%%%    thin,
+%%%  },
+%%%  trace/.style={
+%%%    ->,
+%%%    >=Stealth,
+%%%    thin,
+%%%    dashed
+%%%  },
+%%%]
 
-  \node (snt00) [right=1em of sntR0.east] {\strut NP\textsubscript{SBJ}};
-  \node (sw0) [color=black!50,below=-0.3ex of snt00] {\strut Sam};
+%%%  \node (sntR0) at (0, 1.8) {\strut ROOT};
 
-  \node (snt10) [right=1em of snt00.east] {\strut S};
-  \node (snt11) [right=1ex of snt10.east] {\strut VP};
-  \draw (snt10.east) -- (snt11.west);
-  \node (sw1a) at ($(snt10.west)!0.5!(snt11.east)$) {\strut};
-  \node (sw1) [color=black!50,below=-0.3ex of sw1a] {\strut told};
+%%%  \node (snt00) [right=1em of sntR0.east] {\strut NP\textsubscript{SBJ}};
+%%%  \node (sw0) [color=black!50,below=-0.3ex of snt00] {\strut Sam};
 
-  \node (snt20) [right=1em of snt11.east] {\strut NP};
-  \node (sw2) [color=black!50,below=-0.3ex of snt20] {\strut Alex};
+%%%  \node (snt10) [right=1em of snt00.east] {\strut S};
+%%%  \node (snt11) [right=1ex of snt10.east] {\strut VP};
+%%%  \draw (snt10.east) -- (snt11.west);
+%%%  \node (sw1a) at ($(snt10.west)!0.5!(snt11.east)$) {\strut};
+%%%  \node (sw1) [color=black!50,below=-0.3ex of sw1a] {\strut told};
 
-  \node (snt30) [right=1.5em of snt20.east] {\strut -};
-  \node (sw3) [color=black!50,below=-0.3ex of snt30] {\strut to};
+%%%  \node (snt20) [right=1em of snt11.east] {\strut NP};
+%%%  \node (sw2) [color=black!50,below=-0.3ex of snt20] {\strut Alex};
 
-  \node (snt50) [right=1em of snt30.east] {\strut S};
-  \node (snt51) [right=1ex of snt50.east] {\strut VP};
-  \draw (snt50.east) -- (snt51.west);
-  \node (snt52) [right=1ex of snt51.east] {\strut VP};
-  \draw (snt51.east) -- (snt52.west);
-  \node (sw5a) at ($(snt50.west)!0.5!(snt52.east)$) {\strut};
-  \node (sw5) [color=black!50,below=-0.3ex of sw5a] {\strut run};
+%%%  \node (snt30) [right=1.5em of snt20.east] {\strut -};
+%%%  \node (sw3) [color=black!50,below=-0.3ex of snt30] {\strut to};
 
-  \draw [structural,out=60,in=120] (snt00.north) to (snt10.north west);
-  \draw [structural,out=120,in=60] (snt10.north) to (sntR0.north);
-  \draw [structural,out=120,in=60] (snt20.north) to (snt11.north east);
-  \draw [trace,out=30,in=150] (snt20.north) to (snt50.north west);
-  \draw [structural,out=120,in=60] (snt50.north) to (snt11.north);
-  \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
-\end{tikzpicture}
-\end{center}
+%%%  \node (snt50) [right=1em of snt30.east] {\strut S};
+%%%  \node (snt51) [right=1ex of snt50.east] {\strut VP};
+%%%  \draw (snt50.east) -- (snt51.west);
+%%%  \node (snt52) [right=1ex of snt51.east] {\strut VP};
+%%%  \draw (snt51.east) -- (snt52.west);
+%%%  \node (sw5a) at ($(snt50.west)!0.5!(snt52.east)$) {\strut};
+%%%  \node (sw5) [color=black!50,below=-0.3ex of sw5a] {\strut run};
+
+%%%  \draw [structural,out=60,in=120] (snt00.north) to (snt10.north west);
+%%%  \draw [structural,out=120,in=60] (snt10.north) to (sntR0.north);
+%%%  \draw [structural,out=120,in=60] (snt20.north) to (snt11.north east);
+%%%  \draw [trace,out=30,in=150] (snt20.north) to (snt50.north west);
+%%%  \draw [structural,out=120,in=60] (snt50.north) to (snt11.north);
+%%%  \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
+%%%\end{tikzpicture}
+%%%\end{center}
 
 \paragraph{Spines}
 Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
@@ -137,7 +152,7 @@ The base tree representation described above does not cover null elements or co-
 \paragraph{Null Elements}
 The Penn Treebank contains a range of null elements, indicating structures such as the trace of movement, PRO, and null complementizers.
 These elements do not span any words, so do not have a head word.
-For example, in Figure~\ref{fig:repr}a there is a null element that represents the missing subject of the infinitive.
+For example, in Figure~\ref{fig:repr2} there is a null element that represents the missing subject of the infinitive.
 
 We represent null elements in our structure in two ways.
 If the null element has a reference index, shown as a subscript in our figures, we represent the null element as part of an edge, as described below.
@@ -186,9 +201,6 @@ For example, in a subordinate clause consisting of a Wh-noun phrase (WHNP) and a
 Often the WHNP has a trace to within the S, so making it the head would create a cycle.
 
 \paragraph{One-Endpoint Crossing}
-We generalize \textcite{ec}'s definition of one-endpoint crossing trees to graphs.
-A graph is one-endpoint crossing (1ec) if for any edge $e$, all edges that cross $e$ share an endpoint (treating the edges as undirected).
-
 The dark edges in Figure~\ref{fig:not-1ec} show an example of how head rules can impact this property.
 The trace edge from \emph{Page} to \emph{CEO of Google} does not satisfy the 1ec property because it is crossed by two edges with no endpoints in common.
 By switching the head rule for VPs to use a child VP rather than an auxiliary, we can resolve this case.
@@ -224,7 +236,7 @@ We set the boolean for structural $o$--$[pq]$ edges to true if it is currently t
 
 \subsubsection{When combining items}
 In these cases we never introduce a crossing when making a $B$, or in any rule that combines a set of items with only one non-$I$.
-That leaves these cases, where the top half and bottom half are symmetrical:
+That leaves the following cases, where the top half and bottom half are symmetrical:
 
 \scalebox{0.9}{
 \parbox{\linewidth}{

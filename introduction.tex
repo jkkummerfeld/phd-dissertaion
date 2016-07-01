@@ -7,14 +7,14 @@ to find out what is happening in the world we read newspapers or listen to a new
 for entertainment we read stories, listen to podcasts, or watch TV shows (virtually all of which contain dialogue);
 and for personal communcation we write electronic messages in a variety of formats.
 One of the keys to all of this communication is the use of structure to convey meaning.
-Part of this structure is visible--by convention you are looking at this page from left to right and top to bottom, treating each connected component of ink (or light) as a character, combining a sequence of characters into words, and so on to progressively larger levels of structure.
+Part of this structure is visible--by convention you are looking at this page from top to bottom and left to right, treating each connected component of ink (or light) as a character, combining a sequence of characters into words, and so on to progressively larger levels of structure.
 The focus of this dissertation, syntax, is the mostly invisible structure that exists somewhere between characters and sentences.
 People are able to identify syntactic structure by drawing on knowledge from a range of sources, and in the process they discard a vast array of alternative interpretations for a given utterance.
 In the past century, artificial symbolic processing by machines has advanced dramatically, to the point where computers can start to engage in textual communication, both understanding what people have written and writing back.
 Approaching human-level communication will require systems to resolve syntactic ambiguities in text, either explicitly with an interpretable syntactic structure or implicitly with some other intermediate representation.
 
 Over the past two decades there has been rapid development in systems for the syntactic parsing task, where the input is a single sentence and the output is a structure that encodes syntactic relationships between words in the sentence.
-This development has largely been driven by development of new statistical methods for constructing models of language from resources manually labeled with syntactic structures by linguists.
+This development has largely been driven by new statistical methods for constructing models from resources manually labeled with syntactic structures by linguists.
 In addition to variations in statistical and engineering approaches, research has explored various syntactic representations.
 These representations are based on different linguistic theories, which sometimes encode the same phenomena in different ways and sometimes differ on what phenomena should be disambiguated within syntax.
 
@@ -23,10 +23,10 @@ The first area of research we consider is how we evaluate our systems to underst
 We propose a search algorithm that finds the set of errors present in a parse.
 Using the algorithm, we compare a range of systems, a range of text domains, and two languages.
 The second aspect of syntax we consider is conversion between different linguistic formalisms.
-Our system uses a bottom-up approach that more flexible and more effective than previous work.
+Our system uses a bottom-up approach that is more flexible and more effective than previous work.
 Finally, we explore how to extend parsing algorithms beyond tree structured output.
-We introduce a new algorithm that can efficiently find the max or sum over all possible structures for a sentence, scored with an edge-factored model.
-We define a new representation that is compatible with the algorithm while representing virtually all forms of linguistic structure in the Penn Treebank.
+We introduce a new algorithm that can efficiently find the max or sum over all possible graph structures for a sentence, scored with an edge-factored model.
+We also define a new representation that is compatible with the algorithm and represents virtually all forms of linguistic structure in the Penn Treebank.
 
 \section{Syntax}
 \label{sec:syntax}
@@ -38,9 +38,9 @@ We define a new representation that is compatible with the algorithm while repre
     \node (root) [left=3ex of w0.west] {\strut ROOT};
     \node (w1) [right=3ex of w0.east] {\strut enjoys};
     \node (w2) [right=3ex of w1.east] {\strut running};
-    \draw [-Stealth] (w0.north east) to [out=45,in=135] node[midway,above=-1pt] {\small nsubj} (w1.north west);
-    \draw [dashed,-Stealth] (w0.north) to [out=60,in=120] node[midway,above=-1pt] {\small nsubj} (w2.north);
-    \draw [Stealth-] (w1.north east) to [out=45,in=135] node[midway,above=-1pt] {\small xcomp} (w2.north west);
+    \draw [-Stealth] (w0.north east) to [out=45,in=135] node[midway,above=-2pt] {\small nsubj} (w1.north west);
+    \draw [dashed,-Stealth] (w0.north) to [out=60,in=120] node[midway,above=-2pt] {\small nsubj} (w2.north);
+    \draw [Stealth-] (w1.north east) to [out=45,in=135] node[midway,above=-2pt] {\small xcomp} (w2.north west);
     \draw [-Stealth] (w1.north) to [out=120,in=60] node[midway,above=-1pt] {\small root} (root);
   \end{tikzpicture}
   }
@@ -111,7 +111,7 @@ We define a new representation that is compatible with the algorithm while repre
   }
   \caption{
   \label{fig:syntax}
-  dependency, 
+  Dependency, 
   constituency, 
 %%%  (ROOT
 %%%    (S
@@ -136,22 +136,22 @@ For the purposes of this thesis, it is important to understand a few general pro
 Each theory encodes relationships between words using structure, but the form of those structures varies considerably.
 Figure~\ref{fig:syntax} shows how the sentence \textexample{Ellen enjoys running} is represented in the three syntactic formalisms we use.
 
-In the leftmost case, which uses dependency grammar \parencite[\depgr][]{dependency-grammar}, each edge indicates a relationship between two words.
+In the leftmost case, which uses dependency grammar \parencite[\depgr;][]{dependency-grammar}, each edge indicates a relationship between two words.
 The label expresses the type of dependency, out of 40-50 types \parencite{ud,sd}.
 The arrow points from the word that is the \textit{dependent} / \textit{child} to the word that is the \textit{head} / \textit{parent}\footnote{The direction of the arrow is a convention we are following from linguistics. Note that this is the reverse of the convention in graph theory.}.
-The dashed edge is often excluded in order to make the edges form a tree (a structure that connects all words, but does not contain a cycle).
+The dashed edge is often excluded in order to make the edges form a tree (a structure where every word has exactly one parent and the edges from one connected structure).
 
-The middle case, which uses Government and Binding Theory \parencite[\gb][]{gb}, has a hierarchical phrase structure.
+The middle case, which uses Government and Binding Theory \parencite[\gb;][]{gb}, has a hierarchical phrase structure.
 Each symbol is a \textit{constituent}, capturing the idea that the set of words beneath it constitute a single functional unit.
 Consistituents are linked together to form larger constituents according to rules.
-This figure also shows a null element between \textexample{enjoys} and \textexample{running}, which is used to encode the relationship between \textexample{Ellen} and \textexample{running}.
+This figure also shows a null element in between \textexample{enjoys} and \textexample{running}, which is used to encode the relationship between \textexample{Ellen} and \textexample{running}.
 As with the dashed edge in the dependency case, the null element is often removed from this structure to make it a tree.
 
 The rightmost case, categorial grammar \parencite{categorial-grammar}, also has a hierarchical structure, but uses complex lexical categories that are then combined according to a small set of inference rules.
-This particular example uses Combinatory Categorial Grammar \parencite[\ccg][]{Steedman:2000}, a variant in which combinatory logic is used to construct both syntactic and semantic forms in parallel.
+This particular example uses Combinatory Categorial Grammar \parencite[\ccg;][]{Steedman:2000}, a variant in which combinatory logic is used to construct both syntactic and semantic forms in parallel.
 Immediately beneath each word is its lexical category, which can either by an atomic symbol, or a complex structured combination of symbols.
-A small set of generic combinators define how pairs of adjacent categories can be combined to produce a new structure.
-Along with the syntactic derivation, \ccg builds up a lambda expression denoting the semantic structure of the sentence (not shown in this figure).
+A small set of generic combinators define how pairs of adjacent categories can be combined.
+Along with the syntactic derivation, \ccg builds up a lambda expression denoting the semantic structure of the sentence (not shown in this figure). %TODO: Add lambda expressions to figure
 One interesting property of the formalism is that a sentence can have multiple different derivations with the same semantic representation.
 This ability to have different structures encode the same meaning is a form of derivational or spurious ambiguity\footnote{\textcite{Steedman:2000} explores the possibility that this ambiguity could encode variations in prosody.}.
 Note that unlike the previous two approaches, here the connection between \textexample{Ellen} and \textexample{running} is retained while keeping the structure a tree.
@@ -170,7 +170,7 @@ This is possible because the relation has been threaded through the tree via the
 %%%\end{itemize}
 
 While syntactic formalisms are used in a variety of ways, our focus is on the automatic production of syntactic structures by computer programs.
-These programs take a sentence as input, consider possible structures and return the one that is best according to some model\footnote{The sentence is assumed to be grammatical--a parse is always returned.}.
+These programs take a sentence as input, consider possible structures and return the one that is best according to some scoring model\footnote{The sentence is assumed to be grammatical--a parse is always returned.}.
 Individually considering every possible structure for a sentence is infeasible.
 Instead, programs incrementally build the parse, and as a result they either lose the guarantee of finding the optimal parse according to the model, or give up flexibility in the definition of the model.
 This work follows the second approach, with models being restricted to give the complete structure a score that is the sum of individual scores for each of its components.
@@ -180,7 +180,7 @@ The specific form of dynamic programming applied to the task of finding optimal 
 \section{Error Analysis}
 
 The standard resource for parsing research is the Wall Street Journal section of the Penn Treebank \parencite{ptb}, a collection of one million words of text from 1989 issues of the Wall Street Journal that have been annotated by experts with syntactic structure in a \gb style.
-The standard measure of constituent parser performance is the F-Score, the harmonic mean of precision and recall on labeled nodes in the parse.
+The standard measure of constituent parser performance is the F-Score, the harmonic mean of precision\footnote{Number of correct nodes divided by number of nodes in the output structure} and recall\footnote{Number of correct nodes divided by number of nodes in the gold structure}  on labeled nodes in the parse.
 Performance on \wsj section 23 has exceeded $90$ F\textsubscript{1} \parencite{Petrov-Klein:2007}, and $92$ F\textsubscript{1} when using self-training and reranking \parencite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
 While these results give a useful measure of overall performance, they provide no information about the nature, or relative importance, of the remaining errors.
 
@@ -199,7 +199,7 @@ Previously, these were all analysed only in terms of their impact on F-score.
 \section{Fromalism Conversion}
 
 As shown above, there are many ways of expressing syntactic structure.
-Extensive work has gone into converting the Penn Treebank \parencite[\ptb][]{ptb} to other formalisms, such as \hpsg \parencite{Miyao-Ninomiya-Tsujii:2004}, \lfg \parencite{Cahill-etal:2008}, \ltag \parencite{Xia:1999}, and \ccg \parencite{CCGBank},
+Extensive work has gone into converting the Penn Treebank to other formalisms, such as \hpsg \parencite{Miyao-Ninomiya-Tsujii:2004}, \lfg \parencite{Cahill-etal:2008}, \ltag \parencite{Xia:1999}, and \ccg \parencite{CCGBank},
 These conversions are complex processes that render linguistic phenomena in formalism-specific ways.
 Tools for reversing these conversions are desirable for downstream parser use and parser comparison.
 However, reversing conversions is difficult, as corpus conversions may lose information or smooth over PTB inconsistencies.
@@ -231,7 +231,9 @@ Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has
     \input{figures/picture-simple-flat}
   }
   \caption{\label{fig:repr}
-    Parse representation: (a) constituency (b) ours.
+    Parse representations for graph structures.
+  }{
+    Parse representations for graph structures: (a) constituency (b) ours.
   }
 \end{figure}
 

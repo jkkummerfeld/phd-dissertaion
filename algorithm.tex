@@ -1,7 +1,9 @@
 \chapter{Graph Parsing} \label{chp:parsing}
 
+%TODO: Look at reviews for what else to add
+
 General treebank analyses are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
-In this chapter, wee propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
+In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
 We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
 Our dynamic program uniquely decomposes structures, is sound and complete with respect to a subset of the class of one-endpoint-crossing graphs, and covers $97.7\%$ of the Penn English treebank.
@@ -16,14 +18,14 @@ Non-projectivity is important in syntax for representing many syntactic structur
 Fortunately, in practice almost all parses are covered by well-defined subsets of this space.
 For dependency parsing, recent work has defined algorithms for inference within various subspaces \parencite{Gomez-Rodriguez:2010,ec}.
 We build upon these algorithms and adapt them to constituency parsing.
-For constituency parsing, a range of formalisms have been developed that are mildly-context sensitive, such as CCG \parencite{Steedman:2000}, LFG \parencite{Bresnan:1982}, LTAG \parencite{Joshi:1997}.
+For constituency parsing, a range of formalisms have been developed that are mildly-context sensitive, such as CCG \parencite{Steedman:2000}, LFG \parencite{Bresnan:1982}, and LTAG \parencite{Joshi:1997}.
 Our representation is similar to LTAG-Spinal \parencite{Shen:2007}, but has the advantage that it can be converted back into the PTB representation.
-Also, dependency parsers have been used to assist in constituency parsing, which has involved varying degrees of representation design, but only for trees \parencite{hall2007hybrid,hall-nivre:2008:PaGe,kong-rush-smith:2015:NAACL-HLT,fernandezgonzalez-martins:2015:ACL-IJCNLP}.
+Recently, dependency parsers have been used to assist in constituency parsing, which has involved varying degrees of representation design, but only for trees \parencite{hall2007hybrid,hall-nivre:2008:PaGe,kong-rush-smith:2015:NAACL-HLT,fernandezgonzalez-martins:2015:ACL-IJCNLP}.
 
 Previous work on parsing traces and other null elements in the PTB has taken two general approaches.
 The first broadly effective system was \textcite{Johnson:2002}, which post-processed the output of a parser, inserting extra elements.
 This was effective for some types of structure, such as null complementizers, but had difficulty with long distance dependencies.
-One challenge for a post-processing system is that it must deal with parser mistakes--\textcite{Johnson:2002}'s system F-score was $7$ points higher on gold trees than on parser output.
+One challenge for a post-processing system is that it must deal with parser mistakes--Johnson's system F-score was $7$ points higher on gold trees than on parser output.
 
 The other common approach has been to expand the grammar, threading a trace through the tree structure on the non-terminal symbols.
 \textcite{Collins:1997}'s third model used this approach to recover wh-traces, while \textcite{cai-chiang-goldberg:2011} used it to recover null pronouns, and others have used it for a range of movement types \parencite{dienes-dubey:2003,schmid:2006}.
@@ -64,14 +66,20 @@ All of these approaches have the disadvantage that each additional trace dramati
 % future.
 
 In this section we sketch our algorithm, focusing on how it differs from \textcite{ec}'s tree parsing algorithm.
-For the full derivation see the supplementary material.
+For the full derivation see Section~\ref{sec:full-algorithm}.
 
 The algorithm is a dynamic program defined by (1) a set of items, and (2) deduction rules that define how an item can be composed from other items.
 To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforces additional constraints.
-The representation described above requires directed, labeled edges, and spines.
-To simplify the presentation of the algorithm we first focus on deduction rules for undirected, unlabeled edges and ignore spines, then return to these later.
+Eventually we will show how we can support directed, labeled edges, and labeled words, but to simplify the presentation of the algorithm we first focus on deduction rules for undirected, unlabeled edges and ignore word labels.
 
-To enable efficient parsing we restrict the space we consider, not covering a few specific one-endpoint-crossing structures as described earlier.
+\paragraph{One-Endpoint Crossing}
+\textcite{ec} defined a space of tree structures named one-endpoint crossing (1ec).
+To be in the space, every edge in the tree must obey the 1ec property.
+The property states that for a given edge $e$, all the edges that cross $e$ must share an endpoint (treating the edges as undirected).
+
+We generalize \textcite{ec}'s definition of one-endpoint crossing trees to graphs.
+The 1ec property remains the same, we just relax the requirement that the edges form a tree.
+To enable efficient parsing we further restrict the space we consider, not covering a few specific one-endpoint-crossing structures.
 In practice, these structures are rarely observed in the PTB, and when they do occur it is usually due to where punctuation attaches.
 
 \paragraph{Notation}
@@ -181,7 +189,7 @@ Enforcing these difference involves changes throughout the deduction rules.
 \centering
 \input{figures/picture-algorithm}
 \caption{\label{fig:alg-example}
-An example derivation.
+An example derivation using our graph parsing deduction rules.
 }
 \end{figure}
 
@@ -200,7 +208,7 @@ Figure~\ref{fig:alg-example} presents a derivation of a sentence with crossing e
 
 \subsection{Deduction Rules}
 One set of deduction rules is concerned with removing direct edges between the points $p$, $q$, and $o$ in each item.
-These are straightforward, so we leave them for the supplementary materials.
+These are straightforward, so we leave them for the full derivation in Section~\ref{sec:full-algorithm}.
 
 The other type of deduction rules, which we sketch below, involve decomposing an item into parts.
 Since our item types are entirely disjoint, throughout the rules below we need to give multiple options for item types in many places where \textcite{ec} give only one type.
@@ -889,9 +897,9 @@ As in the previous section, our decomposition differs from \textcite{ec}'s to me
 Here, when a sub-item is an $X$ there is only one $o$--$(pq)$ edge, and when it is an $N$ there is more than one.
 
 
-\section{Algorithm Definition and Proof}
+\section{Algorithm Definition and Proof} \label{sec:full-algorithm}
 
-In the paper we provide only a sketch of the algorithm, here we explain the full derivation.
+Above we provided only a sketch of the algorithm, here we explain the full derivation.
 For completeness, some of the content is repeated.
 When showing the possible deduction rules for each item type we show figures that indicate the required characteristics in each case.
 In the figures black solid curves indicate edges that must exist, and red dotted curves are edges that are not allowed, either by construction or due to constraints.
@@ -925,17 +933,17 @@ Each consists of a span, $[pq]$ and an optional point outside the span, $o$, eit
 
 \subsection{Complete Dynamic Program}
 
-\begin{figure*}
-\vspace{-5mm}
+\begin{algorithm}
+%%%\vspace{-5mm}
 \input{rules-all}
-\vspace{-12mm}
+%%%\vspace{-12mm}
 \caption{
   \label{fig:complete-dp}
-  Complete dynamic program. For definitions of symbols see the text.
+  Complete graph parsing dynamic program.
 }
-\end{figure*}
+\end{algorithm}
 
-Figure ~\ref{fig:complete-dp}above shows the templates for the complete dynamic program.
+Figure~\ref{fig:complete-dp} shows the templates for the complete dynamic program.
 The notation used is as follows:
 
 The notation for edges is $A[p \; c]$, where $p$ and $c$ are the parent and child positions.
@@ -1032,7 +1040,7 @@ We can break these cases down into the edge, plus the item beneath it:
   $I[pq \; Q \; F] \leftarrow \max A[q \; p] \quad I[pq \; \overline{Q} \; F]$
 }
 
-If we were only considering trees then we would constrain the sub-item to be $I[ij \; F \; F]$.
+If we were only considering trees then we would constrain the sub-item to be $I[pq \; F \; F]$.
 
 \subsubsection{No Direct Edges Present}
 
@@ -1063,7 +1071,7 @@ Depending on the size of the set $C$ we get different decompositions.
 \end{tikzpicture}
 \end{center}
 
-There are no $p$--$(sq]$ edges, because of how $s$ was chosen.
+In this case there are no $p$--$(sq]$ edges, because of how $s$ was chosen.
 There are no $(ps)$--$(sq]$ edges, because in this case $|C| = 0$.
 Therefore we can break this case down into two intervals.
 The left interval contains a direct edge from the left end to the right end.
@@ -1119,6 +1127,7 @@ The third item is $[tq.s]$, for reasons already given (in terms of what edges ar
 This cannot be an $R$ or $B$ because that would violate the 1ec property for the $s$--$(tq)$ edge.
 If there is only one $s$--$(tq]$ edge, and it is $sq$, then this item is an $X$.
 Otherwise it will be either an $L$ or $N$, depending on whether the $s$--$(tq)$ edge is crossed by a $t$--$(tq)$ edge.
+If $st$ or $ts$ exists, we attribute it to the middle sub-item (it could come from any of them, so this avoids a spurious ambiguity).
 
 \finalequation{
   $RN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad \cdotp LNX[tqs \; .\overline{S} \; . \; \overline{T}.]$
@@ -1148,7 +1157,7 @@ It cannot be a $B$ because there is only one $(ps)$--$t$ edge.
 In this case it's also possible that $t = q$, in which case there is no third item (it would have width 0).
 
 \finalequation{
-  $LRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$
+  $LRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$ \\
   $LRN\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
 }
 
@@ -1173,7 +1182,7 @@ The same arguments given above apply here, giving the same derivation, the only 
 
 \finalequation{
   $RN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad \cdotp LNX[tqs \; .\overline{S} \; . \; \overline{T}.]$ \\
-  $BLRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$
+  $BLRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$ \\
   $BLRN\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
 }
 
@@ -1829,7 +1838,7 @@ By avoiding derivational ambiguity we reduce the search space, and enable effici
 \subsection{Complexity}
 
 Without any labels, our algorithm is $O(n^4)$, where $n$ is the length of the sentence.
-This comes from both the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
+This comes from all of the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
 
 Adding edge labels changes the complexity to $O(n^4 + e n^2)$, where $e$ is the number of edge types, and the second term comes from having to score every possible edge.
 Adding spines, changes the complexity to $O(s^4 n^4 + e s^2 n^2)$, where $s$ is the number of spine types, though depending on features the second term could be simplified to either $e n^2$ or $s^2 n^2$.

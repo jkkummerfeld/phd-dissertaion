@@ -17,12 +17,12 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 \newcommand{\pluseq}{\mathrel{+}=}
 \renewcommand{\algorithmicrequire}{\textbf{Parameters:}}
 \renewcommand{\algorithmicensure}{}
-\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} #1}{}
+\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} {\small #1}}{}
 \algblockdefx[MyFor]{MyFor}{EndMyFor}[1]{\textbf{for} #1 \textbf{do}}{}
 
 \begin{algorithm}
 \caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
-\algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
+\algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
 \label{alg:ops}
 \vspace{-5mm}
 \setlength\columnsep{-15pt}
@@ -112,7 +112,7 @@ Instead of updating the model with subgradients calculated for single sentences,
 In each pass through the training data we make fewer updates to our model, but each update is based on a more accurate subgradient.
 This has the advantage that we can parse all of the sentences in the batch in parallel.
 Since most of our time is spent in parsing, this can produce improvements proportional to the number of CPU cores available.
-In practise, memory is also a constraint, and CPU utilization is limited by a limited memory bandwidth and the Java Virtual Machine.
+In practise, memory is also a constraint, and CPU utilization is limited by memory bandwidth and possibly memory management by the Java Virtual Machine.
 
 \subsubsection{Sparse Updates}
 
@@ -121,10 +121,10 @@ To save time, we distinguish between two different types of update.
 When the subgradient for a weight is nonzero, we apply the usual update.
 When the subgradient for a weight is zero, we apply a numerically equivalent update later, at the next time the weight is queried.
 This saves time, as we only touch the weights corresponding to the (usually sparse) nonzero directions in the current batch's subgradient.
-The update that occurs later is fast because we can combine more than one update together in a simple closed form calculation.
+The update that occurs later saves time overall because we can combine more than one update together in a simple closed form calculation.
 Algorithm~\ref{alg:ops} gives pseudocode for our implementation.
 
-Sparse updates also have memory and computation costs.
+Sparse updates do add some memory and computation costs.
 First, when accessing weights and applying the delayed updates, we need to use synchronization to ensure an exact update.
 Second, we need to use memory to track the last time each weight was updated and to provide a lock for each weight (used for synchronization).
 However, if we are willing to give up exactness we can avoid these costs by applying a lock-free approach \parencite{hogwild}.
@@ -166,7 +166,7 @@ Here we describe modifications at various scales that further improve speed by p
 
 \subsubsection{State beams}
 
-In each cell of the chart we use a beam, discarding items based on their viterbi inside score.
+In each cell of the chart we use a beam, discarding items based on their Viterbi inside score.
 We ensure diversity by dividing each beam into a collection of sub-beams.
 In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
 This subdivision enables us to avoid considering most incompatible items.
@@ -183,8 +183,8 @@ Using fine sub-beams to avoid comparing incompatible items means that there are 
 Rather than parsing immediately with the full model we use several passes with progressively richer structure \parencite{Goodman:1997}:
 
 \begin{enumerate}
-  \item Projective parser without traces or spines, and a trace classifier
-  \item Non-projective parser without spines, and a spine classifier
+  \item Projective parser without traces or spines, and simultaneously a trace classifier
+  \item Non-projective parser without spines, and simultaneously a spine classifier
   \item Full structure
 \end{enumerate}
 
@@ -193,12 +193,12 @@ The third pass also prunes spines that are not consistent with at least one unpr
 
 \subsubsection{Outside Pass Calculations}
 
-There are two main classes of algorithms for parsing that our algorithm can be used within: Viterbi and Inside--Outside.
+There are two general algorithm classes for parsing that our algorithm can be used within: Viterbi and Inside--Outside.
 The first of these finds the optimal structure for a sentence under a given model and in the process determines the optimal substructure for every span of the sentence.
 While that is sufficient for parsing, it does not provide the information we need for pruning.
 Instead we use the inside--outside algorithm, which computes for each item either the sum or max over all parses that include that item.
 
-When using our algorithm with a model that only places weights on the edges, calculation of the scores for these algorithms is straightforward.
+When using our algorithm with a model that only places weights on the edges, calculation of the scores is straightforward.
 Each edge exists in only one place in the derivation, between the item without it and the item with it.
 Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
 This scoring is important for the beams and cube pruning to be effective, if we only scored spines in one of the items they appear in there would be ties in the beams.
@@ -209,14 +209,14 @@ To correctly calculate the score, and also have effective pruning, we add the co
 
 \subsubsection{Algorithm rule pruning}
 
-\begin{figure*}
-\vspace{-5mm}
+\begin{algorithm}
+%%%\vspace{-5mm}
 \input{rules-pruned}
-\vspace{-12mm}
+%%%\vspace{-12mm}
 \caption{\label{fig:rules-pruned}
 Full dynamic program with rules unseen in training boxed and colored.
 }
-\end{figure*}
+\end{algorithm}
 
 Many structures that can be generated by our dynamic program are not seen in the data we consider.
 To improve speed, we leave out all rules that are not used in the derivation of sentences in the training set.
@@ -234,7 +234,7 @@ We can see several properties:
 
 Pruning the rules in this way further constrains the space of structures that can be formed to some subset of one-endpoint cross graphs.
 This subset more closely describes the structures observed in langauge.
-Unfortunately, it is difficult to describe this space, aside from saying it is the set of structures generated by the deduction rules in Figure~\ref{fig:rules-pruned}.
+Unfortunately, it is difficult to characterize this space, aside from saying it is the set of structures generated by the deduction rules in Figure~\ref{fig:rules-pruned}.
 
 %%%\subsection{Engineering Details}
 % TODO
@@ -270,9 +270,13 @@ Unfortunately, it is difficult to describe this space, aside from saying it is t
   \end{tabular}
   \caption{\label{tab:structures}
     Number of sentences in the training set that are of each structure type.
+  }{
+    Number of sentences in the training set that are of each structure type.
     Values in bold are for structures that are recoverable using our algorithm.
   }
 \end{table}
+
+% TODO: Fix inconsistencies between these tables
 
 \begin{table}
 \centering
@@ -298,8 +302,10 @@ Unfortunately, it is difficult to describe this space, aside from saying it is t
     \hline
   \end{tabular}
   \caption{\label{tab:coverage}
+    Coverage improvements for parts of our graph representation.
+  }{
     Coverage improvements for parts of our representation.
-    Core uses the representation proposed in this paper, with the head rules from \textcite{cck}.
+    Core uses the representation proposed in this work, with the head rules from \textcite{cck}.
     Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
   }
 \end{table}
@@ -334,12 +340,16 @@ Of the rest, most involved a set of arcs like the crossing arcs in Figure~\ref{f
 
 We implemented a proof-of-concept system to get preliminary results using this algorithm and representation.
 We used only first-order features, \myie features do not consider pairs of edges.
-Our code for both the algorithm and conversion to and from our representation will be made available.
+Code for both the algorithm and conversion to and from our representation are available (see Appendix~\ref{chp:resources}).
 
 First we considered the standard parsing metric for trees.
 After one training pass through sections $2$--$21$ of the PTB on sentences up to length $40$, we get an F-score of $88.26$ on section $22$.
 This is lower than other systems, including the \textcite{cck} parser, which scores $92.0$ on all sentences.
 However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
+
+\framebox{
+\textbf{Old - new results coming soon}
+% TODO: new results
 
 For full graph parsing we considered sentences up to length $25$ (half of the treebank).
 For unlabeled trace edges, we obtain a precision of $73\%$ and a recall of $15\%$.
@@ -353,4 +363,4 @@ With that setting, the first pass prunes all but $0.43\%$ of possible edges, and
 The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells.
 However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained.
 With these settings, for sentences up to length $25$, it took $57$ seconds per sentence.
-
+}
