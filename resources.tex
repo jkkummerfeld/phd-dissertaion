@@ -1,8 +1,59 @@
 \chapter{Resources}
 
-% TODO
+All of the systems described in this work have been publicly released under open source licenses:
 
-Code locations
+\begin{figure}
+{\footnotesize
+  \begin{Verbatim}[commandchars=\\\{\},codes={\catcode`$=3\catcode`^=7\catcode`_=8}]
+12 Bracket errors
+1 Clause Attachment error
+(ROOT
+   (S
+      (ADVP
+         (\color{blue}IN \color{red}RB\color{black} So)
+         (RB far))
+      (NP Mr. Hahn)
+      (VP
+         (VBZ is)
+         (VP
+            (VBG trying)
+            \color{red}(S \color{cyan}(VP (S
+               \color{red}(VP
+                  (TO to)
+                  \color{red}(VP \color{cyan}(VP
+                     (VB entice)
+                     (NP Nekoosa)
+                     \color{red}(PP \color{cyan}(PP
+                        (IN into)
+                        \color{red}(S
+                           \color{red}(VP
+                              \color{blue}(VP
+                                 \color{blue}(S
+                                    (VBG negotiating)
+                                    (NP a friendly surrender) \color{cyan}PP) VP) S) VP)\color{blue}))
+                              (SBAR while talking tough)))))))))))
+\end{Verbatim}
+}
+\caption{\label{fig:error-vis}
+Visualisation of errors in a text based output format using colour.
+Red indicates extra nodes in the tree, blue indicates missing nodes, and cyan is used for missing nodes that cross red nodes.
+}
+\end{figure}
 
-History of downloads
+\paragraph{Error Analysis} (Chapter~\ref{chp:analysis}) \\
+\url{https://github.com/jkkummerfeld/berkeley-parser-analyser} \\
+Two versions of the tool were released.
+The initial version was the code submitted with the original paper, which only covered English.
+The second version supported Chinese and also cleaned up the codebase and simplified the search process by using more general operations.
+
+The tool also includes a special output format designed to efficiently show parse errors in a plain-text terminal.
+Figure~\ref{fig:error-vis} shows an example containing a part-of-speech error and a clause attachment error (\texttt{while talking tough} should attach higher, modifying \texttt{trying}).
+
+\paragraph{Formalism Conversion} (Chapter~\ref{chp:conversion}) \\
+\url{https://github.com/jkkummerfeld/berkeley-ccg2pst}
+
+\paragraph{Graph Parsing} (Chapter~\ref{chp:parsing}) \\
+\url{https://github.com/jkkummerfeld/graph-parser} \\
+This repository is being actively used for development and has the entire history of the codebase.
+
 

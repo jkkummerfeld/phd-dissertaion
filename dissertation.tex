@@ -20,11 +20,8 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
-
 \usepackage{ulem}
-%%%\normalem
-%%%\usepackage{LI}
-
+\usepackage{fancyvrb}
 \usepackage{pdflscape}
 \usepackage{qtree}
 \usepackage{rotating}
@@ -42,9 +39,7 @@
 \usepackage{subcaption}
 \usepackage{mdwlist}
 \usepackage{makeidx}
-
 %%%\usepackage{showframe}
-
 \usepackage{fix-cm}
 \usepackage{etoolbox}
 \usepackage{mdframed}
@@ -65,8 +60,11 @@
     }
 \fi
 \usepackage{linguex}
+
 % Last intentionally
 \usepackage{hyperref}
+
+
 
 % For printing, set hidelinks=true 
 \hypersetup{colorlinks=true,
@@ -153,6 +151,7 @@ pdfpagelayout=OneColumn}
 % To get URL breaking in bib working always
 \setcounter{biburllcpenalty}{7000}
 \setcounter{biburlucpenalty}{8000}
+\setlength{\bibnamesep}{1.5\itemsep}
 
 % For showing translations (e.g. Chinese)
 \newcommand{\Trans}[1]{\textit{#1}}
@@ -273,9 +272,9 @@ pdfpagelayout=OneColumn}
 \include{implementation}
 \include{conclusion}
 \appendix
-\include{glossary}
+%%%\include{glossary}
 \include{resources}
-\include{advice}
+%%%\include{advice}
 \printbibliography
 
 \end{document}
