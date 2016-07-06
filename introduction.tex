@@ -33,6 +33,7 @@ We also define a new representation that is compatible with the algorithm and re
 
 \begin{figure}
   \scalebox{0.7}{
+  \framebox{
   \begin{tikzpicture}
     \node (w0) at (0, 0) {\strut Ellen};
     \node (root) [left=3ex of w0.west] {\strut ROOT};
@@ -44,8 +45,10 @@ We also define a new representation that is compatible with the algorithm and re
     \draw [-Stealth] (w1.north) to [out=120,in=60] node[midway,above=-1pt] {\small root} (root);
   \end{tikzpicture}
   }
+  }
   \hfill
   \scalebox{0.7}{
+  \framebox{
   \begin{tikzpicture}
     \node (w0) at (0, 0) {\strut Ellen};
     \node (w1) [right=3ex of w0.east] {\strut enjoys};
@@ -76,8 +79,10 @@ We also define a new representation that is compatible with the algorithm and re
     \draw (nt0.north) -- (nt0-3.south) -- (nt1-3.north);
   \end{tikzpicture}
   }
+  }
   \hfill
   \scalebox{0.7}{
+  \framebox{
   \begin{tikzpicture}[every text node part/.style={align=center}]
     \node (w0) at (0, 0) {\strut Ellen \\ \strut $\cf{NP}$};
     \node (w1) [right=2ex of w0.east] {\strut enjoys \\ \strut $\cf{(S\bs NP)/(S\bs NP)}$};
@@ -108,6 +113,7 @@ We also define a new representation that is compatible with the algorithm and re
 %%%    \node (c20Rb) at (w2b.south east |- c10b.south) {};
 %%%    \draw [-{Straight Barb[length=2mm]}] (c20Lb) -- node[below=0ex] (c20b) {\strut $\cf{S}$} (c20Rb);
   \end{tikzpicture}
+  }
   }
   \caption{
   \label{fig:syntax}
@@ -230,9 +236,7 @@ Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has
   \scalebox{1.0}{
     \input{figures/picture-simple-flat}
   }
-  \caption{\label{fig:repr}
-    Parse representations for graph structures.
-  }{
+  \caption[Parse representations for graph structures.]{ \label{fig:repr}
     Parse representations for graph structures: (a) constituency (b) ours.
   }
 \end{figure}

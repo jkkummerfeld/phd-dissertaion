@@ -17,13 +17,14 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 \newcommand{\pluseq}{\mathrel{+}=}
 \renewcommand{\algorithmicrequire}{\textbf{Parameters:}}
 \renewcommand{\algorithmicensure}{}
-\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} {\small #1}}{}
+\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} {\footnotesize #1}}{}
 \algblockdefx[MyFor]{MyFor}{EndMyFor}[1]{\textbf{for} #1 \textbf{do}}{}
 
 \begin{algorithm}
 \caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
 \algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
 \label{alg:ops}
+% TODO get rid of left margin
 \vspace{-5mm}
 \setlength\columnsep{-15pt}
 \begin{multicols}{2}
@@ -48,13 +49,13 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
             \State \textcolor{gray}{Sum gradients from loss-aug. decodes}
             \State $\mathbf{g} = \mathbf{0}$
             \State \textbf{for} $(x_i,y_i) \in \mathrm{batch}$ \textbf{do}
-                \State \textcolor{white}{\textbf{for}} $y = \argmax_{y' \in Y(x_i)} [$SCORE$(y') + \mathbf{L}(y', y_i) ]$
+                \State \textcolor{white}{\textbf{for}} $y = \argmax_{y' \in Y(x_i)} [${\footnotesize SCORE}$(y') + \mathbf{L}(y', y_i) ]$
                 \State \textcolor{white}{\textbf{for}}  $\mathbf{g} \pluseq (\mathbf{f}(y) - \mathbf{f}(y_i))$
             \State \textcolor{gray}{Update the active features}
             \State $\mathbf{q} \pluseq \mathbf{g}^2$\textcolor{white}{......}\textcolor{gray}{Element-wise square}
             \State $n \pluseq 1$
             \MyFor{$f \in \mathrm{nonzero} \; \mathrm{features} \; \mathrm{in} \; \mathbf{g}$}
-                \State $w_f =$ UPDATE-ACTIVE($w_f$, $g_f$, $q_f$)
+                \State $w_f =$ {\footnotesize UPDATE-ACTIVE}($w_f$, $g_f$, $q_f$)
                 \State $u_f = n$
     \EndMyFor
     \EndMyFor
@@ -90,7 +91,7 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
     \MyFunction{SCORE}($y'$)
         \State $s = 0$
         \State \textbf{for} $f \in \mathbf{f}(y')$ \textbf{do}
-        \State \textcolor{white}{\textbf{for}} $w_f = $ UPDATE-CATCHUP($w_f, q_f, n - u_f$)
+        \State \textcolor{white}{\textbf{for}} $w_f = $ {\footnotesize UPDATE-CATCHUP}($w_f, q_f, n - u_f$)
         \State \textcolor{white}{\textbf{for}} $u_f = n$
         \State \textcolor{white}{\textbf{for}} $s \pluseq w_f$
         \State $\mathbf{return} \; s$
@@ -99,7 +100,7 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
     \end{lefttopbot}
 \end{algorithmic}
 \end{multicols}
-\vspace{-12mm}
+\vspace{-8mm}
 \end{algorithm}
 
 We train with an online primal subgraidnet approach \parencite{Ratliff:2007} as described in \textcite{Kummerfeld-etal:2015:EMNLP}.
@@ -268,9 +269,7 @@ Unfortunately, it is difficult to characterize this space, aside from saying it 
     Other Graph & 0.6\% & 0.01\% \\
     \hline
   \end{tabular}
-  \caption{\label{tab:structures}
-    Number of sentences in the training set that are of each structure type.
-  }{
+  \caption[Number of sentences in the training set that are of each structure type.]{ \label{tab:structures}
     Number of sentences in the training set that are of each structure type.
     Values in bold are for structures that are recoverable using our algorithm.
   }
@@ -301,9 +300,7 @@ Unfortunately, it is difficult to characterize this space, aside from saying it 
     + Gapping shift (\ref{sec:rep-other}) & 98.19 & 99.62 \\
     \hline
   \end{tabular}
-  \caption{\label{tab:coverage}
-    Coverage improvements for parts of our graph representation.
-  }{
+  \caption[Coverage improvements for parts of our graph representation.]{ \label{tab:coverage}
     Coverage improvements for parts of our representation.
     Core uses the representation proposed in this work, with the head rules from \textcite{cck}.
     Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
@@ -348,6 +345,7 @@ This is lower than other systems, including the \textcite{cck} parser, which sco
 However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
 
 \framebox{
+\parbox{0.8\textwidth}{
 \textbf{Old - new results coming soon}
 % TODO: new results
 
@@ -363,4 +361,4 @@ With that setting, the first pass prunes all but $0.43\%$ of possible edges, and
 The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells.
 However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained.
 With these settings, for sentences up to length $25$, it took $57$ seconds per sentence.
-}
+}}

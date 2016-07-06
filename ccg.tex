@@ -197,9 +197,7 @@ powerful combinators allow categories to combine with greater flexibility.
   \draw [-{Straight Barb[reversed,length=2mm]}] (c30L) -- node[below=0ex] (c30) {\strut $\cf{S[dcl]}$} (c30R);
 \end{tikzpicture}
 
-\caption{\label{fig:ccg-example}
-  A crossing constituents example for \ccg and \ptb.
-}{
+\caption[A crossing constituents example for \ccg and \ptb.]{ \label{fig:ccg-example}
   A crossing constituents example: \textit{his death a suicide} (\ptb) crosses \textit{labeled his death} (CCGbank).
 }
 \end{figure}
@@ -220,9 +218,7 @@ Categories & Schema \\
 \cf{NP} + \cf{S[dcl]\bs NP} & place both under S\\
 \hline
 \end{tabular}
-\caption{\label{fig:candc09}
-  Exmple rules from \textcite{Clark-Curran:2009}.
-}{
+\caption[Exmple rules from \textcite{Clark-Curran:2009}.]{ \label{fig:candc09}
   Example \old lexical and rule schemas.
 }
 \end{table}
@@ -296,9 +292,7 @@ These cases account for 10\% of sentences, but the method is still fairly effect
 		 & (S$\;$ a$\;$ f) \\
 	\hline
 \end{tabular}
-\caption{\label{tab:instructions}
-  Example instructions for our \ccg to \ptb conversion.
-}{
+\caption[Example instructions for our \ccg to \ptb conversion.]{ \label{tab:instructions}
   Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
 }
 \end{table}
@@ -352,12 +346,10 @@ However, for this particular construction the \ptb annotations are inconsistent,
 \begin{figure}
 \centering
 \includegraphics[width=0.85\linewidth]{figures/ccg-example}
-\caption{\label{fig:inst-example}
-An example function application during \ccg to \ptb conversion.
-}{
-An example function application.
-Top row: \ccg rule.
-Bottom row: applying instruction (VP f a).
+\caption[An example function application during \ccg to \ptb conversion.]{ \label{fig:inst-example}
+  An example function application.
+  Top row: \ccg rule.
+  Bottom row: applying instruction (VP f a).
 }
 \end{figure}
 
@@ -374,10 +366,8 @@ Bottom row: applying instruction (VP f a).
 		f$_i$ & Place subtrees &  (PP$\;$ f$_0$$\;$ (S$\;$ f$_{1..k}$$\;$ a)) \\
 	\hline
 \end{tabular}
-\caption{\label{tab:operators}
-Types of operations in instructions in our \ccg to \ptb conversion.
-}{
-Types of operations in instructions.
+\caption[Types of operations in instructions in our \ccg to \ptb conversion.]{\label{tab:operators}
+  Types of operations in instructions.
 }
 \end{table}
 
@@ -455,10 +445,7 @@ Many of these errors are unrecoverable from CCGbank, either because inconsistenc
 %%%  \framebox{
 %%%  \scalebox{0.6}{ \includegraphics[trim={25mm 0 15mm 0},clip]{figures/heat-both} }
 %%%  }
-	\caption{
-		\label{fig:scatter_plots}
-		Heatmaps comparing gold conversion accuracy, \ccg native evaluation, and converted evaluation.
-  }{
+	\caption[Heatmaps comparing gold conversion accuracy, \ccg native evaluation, and converted evaluation.]{ \label{fig:scatter_plots}
 		For each sentence in the treebank, we plot the converted parser output against gold conversion (top), the original parser evaluation against gold conversion (left), and the converted parser output against the original parser evaluation against (right).
 		A diagonal line indicating $x=y$ is also included.
 		Top: Most points lie below the diagonal, indicating that the quality of converted parser output (y) is upper bounded by the quality of conversion on gold parses (x).
@@ -520,10 +507,7 @@ Some sentences are higher in the right plot than the left because there are dist
 		\textcite{Charniak-Johnson:2005} & 94.8 & 91.5 & -- \\
 	\hline
 \end{tabular}
-\caption{
-	\label{tab:full-comp}
-	F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.
-}{
+\caption[F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.]{ \label{tab:full-comp}
 	F-scores on section 23 for \ptb parsers and \ccg parsers with their output converted by our method.
 	Clean is only on sentences that are converted perfectly from gold \ccg (51\%).
 	All is over all sentences.

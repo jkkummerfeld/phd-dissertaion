@@ -79,9 +79,7 @@ For all parsers we used the publicly available version, with the standard parame
 		Stanford-U & 85.78 & 86.48 & 85.09 & 28.35 & 2.7 \\
 	\hline
 \end{tabular}
-\caption{
-	\label{tab:standard-results} \parseval results on \wsj section 23 for the parsers we consider.
-}{ 
+\caption[\parseval results on \wsj section 23 for the parsers we consider.]{ \label{tab:standard-results} 
 	\parseval results on \wsj section 23 for the parsers we consider.
 	% TODO: Change (if changed above)
   The columns are F-score, precision, recall, exact sentence match, and speed (sents/sec).
@@ -145,9 +143,7 @@ not show which constructions are the source of those variations.
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:PP-attachment} Error analysis example: PP Attachment.
-}{
+\caption[Error analysis example: PP Attachment.]{ \label{fig:PP-attachment}
 	Grouping errors by node type is of limited usefulness.  In this figure and
 	those that follow the top tree is the incorrect parse and the bottom tree is
 	the correct parse.  Bold, boxed nodes are either extra (marked in the
@@ -205,8 +201,7 @@ stage corresponds to the final loop.
 	\State Classify $g$ based on properties of the group
 \EndFor
 \end{algorithmic}
-\caption{
-\label{alg:code}
+\caption{ \label{alg:code}
 	Tree transformation error classification
 }
 \end{algorithm}
@@ -310,9 +305,7 @@ where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Ap
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:NP-attachment} Error analysis example: NP Attachment.
-}{
+\caption[Error analysis example: NP Attachment.]{ \label{fig:NP-attachment} 
 	\textbf{NP Attachment}: \emph{today} is too high, it should be the argument
 	of \emph{appearing}, rather than \emph{wrote}.  This causes three node errors
 	(extra NP, missing NP and VP).
@@ -361,9 +354,7 @@ where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:modifier-attachment} Error analysis example: modifier attachment.
-}{
+\caption[Error analysis example: modifier attachment.]{ \label{fig:modifier-attachment} 
 	\textbf{Modifier Attachment}: \emph{ahead of time} is too high, it should
 	modify \emph{think}, not \emph{had}.  This causes six node errors (extra
 	S, VP, and VP, missing S, VP, and VP).
@@ -414,9 +405,7 @@ requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:clause-attachment} Error analysis example: clause attachment.
-}{
+\caption[Error analysis example: clause attachment.]{ \label{fig:clause-attachment} 
 	\textbf{Clause Attachment}: \emph{unless the agency receives specific
 	congressional authorization} is attaching too low. This causes six
 	node errors (extra S, VP, and VP, missing S, VP and VP).
@@ -482,9 +471,7 @@ Any group that involves movement of some form of S node.
 (c) Gold tree with traces and function tags
 \end{center}
 \derivspace
-\caption{
-	\label{fig:unary} Error analysis example: unary.
-}{
+\caption[Error analysis example: unary.]{ \label{fig:unary} 
 	Two \textbf{Unary} errors, a missing S and a missing NP.  The third tree is
 	the \ptb tree before traces and function tags are removed.  Note that the
 	missing NP is over another NP, a production that occurs widely in the
@@ -532,9 +519,7 @@ We do not include a breakdown by unary type, though we did find that clause labe
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:coordination} Error analysis example: coordination.
-}{
+\caption[Error analysis example: coordination.]{ \label{fig:coordination} 
 	\textbf{Coordination}: \emph{and Dresdner AG's 10\% decline} is too low.
 	This causes four node errors (extra PP and NP, missing NP and PP).
 }
@@ -577,9 +562,7 @@ Cases in which a conjunction is an immediate sibling of the nodes being moved, o
 (b) Gold tree
 \end{center}
 \derivspace
-\caption{
-	\label{fig:NP-internal-structure}  Error analysis example: NP internal structure.
-}{
+\caption[Error analysis example: NP internal structure.]{ \label{fig:NP-internal-structure} 
 	\textbf{NP Internal Structure}: \emph{Baker} is too low, causing four
 	errors (extra PP and NP, missing PP and NP).
 }
@@ -637,9 +620,7 @@ Our evaluation is entirely focused on the errors of the parsers, so unless there
 		Unclassified & 655 & 734 & 1.1 \\
 	\hline
 \end{tabular}
-\caption{\label{tab:charniak-breakdown}
-	Breakdown of errors on section 23 for the Charniak parser with self-trained model and reranker.
-}{
+\caption[Breakdown of errors on section 23 for the Charniak parser with self-trained model and reranker.]{ \label{tab:charniak-breakdown}
 	Breakdown of errors on section 23 for the Charniak parser with self-trained model and reranker.
 	Errors are sorted by the number of times they occur.
 	Ratio is the average number of node errors caused by each error we identify
@@ -766,10 +747,7 @@ improvements for longer lists, unlike the other error types.
 		G-Web Email & E-mail & 2450 & 11.9 \\
 	\hline
 \end{tabular}
-\caption{
-	\label{tab:domain-info}
-	Variation in size and contents of the domains we consider.
-}{
+\caption[Variation in size and contents of the domains we consider.]{ \label{tab:domain-info}
 	Variation in size and contents of the domains we consider.	The variation in
 	average sentence lengths skews the results for errors per sentences, and so
 	in Table~\ref{tab:charniak-domains} we consider errors per word.
@@ -965,9 +943,7 @@ errors.
                      Other & 3186 & 12.02\% \\
 \hline
 \end{tabular}
-\caption{
-  \label{tab:errors} Breakdown of errors in Chinese parsing.
-}{
+\caption[Breakdown of errors in Chinese parsing.]{ \label{tab:errors} 
   Errors made when parsing Chinese. Values are the number of bracket errors
   attributed to that error type. The values shown are for the Berkeley parser,
   evaluated on the development set. * indicates error types that were added or
@@ -984,9 +960,7 @@ Bracket counts are more informative than a direct count of each error type, beca
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-tree2} }
-  \caption{
-    \label{fig:np_internal} Error analysis example: NP internal (Chinese).
-  }{
+  \caption[Error analysis example: NP internal (Chinese).]{ \label{fig:np_internal} 
     NP-internal structure errors, gold structure (left) and parser hypothesis (right).
   }
 \end{figure}
@@ -1001,9 +975,7 @@ These errors arise when a parser proposes a tree in which POS tags (for instance
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-treebush} }
-  \caption{
-    \label{fig:wrong_arg} Error analysis example: Verb taking wrong arguments (Chinese).
-  }{
+  \caption[Error analysis example: Verb taking wrong arguments (Chinese).]{ \label{fig:wrong_arg}
     Verb taking wrong arguments, gold structure (left) and parser hypothesis (right).
   }
 \end{figure}
@@ -1026,9 +998,7 @@ However, for parsers that do not return traces they are a benign error.
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-treemodatt} }
-  \caption{
-    \label{fig:mod_att} Error analysis example: modifier attachment (Chinese).
-  }{
+  \caption[Error analysis example: modifier attachment (Chinese).]{ \label{fig:mod_att}
     Modifier attachment ambiguity, gold structure (left) and parser hypothesis (right).
   }
 \end{figure}
@@ -1041,9 +1011,7 @@ post-verbal positions, Chinese only allows pre-verbal modification.
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-tree1} }
-  \caption{
-    \label{fig:sense} Error analysis example: Word sense confusion (Chinese).
-  }{
+  \caption[Error analysis example: Word sense confusion (Chinese).]{ \label{fig:sense} 
     Sense confusion, gold structure (left) and parser hypothesis (right).
   }
 \end{figure}
@@ -1106,9 +1074,7 @@ label it PP attachment.
 	\emph{Worst}   & 3.94 & 1.75 & 1.73 & 1.48 & 1.68 & 1.06 & 1.02 & 0.88 & 0.55 & 0.50 & 0.44 & 0.44 & 4.11 \\
 	\hline
 \end{tabular}
-\caption{
-  \label{tab:comparison} Error breakdown for a range of parsers on the \pctb.
-}{
+\caption[Error breakdown for a range of parsers on the \pctb.]{ \label{tab:comparison}
   Error breakdown for the development set of \pctb 6.  The area filled in for
   each bar indicates the average number of bracket errors per sentence attributed
   to that error type, where an empty bar is no errors and a full bar has
@@ -1218,9 +1184,7 @@ Berkeley parser, and run the fine-grained error analysis on its output.
       NR  & NN  &  320 & -0.05 \\
     \hline
   \end{tabular}
-  \caption{\label{tab:pos-confusion}
-    The most frequently confused POS tag pairs in Chinese parsing.
-  }{
+  \caption[The most frequently confused POS tag pairs in Chinese parsing.]{ \label{tab:pos-confusion}
     The most frequently confused POS tag pairs.
     Each $\Delta$ F$_1$ is relative to Berk-G.
   }
