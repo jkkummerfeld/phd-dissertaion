@@ -394,26 +394,23 @@ For unannotated categories, we use the instructions of the result category with 
 
 \begin{table}
 \centering
-\begin{tabular}{llcccc}
+\begin{tabular}{lc@{\hskip 7.5mm}cccc@{\hskip 7.5mm}cccc}
   \hline
-    System & Data & P & R & F & Sent. \\
+           &      & \multicolumn{4}{c}{Length $\le 40$} & \multicolumn{4}{c}{All lengths} \\
+    System & Data & P & R & F & Sent. & P & R & F & Sent. \\
   \hline
   \hline
-  % TODO: Move 'len 40' to the left, for a wider table
-           & 00 (all)          & 93.67 & 95.37 & 94.51 & 39.6 \\
-    \candc & 00 (len $\le 40$) & 94.39 & 95.85 & 95.12 & 42.1 \\
-    Conv   & 23 (all)          & 93.95 & 95.33 & 94.64 & 39.7 \\
-           & 23 (len $\le 40$) & 94.04 & 95.44 & 94.73 & 41.9 \\
+    \multirow{2}{*}{\old}
+           & 00  & 94.39 & 95.85 & 95.12 & 42.1 & 93.67 & 95.37 & 94.51 & 39.6 \\
+           & 23  & 94.04 & 95.44 & 94.73 & 41.9 & 93.95 & 95.33 & 94.64 & 39.7 \\
   \hline
-           & 00 (all)          & 96.92 & 94.82 & 95.86 & -- \\
-    Zhang  & 00 (len $\le 40$) & 97.09 & 95.40 & 96.24 & -- \\
-    (2012) & 23 (all)          & 96.67 & 94.77 & 95.71 & -- \\
-           & 23 (len $\le 40$) & 96.69 & 94.79 & 95.73 & -- \\
+    \multirow{2}{*}{Zhang, et al. (2012)}
+           & 00  & 97.09 & 95.40 & 96.24 & --   & 96.92 & 94.82 & 95.86 & -- \\
+           & 23  & 96.69 & 94.79 & 95.73 & --   & 96.67 & 94.77 & 95.71 & -- \\
   \hline
-           & 00 (all)          & 96.69 & 96.58 & 96.63 & 51.1 \\
-    This   & 00 (len $\le 40$) & 96.98 & 96.77 & 96.87 & 53.6 \\
-    Work   & 23 (all)          & 96.49 & 96.11 & \textbf{96.30} & \textbf{51.4} \\
-           & 23 (len $\le 40$) & 96.57 & 96.21 & 96.39 & 53.8 \\
+    \multirow{2}{*}{This work}
+           & 00  & 96.98 & 96.77 & 96.87 & 53.6 & 96.69 & 96.58 & 96.63 & 51.1 \\
+           & 23  & 96.57 & 96.21 & 96.39 & 53.8 & 96.49 & 96.11 & 96.30 & 51.4 \\
   \hline
 \end{tabular}
 \caption{\label{tab:conversion-comparison}
