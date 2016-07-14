@@ -10,7 +10,8 @@ Each tool is based on a core algorithm and adaptations specific to linguistic st
 First, we consider a search algorithm that, given two structures, will find a sequence of modifications leading from one structure to the other.
 We apply this algorithm to syntactic error analysis, where one structure is the output of a parser, the other is the correct parse, and each modification corresponds to fixing one error.
 We constructed a tool based on the algorithm and analysed variations in behaviour between parsers, types of text, and languages.
-Our analysis provided new empirical evidence for and against widely-held beliefs in the community regarding the prevalence of certain errors and hence the nature of unsolved challenges in parsing.
+Within the CL community there are a range of widely-held beliefs regarding the prevalence of certain errors and hence the nature of unsolved challenges in parsing.
+Our analysis provided new empirical evidence, supporting some beliefs, such as the high frequency of prepositional phrase attachment errors, while reframing others, for example coordination scope errors do not have a major impact on performance though resolving them remains a challenging problem.
 
 Next, we describe a mapping algorithm that converts one syntactic representation into another.
 Specifically, we map from Combinatory Categorial Grammar derivations to Phrase Structure trees.

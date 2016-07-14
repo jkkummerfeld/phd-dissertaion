@@ -5,7 +5,7 @@ Textual language in particular is found throughout our daily lives;
 when asking a question, we type it into a search engine and usually read an answer from either Wikipedia or discussions between other people;
 to find out what is happening in the world we read newspapers or listen to a newsreader;
 for entertainment we read stories, listen to podcasts, or watch TV shows (virtually all of which contain dialogue);
-and for personal communcation we write electronic messages in a variety of formats.
+and for personal communication we write electronic messages in a variety of formats.
 One of the keys to all of this communication is the use of structure to convey meaning.
 Part of this structure is visible--by convention you are looking at this page from top to bottom and left to right, treating each connected component of ink (or light) as a character, combining a sequence of characters into words, and so on to progressively larger levels of structure.
 The focus of this dissertation, syntax, is the mostly invisible structure that exists somewhere between characters and sentences.
@@ -16,17 +16,20 @@ Approaching human-level communication will require systems to resolve syntactic 
 Over the past two decades there has been rapid development in systems for the syntactic parsing task, where the input is a single sentence and the output is a structure that encodes syntactic relationships between words in the sentence.
 This development has largely been driven by new statistical methods for constructing models from resources manually labeled with syntactic structures by linguists.
 In addition to variations in statistical and engineering approaches, research has explored various syntactic representations.
-These representations are based on different linguistic theories, which sometimes encode the same phenomena in different ways and sometimes differ on what phenomena should be disambiguated within syntax.
+These representations are based on different linguistic theories, each with a body of research going into its design.
+These theories vary several ways: what form is used to encode syntax, what distinctions in structure are meaningful or not (and so represented or not), and what distinctions fall within syntax (and so to be represented here or in downstream processing).
 
 In this thesis, we present new algorithms that extend the capabilities of various systems related to syntax.
-The first area of research we consider is how we evaluate our systems to understand their strengths and weaknesses.
-We propose a search algorithm that finds the set of errors present in a parse.
-Using the algorithm, we compare a range of systems, a range of text domains, and two languages.
-The second aspect of syntax we consider is conversion between different linguistic formalisms.
+The first area of research we consider is how the community evaluates automatic syntactic parsers to understand their strengths and weaknesses.
+We propose a two-stage algorithm that searches for a set of transformations that will correct a parse, then classifies each transformation into one of several error types.
+Using the algorithm, we compare parse errors for a range of systems, a range of text domains, and two languages.
+The second aspect of syntax we consider is conversion between two different linguistic formalisms, which enables comparison of different parsers, and provides greater flexibility for projects where the parser is part of a larger pipeline.
 Our system uses a bottom-up approach that is more flexible and more effective than previous work.
 Finally, we explore how to extend parsing algorithms beyond tree structured output.
+Existing algorithms need the tree constraint to be efficient, but the standard way to apply the constraint has been to discard structure for a range of phenomena, such as wh-movement, passivization, and fronting.
 We introduce a new algorithm that can efficiently find the max or sum over all possible graph structures for a sentence, scored with an edge-factored model.
-We also define a new representation that is compatible with the algorithm and represents virtually all forms of linguistic structure in the Penn Treebank.
+We also define a new parse representation that is compatible with the algorithm and deterministically convertable into the Penn Treebank style.
+Together, our algorithm and representation are able to produce parses that cover virtually all forms of structure in the Penn Treebank, providing a more complete expression of the structure of sentences for downstream processing.
 
 \section{Syntax}
 \label{sec:syntax}
@@ -77,6 +80,7 @@ We also define a new representation that is compatible with the algorithm and re
     \draw (nt2b.north) -- (nt2-3.south) -- (nt3.north);
     \draw (w1.north) -- (w1 |- nt2-3.north) -- (nt1-3.south) -- (nt2-3.north);
     \draw (nt0.north) -- (nt0-3.south) -- (nt1-3.north);
+    \draw [dashed] (nt2.west) to [out=180,in=0] (nt0.east);
   \end{tikzpicture}
   }
   }
@@ -115,25 +119,9 @@ We also define a new representation that is compatible with the algorithm and re
   \end{tikzpicture}
   }
   }
-  \caption{
-  \label{fig:syntax}
-  Dependency, 
-  constituency, 
-%%%  (ROOT
-%%%    (S
-%%%      (NP-1 Ellen)
-%%%      (VP enjoys
-%%%          (S
-%%%            (NP *-1)
-%%%            (VP running)))))
-  and categorial forms of the sentence \textexample{Ellen enjoys running}.
-%%%  Ellen NP
-%%%  enjoys (S\NP)/(S\NP)
-%%%  reading S\NP
-%%% beneath
-%%%  Ellen NP -> S / (S\NP)
-%%%  enjoys (S\NP)/(S\NP)
-%%%  reading S\NP 
+  \caption[Dependency, constituency, and categorial forms of the sentence \textexample{Ellen enjoys running}.]{
+    \label{fig:syntax} Dependency, constituency, and categorial forms of the sentence \textexample{Ellen enjoys running}.
+    Visualizations used here are in the style of \textcite[][dependency]{ud}, \textcite[][constituency]{ptb-guide} and \textcite[][categorial]{Steedman:2000}.
   }
 \end{figure}
 
@@ -149,7 +137,7 @@ The dashed edge is often excluded in order to make the edges form a tree (a stru
 
 The middle case, which uses Government and Binding Theory \parencite[\gb;][]{gb}, has a hierarchical phrase structure.
 Each symbol is a \textit{constituent}, capturing the idea that the set of words beneath it constitute a single functional unit.
-Consistituents are linked together to form larger constituents according to rules.
+Constituents are linked together to form larger constituents according to rules.
 This figure also shows a null element in between \textexample{enjoys} and \textexample{running}, which is used to encode the relationship between \textexample{Ellen} and \textexample{running}.
 As with the dashed edge in the dependency case, the null element is often removed from this structure to make it a tree.
 
@@ -177,10 +165,11 @@ This is possible because the relation has been threaded through the tree via the
 
 While syntactic formalisms are used in a variety of ways, our focus is on the automatic production of syntactic structures by computer programs.
 These programs take a sentence as input, consider possible structures and return the one that is best according to some scoring model\footnote{The sentence is assumed to be grammatical--a parse is always returned.}.
-Individually considering every possible structure for a sentence is infeasible.
-Instead, programs incrementally build the parse, and as a result they either lose the guarantee of finding the optimal parse according to the model, or give up flexibility in the definition of the model.
-This work follows the second approach, with models being restricted to give the complete structure a score that is the sum of individual scores for each of its components.
-With this restriction we can apply dynamic programming methods, where the larger problem (find the optimal parse) is decomposed into independent sub-problems (find the optimal parse for part of the sentence) whose solutions can be used to solve the original problem (take the best solution from one half of the sentence and combine it with the best solution from the other half).
+Individually considering every possible structure for a sentence is infeasible as the number of possible parses is exponential in the length of the sentence.
+One way to avoid this issue is to perform an approximate search that incrementally builds the parse, maintaining only a few options at any given point.
+However, if the part of the optimal structure that is built first looks bad, then it may drop out of the list of options, and so there is no guarantee of finding the optimal parse.
+Alternatively, we can maintain optimality at the cost of model flexibility, constraining the model so that the score for a parse is the sum of scores for each of its components.
+This work follows the second approach, which enables dynamic programming methods, where the larger problem (find the optimal parse) is decomposed into independent sub-problems (find the optimal parse for part of the sentence) whose solutions can be used to solve the original problem (take the best solution from one half of the sentence and combine it with the best solution from the other half).
 The specific form of dynamic programming applied to the task of finding optimal parses structures is the CKY algorithm \parencite{Cocke:1969,Kasami:1966,Younger:1967}.
 
 \section{Error Analysis}
@@ -196,37 +185,64 @@ In all of these cases, the analysis has not taken into consideration how a set o
 In the first part of the thesis, we propose a new method of error classification using tree transformations.
 Errors in the parse tree are repaired using subtree movement, node creation, and node deletion.
 Each step in the process is then associated with a linguistically meaningful error type, based on factors such as the node that is moved, its siblings, and parents.  
-Using our method we analyse the output of thirteen constituency parsers on newswire.
-Some of the frequent error types that we identify are widely recognised as challenging, such as prepositional phrase (PP) attachment.
+Using our method we analyze the output of thirteen constituency parsers on newswire.
+Some of the frequent error types that we identify are widely recognized as challenging, such as prepositional phrase (PP) attachment.
 However, other significant types have not received as much attention, such as clause attachment and modifier attachment.
 We also investigate where reranking and self-training improve parsing, and where performance decreases when parsing out-of-domain text.
-Previously, these were all analysed only in terms of their impact on F-score.
+Previously, these were all analyzed only in terms of their impact on F-score.
 
-\section{Fromalism Conversion}
+\section{Formalism Conversion}
 
 As shown above, there are many ways of expressing syntactic structure.
 Extensive work has gone into converting the Penn Treebank to other formalisms, such as \hpsg \parencite{Miyao-Ninomiya-Tsujii:2004}, \lfg \parencite{Cahill-etal:2008}, \ltag \parencite{Xia:1999}, and \ccg \parencite{CCGBank},
 These conversions are complex processes that render linguistic phenomena in formalism-specific ways.
-Tools for reversing these conversions are desirable for downstream parser use and parser comparison.
-However, reversing conversions is difficult, as corpus conversions may lose information or smooth over PTB inconsistencies.
-Clark and Curran (2009) developed a CCG to PTB conversion that treats the CCG derivation as a phrase structure tree and applies hand-crafted rules to every pair of categories that combine in the derivation.
-Because their approach does not exploit the generalisations inherent in the CCG formalism, they must resort to ad-hoc rules over non-local features of the CCG constituents being combined (when a fixed pair of CCG categories correspond to multiple PTB structures).
-Even with such rules, they correctly convert only 39.6\% of gold CCGbank derivations.
+Tools for reversing these conversions enable performance comparisons between parsers based on the two formalisms, and provide more options for researchers and developers building pipelines in which parsing is only one step.
+However, reversing conversions is difficult, as the original conversion may have lost information or smoothed over inconsistencies in the corpus.
+\textcite{Clark-Curran:2009} developed a \ccg to \ptb conversion that treats the \ccg derivation as a phrase structure tree and applies hand-crafted rules to every pair of categories that combine in the derivation.
+Because their approach does not exploit the generalizations inherent in the \ccg formalism, they must resort to ad-hoc rules over non-local features of the \ccg constituents being combined (when a fixed pair of \ccg categories correspond to multiple \ptb structures).
+Even with such rules, they correctly convert only 39.7\% of gold CCGbank derivations.
 
-In the second chapter, we describe a conversion method that assigns a set of bracket instructions to each word based on its CCG category, then follows the CCG derivation, applying and combining instructions at each combinatory step to build a phrase structure tree.
+In the second chapter, we describe a conversion method that assigns a set of bracket instructions to each word based on its \ccg category, then follows the \ccg derivation, applying and combining instructions at each combinatory step to build a phrase structure tree.
 This requires specific instructions for each category (not all pairs), and generic operations for each combinator.
-We cover all categories in the development set and correctly convert 51.1\% of sentences.
-Unlike Clark and Curran's approach, we require no rules that consider non-local features of constituents, which enables the possibility of simple integration with a CKY-based parser.
-The most common errors our approach makes involve nodes for clauses and rare spans such as QPs, NXs, and NACs.
-Many of these errors are inconsistencies in the original PTB annotations that are not recoverable.
-These issues make evaluating parser output difficult, but our method does enable an improved comparison of \ccg and \ptb parsers.
+Unlike \textcite{Clark-Curran:2009}'s approach, we require no rules that consider non-local features of constituents, which enables the possibility of simple integration with a CKY-based parser.
+
+Our approach perfectly converts 51.4\% of sentences, an 11.7\% (absolute) improvement over \textcite{Clark-Curran:2009}.
+On the remaining sentences our conversion generally handles most of the sentence correctly, but makes mistakes on some clause spans and rare spans such as QPs, NXs, and NACs.
+Many of these errors are inconsistencies in the original \ptb annotations that are not recoverable.
+These issues make evaluating parser output difficult, but using our method we do an improved comparison of \ccg and \ptb parsers.
 
 \section{Graph Parsing}
 
-In Section~\ref{sec:syntax} we saw that some edges in the dependency parse, and the traces in the Government and Binding structure, break context free assumptions, leading to graphs and/or discontinuous structures.
+In Section~\ref{sec:syntax} we saw that while parse structures can be graphs and discontinuous, removing some edges in the dependency parse, or the traces in the Government and Binding structure, can make the structures into projective trees.
+Whether these edges are included in our grammar impacts the class of formal languages we are generating \parencite{Chomsky-grammars}.
+The trees are entirely within the context-free class, while the graphs are in the context-sensitive class.
+There are a range of well known polynomial time algorithms for parsing in the context-free class \parencite{Cocke:1969,Younger:1967,Kasami:1966,Earley:1970,Lang:1974}, but parsing of context-sensitive grammars is PSPACE complete \parencite{Kuroda:1964,Savitch:1970}.
+Fortunately, human language appears to fall into a class somewhere in between these two, which researchers have attempted to characterize using mildly-context-sensitive grammars \textcite{weir-joshi:1988:ACL} and range concatenation grammars \parencite{Boullier:1998}.
+In general, work on these intermediate classes has been in conjunction with the development of new formalisms, for example \ccg falls into the mildly-context-sensitive class.
+
 In the Penn Treebank, the traces are distinguished from the core projective tree structure, and are used to represent control structures, wh-movement and more.
-However, most parsers and the standard evaluation metric ignore these edges and all null elements.
-By leaving out parts of the structure, they fail to provide all predicates to downstream tasks such as question answering.
+Traces are indicated using nodes in the parse that do not span any words (null elements) and numbers to indicate a connection with another node in the parse (co-indexation, with the null element getting a reference index and the other node getting an identity index).
+By varying the null element used, different forms of movement can be indicated.
+The list below describes all of the null elements used in the treebank, though only the first two can be assigned reference indexes \parencite{ptb-guide}:
+
+\begin{itemize}
+  \item *T* -- Trace of non-argument movement, including parasitic gaps
+  \item (NP *) -- Trace of argument movement, arbitrary PRO, and controlled PRO
+  \item 0 -- Null complementizer, including null wh-operator
+  \item *U* -- Unit
+  \item *?* -- Placeholder for ellipsed material
+  \item *NOT* -- Anti-placeholder in template gapping
+  \item *RNR* -- Pseudo-attach: right node raising
+  \item *ICH* -- Pseudo-attach: interpret constituent here
+  \item *EXP* -- Pseudo-attach: expletive
+  \item *PPA* -- Pseudo-attach: permanent predictable ambiguity
+\end{itemize}
+
+However, most parsers and the standard evaluation metric ignore these edges and all null elements, focusing entirely on the tree structure.
+By leaving out parts of the structure, they are not explicitly representing all of the relations in the sentence.
+These aspects of syntax are excluded not because of disagreements regarding theory, but rather because of the computational challenge of including them.
+Unfortunately, this means that downstream tasks such as question answering have to make do with the more limited structure, \myeg in \textexample{Who enjoys running?} the link between \textexample{who} and \textexample{running} is not present in the tree structure.
+
 While there has been work on capturing some parts of this extra structure, it has generally either been through post-processing on trees \parencite{Johnson:2002,Jijkoun:2003,Campbell:2004,Levy:2004,Gabbard:2006}, or has only captured a limited set of phenomena via grammar augmentation \parencite{Collins:1997,dienes-dubey:2003,schmid:2006,cai-chiang-goldberg:2011}.
 In both cases phenomena such as shared argumentation are completely ignored.
 Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has removed edges to turn all structures into trees.
@@ -241,7 +257,7 @@ Similarly, most work on the Abstract Meaning Representation \parencite{amr}, has
   }
 \end{figure}
 
-In the fianl chapter, we propose a new parse representation and a new algorithm that can efficiently consider almost all observed syntactic phenomena.
+In the final chapter, we propose a new parse representation and a new algorithm that can efficiently consider almost all observed syntactic phenomena.
 Our representation is an extension of TAG-based tree representations \parencite{cck,Shen:2007}, modified to represent graphs and designed to maximize coverage under a new class of graphs.
 Our algorithm extends a non-projective tree parsing algorithm \parencite{ec} to graph structures, with improvements to avoid derivational ambiguity.
 
@@ -256,10 +272,11 @@ Together, our representation and algorithm form an inference method that can cov
 \section{Contributions of This Dissertation}
 
 Our contributions are a set of novel algorithms and experimental results and analysis using those algorithms.
-First, we define a new algorithm for error analysis of constituency parsing output.
-We implemtn the algorithm and use it to perform an analysis of current parsing effectiveness, considering a wide range of systems, multiple domains, and two languages.
+First, we define a new algorithm for error analysis of constituency parsing output, which provides a more intuitive breakdown of error types than previous approaches.
+We implement the algorithm and use it to give insight into current parsing effectiveness, considering a wide range of systems, multiple domains, and two languages.
 Second, we present a new algorithm for transforming \ccg derivations into \gb parses.
 Our approach is significantly more accurate than previous work and has desireable algorithmic properties.
 Finally, we describe the first algorithm for inference over the space of \gb graph structures.
+Previous work compromised by leaving out important aspects of the syntactic representation in order to satisfy constraints of their parsing algorithms.
 We show how to efficiently implement the algorithm, and discuss results and remaining challenges.
 
