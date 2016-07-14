@@ -17,85 +17,6 @@ We use this analysis to answer a range of questions about parser behaviour, incl
 %%%	Errors related to temporal structures would be a sensible
 %%%	part though
 
-\section{Parsers}
-
-Our evaluation is over a wide range of \ptb constituency parsers and their variants from the past twenty years.
-For all parsers we used the publicly available version, with the standard parameter settings.
-
-% TODO: Expand descriptions of parsers evaluated
-\begin{description}
-	\item[ Berkeley] \parencite{Petrov-etal:2006,Petrov-Klein:2007}. An
-	unlexicalised parser with a grammar constructed with automatic state
-	splitting.
-
-	\item[ Bikel] (\citeyear{Bikel:2004}) implementation of \textcite{Collins:1997}.
-
-	\item[ BUBS]
-	\parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
-	`grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar,
-	but parses with various pruning techniques to improve speed, at the cost of
-	accuracy.
-
-	\item[ Charniak] (\citeyear{Charniak:2000}). A generative parser with a
-	maximum entropy-inspired model.  We also use the reranker
-	\parencite{Charniak-Johnson:2005}, and the self-trained model
-	\parencite{McClosky-Charniak-Johnson:2006}.
-
-	\item[ Collins] (\citeyear{Collins:1997}). A generative lexicalised parser, with
-	three models, a base model, a model that uses subcategorisation
-	frames for head words, and a model that takes into account traces.
-
-	\item[ SSN] \parencite{Henderson:2003,Henderson:2004}. A statistical left-corner
-	parser, with probabilities estimated by a neural network.
-
-	\item[ Stanford] \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}. We
-	consider both the unlexicalised PCFG parser (-U) and the factored parser
-	(-F), which combines the PCFG parser with a lexicalised dependency parser.
-\end{description}
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|lccccr|}
-	\hline
-	  % TODO: Move F to be after P and R
-		System & F & P & R & Exact & Speed \\
-	\hline
-	\hline
-		\multicolumn{6}{|c|}{Enhanced Training / Systems} \\
-		Charniak-SR & 92.07 & 92.44 & 91.70 & 44.87 & 1.8 \\
-		Charniak-R & 91.41 & 91.78 & 91.04 & 44.04 & 1.8 \\
-		Charniak-S & 91.02 & 91.16 & 90.89 & 40.77 & 1.8 \\
-	\hline
-		\multicolumn{6}{|c|}{Standard Parsers} \\
-		Berkeley & 90.06 & 90.30 & 89.81 & 36.59 & 4.2 \\
-		Charniak & 89.71 & 89.88 & 89.55 & 37.25 & 1.8 \\
-		SSN & 89.42 & 89.96 & 88.89 & 32.74 & 1.8 \\
-		BUBS & 88.50 & 88.57 & 88.43 & 31.62 & 27.6 \\
-		Bikel & 88.16 & 88.23 & 88.10 & 32.33 & 0.8 \\
-		Collins-3 & 87.66 & 87.82 & 87.50 & 32.22 & 2.0 \\
-		Collins-2 & 87.62 & 87.77 & 87.48 & 32.51 & 2.2 \\
-		Collins-1 & 87.09 & 87.29 & 86.90 & 30.35 & 3.3 \\
-		Stanford-L & 86.42 & 86.35 & 86.49 & 27.65 & 0.7 \\
-		Stanford-U & 85.78 & 86.48 & 85.09 & 28.35 & 2.7 \\
-	\hline
-\end{tabular}
-\caption[\parseval results on \wsj section 23 for the parsers we consider.]{ \label{tab:standard-results} 
-	\parseval results on \wsj section 23 for the parsers we consider.
-	% TODO: Change (if changed above)
-  The columns are F-score, precision, recall, exact sentence match, and speed (sents/sec).
-  Coverage was left out as it was above 99.8\% for all parsers.  In the {enhanced training /
-	systems} section we include the Charniak parser with reranking (R), with a
-	self-trained model (S), and both (SR).
-}
-\end{center}
-\end{table}
-
-Table~\ref{tab:standard-results} shows the standard performance metrics,
-measured on section 23 of the \wsj, using all sentences.  Speeds were measured
-using a Quad-Core Xeon CPU (2.33GHz 4MB L2 cache) with 16GB of RAM.
-These results clearly show the variation in parsing performance, but they do
-not show which constructions are the source of those variations.
-
 \begin{figure}
 \begin{center}
 \scalebox{\derivscale}{
@@ -107,12 +28,12 @@ not show which constructions are the source of those variations.
 		[VBD [was]]
 		[VP
 			[VBN [named]]
-			[\wrongnode{S}
-				[\wrongnode{NP}
+			[\extranode{S}
+				[\extranode{NP}
 					[NP [.t chief executive officer]]
-					[\wrongnode{PP}
+					[\extranode{PP}
 						[IN [of]]
-						[\wrongnode{NP}
+						[\extranode{NP}
 							[NP
 								[NNP [Applied]]]
 							[PP [.t in 1986]]]]]]]]]
@@ -130,47 +51,36 @@ not show which constructions are the source of those variations.
 		[VBD [was]]
 		[VP
 			[VBN [named]]
-			[\wrongnode{S}
-				[\wrongnode{NP}
+			[\missingnode{S}
+				[\missingnode{NP}
 					[NP [.t chief executive officer]]
-					[\wrongnode{PP}
+					[\missingnode{PP}
 						[IN [of]]
 						[NP
 							[NNP [Applied]]]]]]
 			[PP [.t in 1986]]]]]
 }
 
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: PP Attachment.]{ \label{fig:PP-attachment}
-	Grouping errors by node type is of limited usefulness.  In this figure and
-	those that follow the top tree is the incorrect parse and the bottom tree is
-	the correct parse.  Bold, boxed nodes are either extra (marked in the
-	incorrect tree) or missing (marked in the correct tree).  This is an example
-	of \textbf{PP~Attachment} (\emph{in~1986} is too low), but that is not at all
-	clear from the set of incorrect nodes (extra S, NP, PP, and NP, missing S,
-	NP, and PP).
+	\textbf{Incorrect PP~Attachment}, as \emph{(PP in~1986)} is too low.
+	Bold, boxed nodes are either extra (marked in red in the parser output) or missing (marked in blue in the gold parse).
 }
 \derivaftercompress
 \end{figure}
 
 \section{Error Classification}
 
-While the statistics in Table~\ref{tab:standard-results} give a sense of
-overall parser performance they do not provide linguistically meaningful
-intuition for the source of remaining errors.  Breaking down the remaining
-errors by node type is not particularly informative, as a single attachment
-error can cause multiple node errors, many of which are for unrelated node
-types.  For example, in Figure~\ref{fig:PP-attachment} there is a PP attachment
-error that causes seven bracket errors (extra S, NP, PP, and NP, missing S,
-NP, and PP).  Determining that these correspond to a PP attachment error from
-just the labels of the missing and extra nodes is difficult.  In contrast, the
-approach we describe below takes into consideration the relations between
-errors, grouping them into linguistically meaningful sets.
+While metrics such as F-score give a sense of overall parser performance they do not provide linguistically meaningful intuition for the source of remaining errors.
+Breaking down the remaining errors by node type is not particularly informative, as a single attachment error can cause multiple node errors, many of which are for unrelated node types.
+For example, in Figure~\ref{fig:PP-attachment} there is a PP attachment error that causes seven bracket errors (extra S, NP, PP, and NP, missing S, NP, and PP).
+Determining that these correspond to a PP attachment error from just the labels of the missing and extra nodes is difficult.
+In contrast, the approach we describe below takes into consideration the relations between errors, grouping them into linguistically meaningful sets.
 
 We classify node errors in two phases.  First, we find a set of tree
-transformations that convert the output tree into the gold tree.  Second, the
+transformations that convert the output parse into the gold parse.  Second, the
 transformation are classified into error types such as PP attachment and
 coordination.  Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
 The tree transformation stage corresponds to the main loop, while the second
@@ -179,7 +89,7 @@ stage corresponds to the final loop.
 \begin{algorithm}[t]
 \begin{algorithmic}
 \State $U =$ initial set of node errors
-\State Sort $U$ by the depth of the error in the tree, deepest first
+\State Sort $U$ by the depth of the error in the parse, deepest first
 \State $G = \emptyset$
 \Repeat
 	\ForAll{errors $e \in U$}
@@ -210,9 +120,9 @@ stage corresponds to the final loop.
 
 The core of our transformation process is a set of operations that move
 subtrees, create nodes, and delete nodes.  Searching for the shortest path to
-transform one tree into another is prohibitively slow\footnote{We implemented
+transform one parse into another is prohibitively slow\footnote{We implemented
 various search procedures and applied them to shorter sentences. There were no substantial changes to the results. This is unsurprising, as in most sentences a single correction will fix the parse and in cases with multiple errors they are often in disjoint sections of the parse.}.
-Instead, we find a path by applying a greedy bottom--up approach, iterating through the errors in the tree, deepest first.
+Instead, we find a path by applying a greedy bottom--up approach, iterating through the errors in the parse, deepest first.
 
 For example, in Figure~\ref{fig:PP-attachment} there are four extra
 nodes that all cover spans ending at \emph{Applied in 1986}: S, NP, PP, NP.
@@ -249,16 +159,16 @@ Once a suitable template is identified we correct the error by moving subtrees,
 adding nodes and removing nodes.  In the example this is done by 
 
 We consider adding nodes, removing nodes, or moving a set of sibling nodes, to fix the error.
-In this case, moving the node spanning \emph{in 1986} up in the tree until it is outside of all the extra spans fixes most of the errors.
+In this case, moving the node spanning \emph{in 1986} up in the parse until it is outside of all the extra spans fixes most of the errors.
 Moving the PP leaves a unary production from an NP to an NP, which we collapse at the same time, resolving the final error.
-All of the nodes that were fixed are placed in a single group and information about the nearby tree structure before and after the transformation is recorded.
+All of the nodes that were fixed are placed in a single group and information about the nearby parse structure before and after the transformation is recorded.
 
 We continue to make passes through the list until no errors are corrected on a pass.
 For each remaining node error an individual error group is created.
 
 \subsection{Transformation Classification}
 
-We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the test tree to the gold tree.
+We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the test parse to the gold parse.
 Now we classify each group as one of the error types below.
 
 \paragraph{PP Attachment} (Figure~\ref{fig:PP-attachment}) 
@@ -272,7 +182,7 @@ where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Ap
 \synttree
 [VP
 	[VBD [wrote]]
-		[\wrongnode{NP}
+		[\extranode{NP}
 			[NP
 				[DT [another]]
 				[JJ [new]]
@@ -291,18 +201,18 @@ where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Ap
 \synttree
 [VP
 	[VBD [wrote]]
-		[\wrongnode{NP}
+		[\missingnode{NP}
 			[NP
 				[DT [another]]
 				[JJ [new]]
 				[NN [ad]]]
-			[\wrongnode{VP}
+			[\missingnode{VP}
 				[VBG [appearing]]
 				[NP
 					[NN [today]]]]]]
 }
 
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: NP Attachment.]{ \label{fig:NP-attachment} 
@@ -323,10 +233,10 @@ where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 \synttree
 [VP
 	[VBD [had]]
-	[\wrongnode{S}
-		[\wrongnode{VP}
+	[\extranode{S}
+		[\extranode{VP}
 			[TO [to]]
-			[\wrongnode{VP}
+			[\extranode{VP}
 				[VB [think]]
 				[PP [.t about it]]]]]
 	[ADVP [.t ahead of time]]]
@@ -341,17 +251,17 @@ where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 \synttree
 [VP
 	[VBD [had]]
-	[\wrongnode{S}
-		[\wrongnode{VP}
+	[\missingnode{S}
+		[\missingnode{VP}
 			[TO [to]]
-			[\wrongnode{VP}
+			[\missingnode{VP}
 				[VB [think]]
 				[PP [.t about it]]
 				[ADVP [.t ahead of time]]]]]]
 }
 
 \vspace{3mm}
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: modifier attachment.]{ \label{fig:modifier-attachment} 
@@ -374,10 +284,10 @@ requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
 \synttree
 [VP
 	[VBZ [intends]]
-	[\wrongnode{S}
-		[\wrongnode{VP}
+	[\extranode{S}
+		[\extranode{VP}
 			[TO [to]]
-			[\wrongnode{VP}
+			[\extranode{VP}
 				[VB [restrict]]
 				[NP [.t the RTC to \ldots]] % TODO: Avoid ldots, get text
 				[SBAR [.t unless the agency \ldots]]]]]]
@@ -392,17 +302,17 @@ requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
 \synttree
 [VP
 	[VBZ [intends]]
-	[\wrongnode{S}
-		[\wrongnode{VP}
+	[\missingnode{S}
+		[\missingnode{VP}
 			[TO [to]]
-			[\wrongnode{VP}
+			[\missingnode{VP}
 				[VB [restrict]]
 				[NP [.t the RTC to \ldots]]]]]
 	[SBAR [.t unless the agency \ldots]]]
 }
 
 \vspace{3mm}
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: clause attachment.]{ \label{fig:clause-attachment} 
@@ -437,18 +347,18 @@ Any group that involves movement of some form of S node.
 \scalebox{\derivscale}{
 \synttree
 [SINV
-	[\wrongnode{S}
+	[\missingnode{S}
 		[VP
 			[VBG [Following]]]]
 	[VBZ [is]]
-	[\wrongnode{NP}
+	[\missingnode{NP}
 		[NP
 			[NP [.t a breakdown]]
 			[PP [.t of major market activity]]]]]
 }
 
 \vspace{3mm}
-(b) Gold tree
+(b) Gold parse
 
 \vspace{6mm}
 
@@ -468,12 +378,12 @@ Any group that involves movement of some form of S node.
 }
 
 \vspace{3mm}
-(c) Gold tree with traces and function tags
+(c) Gold parse with traces and function tags
 \end{center}
 \derivspace
 \caption[Error analysis example: unary.]{ \label{fig:unary} 
-	Two \textbf{Unary} errors, a missing S and a missing NP.  The third tree is
-	the \ptb tree before traces and function tags are removed.  Note that the
+	Two \textbf{Unary} errors, a missing S and a missing NP.  The third parse is
+	the \ptb parse before traces and function tags are removed.  Note that the
 	missing NP is over another NP, a production that occurs widely in the
 	treebank, particularly over the word \emph{it}.
 }
@@ -490,9 +400,9 @@ We do not include a breakdown by unary type, though we did find that clause labe
 \synttree
 [NP
 	[NP [.t A 16\% drop]]
-	[\wrongnode{PP}
+	[\extranode{PP}
 		[IN [for]]
-		[\wrongnode{NP}
+		[\extranode{NP}
 			[NP [.t Mannesmann AG]]
 			[CC [and]]
 			[NP [.t Dresdner AG's 10\% decline]]]]]
@@ -506,9 +416,9 @@ We do not include a breakdown by unary type, though we did find that clause labe
 \scalebox{\derivscale}{
 \synttree
 [NP
-	[\wrongnode{NP}
+	[\missingnode{NP}
 		[NP [.t A 16\% drop]]
-		[\wrongnode{PP}
+		[\missingnode{PP}
 			[IN [for]]
 			[NP [.t Mannesmann AG]]]]
 	[CC [and]]
@@ -516,7 +426,7 @@ We do not include a breakdown by unary type, though we did find that clause labe
 }
 
 \vspace{3mm}
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: coordination.]{ \label{fig:coordination} 
@@ -535,9 +445,9 @@ Cases in which a conjunction is an immediate sibling of the nodes being moved, o
 \synttree
 [NP
 	[NNP [Secretary]]
-	[\wrongnode{PP}
+	[\extranode{PP}
 		[IN [of]]
-		[\wrongnode{NP}
+		[\extranode{NP}
 			[NNP [State]]
 			[NNP [Baker]]]]]
 }
@@ -551,15 +461,15 @@ Cases in which a conjunction is an immediate sibling of the nodes being moved, o
 \synttree
 [NP
 	[NNP [Secretary]]
-	[\wrongnode{PP}
+	[\missingnode{PP}
 		[IN [of]]
-		[\wrongnode{NP}
+		[\missingnode{NP}
 			[NNP [State]]]]
 	[NNP [Baker]]]
 }
 
 \vspace{3mm}
-(b) Gold tree
+(b) Gold parse
 \end{center}
 \derivspace
 \caption[Error analysis example: NP internal structure.]{ \label{fig:NP-internal-structure} 
@@ -574,7 +484,7 @@ While most NP structure is not annotated in the \ptb, there is some use of ADJP,
 We form a single group for each NP that has one or more errors involving these types of nodes.
 
 \paragraph{Different label}
-In many cases a node is present in the tree that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error.
+In many cases a node is present in the parse that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error.
 
 \paragraph{Single word phrase}
 A range of node errors that span a single word, with checks to ensure this is not linked to another error (\myeg one part of a set of internal noun phrase errors).
@@ -587,14 +497,85 @@ For many of these error types it would be difficult to extract a meaningful unde
 Even for error types that can be measured by counting node errors or rule production errors, our approach has the advantage that we identify groups of errors with a single cause.
 For example, a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
 
-\subsection{Methodology}
+\section{Results}
 
 We used sections 00 and 24 as development data while constructing the tree transformation and error group classification methods.
 All of our examples in text come from these sections as well, but for all tables of results we ran our system on section 23.
 We chose to run our analysis on section 23 as it is the only section we are sure was not used in the development of any of the parsers, either for tuning or feature development.
 Our evaluation is entirely focused on the errors of the parsers, so unless there is a particular construction that is unusually prevalent in section 23, we are not revealing any information about the test set that could bias future work.
 
-\section{Results}
+Our evaluation is over a wide range of \ptb constituency parsers and their variants from the past twenty years.
+For all parsers we used the publicly available version, with the standard parameter settings.
+
+% TODO: Expand descriptions of parsers evaluated
+\begin{description}
+	\item[ Berkeley] \parencite{Petrov-etal:2006,Petrov-Klein:2007}. An
+	unlexicalised parser with a grammar constructed with automatic state
+	splitting.
+
+	\item[ Bikel] (\citeyear{Bikel:2004}) implementation of \textcite{Collins:1997}.
+
+	\item[ BUBS]
+	\parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
+	`grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar,
+	but parses with various pruning techniques to improve speed, at the cost of
+	accuracy.
+
+	\item[ Charniak] (\citeyear{Charniak:2000}). A generative parser with a
+	maximum entropy-inspired model.  We also use the reranker
+	\parencite{Charniak-Johnson:2005}, and the self-trained model
+	\parencite{McClosky-Charniak-Johnson:2006}.
+
+	\item[ Collins] (\citeyear{Collins:1997}). A generative lexicalised parser, with
+	three models, a base model, a model that uses subcategorisation
+	frames for head words, and a model that takes into account traces.
+
+	\item[ SSN] \parencite{Henderson:2003,Henderson:2004}. A statistical left-corner
+	parser, with probabilities estimated by a neural network.
+
+	\item[ Stanford] \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}. We
+	consider both the unlexicalised PCFG parser (-U) and the lexicalized factored parser
+	(-L), which combines the PCFG parser with a lexicalised dependency parser.
+\end{description}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|lccccr|}
+	\hline
+		System & P & R & F & Exact & Speed \\
+	\hline
+	\hline
+		\multicolumn{6}{|c|}{Enhanced Training / Systems} \\
+		Charniak S \& R (SR)       & 92.44 & 91.70 & 92.07 & 44.87 & 1.8 \\
+		Charniak Reranking (R)     & 91.78 & 91.04 & 91.41 & 44.04 & 1.8 \\
+		Charniak Self-trained (S)  & 91.16 & 90.89 & 91.02 & 40.77 & 1.8 \\
+	\hline
+		\multicolumn{6}{|c|}{Standard Parsers} \\
+		Berkeley                   & 90.30 & 89.81 & 90.06 & 36.59 & 4.2 \\
+		Charniak                   & 89.88 & 89.55 & 89.71 & 37.25 & 1.8 \\
+		SSN                        & 89.96 & 88.89 & 89.42 & 32.74 & 1.8 \\
+		BUBS                       & 88.57 & 88.43 & 88.50 & 31.62 & 27.6 \\
+		Bikel                      & 88.23 & 88.10 & 88.16 & 32.33 & 0.8 \\
+		Collins-3                  & 87.82 & 87.50 & 87.66 & 32.22 & 2.0 \\
+		Collins-2                  & 87.77 & 87.48 & 87.62 & 32.51 & 2.2 \\
+		Collins-1                  & 87.29 & 86.90 & 87.09 & 30.35 & 3.3 \\
+		Stanford Lexicalized (L)   & 86.35 & 86.49 & 86.42 & 27.65 & 0.7 \\
+		Stanford Unlexicalized (U) & 86.48 & 85.09 & 85.78 & 28.35 & 2.7 \\
+	\hline
+\end{tabular}
+\caption[\parseval results on \wsj section 23 for the parsers we consider.]{ \label{tab:standard-results} 
+	\parseval results on \wsj section 23 for the parsers we consider.
+  The columns are precision, recall, F-score, exact sentence match, and speed (sentences / sec).
+  Coverage was left out as it was above 99.8\% for all parsers.
+}
+\end{center}
+\end{table}
+
+Table~\ref{tab:standard-results} shows the standard performance metrics,
+measured on section 23 of the \wsj, using all sentences.  Speeds were measured
+using a Quad-Core Xeon CPU (2.33GHz 4MB L2 cache) with 16GB of RAM.
+These results clearly show the variation in parsing performance, but they do
+not show which constructions are the source of those variations.
 
 \begin{table}
 \begin{center}
@@ -912,7 +893,7 @@ we manually checked, to avoid over-fitting.
 
 Where necessary, we also expanded the information available during
 classification.  For example, we use the structure of the final gold standard
-tree when classifying errors that are a byproduct of sense disambiguation
+parse when classifying errors that are a byproduct of sense disambiguation
 errors.
 
 \subsection{Chinese Parsing Errors} \label{sec:chinese_parsing_errors}
@@ -967,10 +948,10 @@ Bracket counts are more informative than a direct count of each error type, beca
 
 \paragraph{NP-internal} (Figure~\ref{fig:np_internal})
 The \pctb annotates more NP-internal structure than the \ptb.
-We assign this error type when a transformation involves words whose parts of speech in the gold tree are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
+We assign this error type when a transformation involves words whose parts of speech in the gold parse are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
 
 We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-termianl phrasal bracket.
-These errors arise when a parser proposes a tree in which POS tags (for instance, JJ or NN) occur as siblings of phrasal tags (such as NP), a configuration used by the PCTB bracketing guidelines to indicate complementation as opposed to adjunction \parencite{Xue:2005:NLE}.
+These errors arise when a parser proposes a parse in which POS tags (for instance, JJ or NN) occur as siblings of phrasal tags (such as NP), a configuration used by the PCTB bracketing guidelines to indicate complementation as opposed to adjunction \parencite{Xue:2005:NLE}.
 
 \begin{figure}
 \centering

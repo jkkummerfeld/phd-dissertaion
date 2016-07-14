@@ -196,20 +196,21 @@ Previously, these were all analyzed only in terms of their impact on F-score.
 As shown above, there are many ways of expressing syntactic structure.
 Extensive work has gone into converting the Penn Treebank to other formalisms, such as \hpsg \parencite{Miyao-Ninomiya-Tsujii:2004}, \lfg \parencite{Cahill-etal:2008}, \ltag \parencite{Xia:1999}, and \ccg \parencite{CCGBank},
 These conversions are complex processes that render linguistic phenomena in formalism-specific ways.
-Tools for reversing these conversions enable performance comparisons between parsers based on the two formalisms, and provide more options for researchers and developers building pipelines in which parsing is only one step.
-However, reversing conversions is difficult, as the original conversion may have lost information or smoothed over inconsistencies in the corpus.
-\textcite{Clark-Curran:2009} developed a \ccg to \ptb conversion that treats the \ccg derivation as a phrase structure tree and applies hand-crafted rules to every pair of categories that combine in the derivation.
+Tools for the reverse process, converting back to the \ptb, enable performance comparisons between parsers based on the two formalisms, and provide more options for researchers and developers building pipelines in which parsing is only one step.
+However, the reversal is difficult, as the original conversion may have lost information or smoothed over inconsistencies in the corpus.
+\textcite{Clark-Curran:2009} developed a \ccg to \ptb auto-conversion tool that treats the \ccg derivation as a phrase structure tree and applies hand-crafted rules to every pair of categories that combine in the derivation.
 Because their approach does not exploit the generalizations inherent in the \ccg formalism, they must resort to ad-hoc rules over non-local features of the \ccg constituents being combined (when a fixed pair of \ccg categories correspond to multiple \ptb structures).
-Even with such rules, they correctly convert only 39.7\% of gold CCGbank derivations.
+Even with such rules, they correctly auto-convert only 39.7\% of gold CCGbank derivations.
 
-In the second chapter, we describe a conversion method that assigns a set of bracket instructions to each word based on its \ccg category, then follows the \ccg derivation, applying and combining instructions at each combinatory step to build a phrase structure tree.
+In the second chapter, we describe an auto-conversion method that assigns a set of bracket instructions to each word based on its \ccg category, then follows the \ccg derivation, applying and combining instructions at each combinatory step to build a phrase structure tree.
 This requires specific instructions for each category (not all pairs), and generic operations for each combinator.
 Unlike \textcite{Clark-Curran:2009}'s approach, we require no rules that consider non-local features of constituents, which enables the possibility of simple integration with a CKY-based parser.
 
-Our approach perfectly converts 51.4\% of sentences, an 11.7\% (absolute) improvement over \textcite{Clark-Curran:2009}.
-On the remaining sentences our conversion generally handles most of the sentence correctly, but makes mistakes on some clause spans and rare spans such as QPs, NXs, and NACs.
+Our approach perfectly auto-converts 51.4\% of sentences, an 11.7\% (absolute) improvement over \textcite{Clark-Curran:2009}.
+On the remaining sentences our auto-conversion generally handles most of the sentence correctly, but makes mistakes on some clause spans and rare spans such as QPs, NXs, and NACs.
 Many of these errors are inconsistencies in the original \ptb annotations that are not recoverable.
-These issues make evaluating parser output difficult, but using our method we do an improved comparison of \ccg and \ptb parsers.
+Applying our tool to the output of several \ccg parsers, we are able to compare them with standard \ptb parsers, showing that their accuracy is somewhere between the Stanford and Berkeley parsers.
+Our auto-conversion tool is easy to use and more effective than prior work, providing a convenient means of getting \ptb-style output from a \ccg parser.
 
 \section{Graph Parsing}
 
