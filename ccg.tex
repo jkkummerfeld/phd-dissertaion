@@ -197,8 +197,8 @@ powerful combinators allow categories to combine with greater flexibility.
   \draw [-{Straight Barb[reversed,length=2mm]}] (c30L) -- node[below=0ex] (c30) {\strut $\cf{S[dcl]}$} (c30R);
 \end{tikzpicture}
 
-\caption[A crossing constituents example for \ccg and \ptb.]{ \label{fig:ccg-example}
-  A crossing constituents example: \textit{his death a suicide} (\ptb) crosses \textit{labeled his death} (CCGbank).
+\caption[An example of \ccg and \ptb parses with nodes covering crossing spans.]{ \label{fig:ccg-example}
+  An example of \ccg and \ptb parses with nodes covering crossing spans: \emph{his death a suicide} (\ptb) and \emph{labeled his death} (CCGbank).
 }
 \end{figure}
 
@@ -223,7 +223,11 @@ Categories & Schema \\
 }
 \end{table}
 
-We cannot form a \ptb tree by simply relabeling the categories in a \ccg derivation because the mapping to phrase labels is many-to-many, \ccg derivations contain extra brackets due to binarisation, and there are cases where the constituents in the \ptb tree and the \ccg derivation cross (\myeg in Figure~\ref{fig:ccg-example})\footnote{These differences are the result of conscious decisions made in the construction of CCGbank, in many cases enabling the derivation to encode extra dependencies that are not explicitly present in the \ptb}.
+We cannot form a \ptb tree by simply relabeling the categories in a \ccg derivation for two reasons.
+First, the mapping from categories to phrase labels is many-to-many, so it would be difficult to determine the correct label (though other researchers have tried, as discussed in Section~\ref{sec-learned-conv}).
+Second, there are some spans that occur only in the \ccg derivation and others that occur only in the \ptb parse, \myeg in Figure~\ref{fig:ccg-example} there is a node for \emph{his death a suicide} in \ptb but not \ccg, and vice versa for \emph{labeled his death} (CCGbank).
+This second issue is particularly difficult because in some cases, including the example given, the differing nodes in the two parses cover spans of the sentence that cross.
+These differences are the result of conscious decisions made in the construction of CCGbank, in many cases enabling the derivation to encode extra dependencies that are either implicit or expressed via traces in the \ptb.
 
 \subsection{\textcite{Clark-Curran:2009}}
 
@@ -264,11 +268,10 @@ tree with ad-hoc rules based on non-local features over the \ccg nodes
 being combined --- an approach that cannot be easily integrated into a
 parser.
 
-These disadvantages are a consequence of failing to exploit the generalisations
-that \ccg combinators define.  We return to this example below to show how our
-approach handles both cases correctly.
+These disadvantages are a consequence of failing to exploit the generalisations that \ccg combinators define. 
+We return to this example below to show how our approach does exploit those generalizations and thereby handles both cases correctly.
 
-\subsection{\textcite{zhang-zhao-hui:2012:DEMOS}}
+\subsection{\textcite{zhang-zhao-hui:2012:DEMOS}} \label{sec-learned-conv}
 
 \textcite{zhang-zhao-hui:2012:DEMOS} considered a statistical approach to conversion from \ccg to \ptb.
 Their system works by classifying each step in the \ccg derivation as either being a \ptb node or being a dummy node, to be flattened in the final structure.
@@ -276,72 +279,6 @@ This approach has the limitation that it cannot handle sentences where the struc
 These cases account for 10\% of sentences, but the method is still fairly effective because they are able to recover most of the structure for such sentences.
 
 \section{Our Approach}
-
-\begin{table}
-\centering
-\begin{tabular}{lll}
-	\hline
-		Category & Instruction set \\
-	\hline
-	\hline
-		\cf{N} & (NP$\;$ f) \\[1pt]
-		\cf{N/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
-		\cf{NP[nb]/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
-		\cf{((S[dcl]\bs NP_3)/NP_2)/NP_1} & (VP$\;$ f$\;$ a) \\
-		 & (VP$\;$ \{f\}$\;$ a) \\
-		 & (S$\;$ a$\;$ f) \\
-	\hline
-\end{tabular}
-\caption[Example instructions for our \ccg to \ptb conversion.]{ \label{tab:instructions}
-  Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
-}
-\end{table}
-
-Our conversion assigns a set of instructions to each lexical category and
-defines generic operations for each combinator that combine instructions.
-Figure~\ref{fig:inst-example} shows a typical instruction, which specifies the
-node to create and where to place the \ptb trees associated with the two
-categories combining.  More complex operations are shown in
-Table~\ref{tab:operators}.  Categories with multiple arguments are assigned one
-instruction per argument, \myeg \textit{labeled} has three.  These are applied
-one at a time, as each combinatory step occurs.
-
-For the example from the previous section we begin by assigning the
-instructions shown in Table~\ref{tab:instructions}.  Some of these can apply
-immediately as they do not involve an argument, \myeg \textit{magistrates} has (NP$\;$~f).
-
-One of the more complex cases in the example is \textit{Italian}, which is
-assigned (NP~f~\{a\}). This creates a new bracket, inserts the functor's tree, and
-flattens and inserts the argument's tree, producing:
-
-\vspace{3mm}
-\noindent
-(NP (JJ Italian) (NNS magistrates))
-\vspace{3mm}
-
-Similar operations apply for the other NPs, followed by a unary rule,
-mapping \cf{N} to \cf{NP}.  We handle this by applying one of twelve special
-cases for non-combinatory unary operations in CCGbank.
-
-Next \textit{labeled} and \textit{his death} combine.  The verb takes three
-arguments, and so has three instructions applied as follows:
-
-\vspace{3mm}
-\noindent
-(VP (VBD labeled) (NP (PRP\$ his) (NN death))) \\
-(VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))) \\
-(S (NP (JJ Italian) (NNS magistrates)) (VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))))
-\vspace{3mm}
-
-As well as creating and flattening, we define three other operators.
-The * operator takes the label for the new node from the argument,
-\myeg the result of an \cf{S\bs S_1} should correspond to the label of
-argument 1 (SINV, SBAR, etc, which all appear as \cf{S} in \ccg).
-This is necessary because CCGBank uses additional annotations on categories to distinguish cases that are assigned entirely different labels in the \ptb.
-For the complete example above, the final tree is almost correct but omits the S bracket around the two NPs on the right.
-To fix our example we could have modified \textit{labeled}'s second instruction to move \textit{his death} under a new S via the final symbol in Table~\ref{tab:operators}.
-The subscripts indicate which subtrees to place where.
-However, for this particular construction the \ptb annotations are inconsistent, and so we cannot recover without introducing more errors elsewhere.
 
 \begin{figure}
 \centering
@@ -371,20 +308,82 @@ However, for this particular construction the \ptb annotations are inconsistent,
 }
 \end{table}
 
-For combinators other than function application, we combine the instructions in
-various ways.  Additionally, we vary the instructions assigned based on the
-\pos tag in 32 cases, and for the word \textit{not}, to recover distinctions
-not captured by CCGbank categories alone.  In 52 cases the later
-instructions depend on the structure of the argument being picked up.  We have
-sixteen special cases for non-combinatory binary rules and twelve special
-cases for non-combinatory unary rules.
+Our conversion assigns a set of instructions to each lexical category and defines generic operations for each combinator that combine instructions.
+Figure~\ref{fig:inst-example} shows the most common form of instruction, which specifies three things:
 
-Our approach naturally handles our QP \myvs ADJP example from the previous section because the two cases
-have different lexical categories: {\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}}
-on \textit{than} and {\small \cf{(N/N)/(N/N)}} on \textit{relatively}.  This
-lexical difference means we can assign different instructions to correctly
-recover the QP and ADJP nodes, whereas \old applies the same schema in both
-cases because after the first function application for \textit{than}, the category becomes the same as the category for \textit{relaitvely}.
+\begin{itemize}
+  \item Create a new VP node, indicated by the VP and brackets
+  \item Place the \ptb parse for the functor under the new node, on the left, indicated by the position of the f
+  \item Place the \ptb parse for the argument under the new node, on the right, indicated by the position of the a
+\end{itemize}
+
+Table~\ref{tab:operators} shows all of the operators we define.
+For convenience, in this description we will refer to the parses coming from the functor and argument as sub-parses.
+The first operator is the one described above, though note that it can be more powerful, constructing any set of \ptb nodes indicated with standard bracket notation plus the two markers for the functor and argument.
+The \{ \} operator indicates that a flattened version of that sub-parse should be placed, in the example in the table the top node in the sub-parse for the argument would be deleted so its children are placed instead.
+The * operator takes the label for the new node from the argument sub-parse, \myeg the result of an \cf{S\bs S_1} should correspond to the label of argument 1 (SINV, SBAR, etc, which all appear as \cf{S} in \ccg).
+This is necessary because CCGBank uses additional annotations on categories to distinguish cases that are assigned entirely different labels in the \ptb.
+The final operator enables breaking up children in a sub-parse and placing them at different locations in the structure being formed.
+This only makes sense when creating multiple nodes, a PP and an S in the example, and uses subscripts to indicate which sub to place where.
+Finally, complex categories with multiple arguments are assigned a list of instructions, one per argument.
+
+For the function application combinators the rule for the functor is applied and any remaining rules in its list are retained as the new rule set.
+% TODO: work out what we do for the others
+For combinators other than function application, we combine the instructions in various ways.
+Additionally, we vary the instructions assigned based on the \pos tag in 32 cases, and for the word \textit{not}, to recover distinctions not captured by CCGbank categories alone.
+In 52 cases the later instructions depend on the structure of the argument being picked up.
+For the non-combinatory binary and unary rules in CCGbank we define twenty-eight special cases.
+
+\begin{table}
+\centering
+\begin{tabular}{lll}
+	\hline
+		Category & Instruction set \\
+	\hline
+	\hline
+		\cf{N} & (NP$\;$ f) \\[1pt]
+		\cf{N/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
+		\cf{NP[nb]/N_1} & (NP$\;$ f$\;$ \{a\}) \\[1pt]
+		\cf{((S[dcl]\bs NP_3)/NP_2)/NP_1} & (VP$\;$ f$\;$ a) \\
+		 & (VP$\;$ \{f\}$\;$ a) \\
+		 & (S$\;$ a$\;$ f) \\
+	\hline
+\end{tabular}
+\caption[Example instructions for our \ccg to \ptb conversion.]{ \label{tab:instructions}
+  Instruction sets for the categories in Figure~\ref{fig:ccg-example}.
+}
+\end{table}
+
+For the example from the previous section we begin by assigning the instructions shown in Table~\ref{tab:instructions}.
+Some of these can apply immediately as they do not involve an argument, \myeg \textit{magistrates} has (NP$\;$~f).
+
+One of the more complex cases in the example is \textit{Italian}, which is assigned (NP~f~\{a\}). This creates a new bracket, inserts the functor's tree, and flattens and inserts the argument's tree, producing:
+
+\vspace{3mm}
+\noindent
+(NP (JJ Italian) (NNS magistrates))
+\vspace{3mm}
+
+Similar operations apply for the other NPs, followed by a unary rule, mapping \cf{N} to \cf{NP}.
+We handle this by applying one of twelve special cases for non-combinatory unary operations in CCGbank.
+
+The next three steps all involve instructions from the verb's list:
+Next \textit{labeled} and \textit{his death} combine.
+The verb takes three arguments, and so has three instructions applied as follows:
+
+\vspace{3mm}
+\noindent
+(VP (VBD labeled) (NP (PRP\$ his) (NN death))) \\
+(VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))) \\
+(S (NP (JJ Italian) (NNS magistrates)) (VP (VBD labeled) (NP (PRP\$ his) (NN death)) (NP (DT a) (NN suicide))))
+\vspace{3mm}
+
+The final tree in this case is almost correct but omits the S bracket around the two NPs on the right.
+To fix it we could have modified \textit{labeled}'s second instruction to move \textit{his death} under a new S via the final symbol in Table~\ref{tab:operators}.
+However, for this particular construction the \ptb annotations are inconsistent, and so we cannot recover without introducing more errors elsewhere.
+
+Our approach naturally handles our QP \myvs ADJP example from the previous section because the two cases have different lexical categories: {\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}} on \textit{than} and {\small \cf{(N/N)/(N/N)}} on \textit{relatively}.
+This lexical difference means we can assign different instructions to correctly recover the QP and ADJP nodes, whereas \old applies the same schema in both cases because after the first function application for \textit{than}, the category becomes the same as the category for \textit{relaitvely}.
 
 \section{Evaluation}
 

@@ -73,18 +73,27 @@ We use this analysis to answer a range of questions about parser behaviour, incl
 
 \section{Error Classification}
 
-While metrics such as F-score give a sense of overall parser performance they do not provide linguistically meaningful intuition for the source of remaining errors.
-Breaking down the remaining errors by node type is not particularly informative, as a single attachment error can cause multiple node errors, many of which are for unrelated node types.
+The standard metric for parsing is:
+
+\begin{align*}
+  \text{F}_1 & = \frac{2 * \text{precision} * \text{recall}}{\text{precision} + \text{recall}} \\
+            & = \frac{2 * |\text{matching nodes}|}{|\text{nodes in gold parse}| + |\text{nodes in predicted parse}|}
+\end{align*}
+
+This is a robust metric that gives a sense of overall parser performance, but a single number cannot provide linguistically meaningful intuition for the source of remaining errors.
+Since the metric is defined in terms of nodes, one natural direction for analysis is to break down the errrors by node type.
+Unfortunately, that approach is not particularly informative, as a single attachment error can cause multiple node errors, without a clear link between the two once aggregated.
 For example, in Figure~\ref{fig:PP-attachment} there is a PP attachment error that causes seven bracket errors (extra S, NP, PP, and NP, missing S, NP, and PP).
 Determining that these correspond to a PP attachment error from just the labels of the missing and extra nodes is difficult.
-In contrast, the approach we describe below takes into consideration the relations between errors, grouping them into linguistically meaningful sets.
+Additionally, once an aggregate count of node errors is made, different types of errors may contribute to the same count, for example mistakes in PP attachment and co-ordination could both contribute to the count of incorrect NP nodes.
+% TODO: elaborate further
+In contrast, the approach we describe below takes into consideration the relations between node errors, grouping them into linguistically meaningful sets.
 
-We classify node errors in two phases.  First, we find a set of tree
-transformations that convert the output parse into the gold parse.  Second, the
-transformation are classified into error types such as PP attachment and
-coordination.  Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
-The tree transformation stage corresponds to the main loop, while the second
-stage corresponds to the final loop.
+We classify node errors in two phases.
+First, we find a set of tree transformations that convert the output parse into the gold parse (Section~\ref{sec:tree-transform}).
+Second, each transformation is classified as one of several error types (Section~\ref{sec:classify}).
+Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
+The tree transformation stage corresponds to the main loop, while the second stage corresponds to the final loop.
 
 \begin{algorithm}[t]
 \begin{algorithmic}
@@ -116,57 +125,32 @@ stage corresponds to the final loop.
 }
 \end{algorithm}
 
-\subsection{Tree Transformations}
+\subsection{Tree Transformations} \label{sec:tree-transform}
 
-The core of our transformation process is a set of operations that move
-subtrees, create nodes, and delete nodes.  Searching for the shortest path to
-transform one parse into another is prohibitively slow\footnote{We implemented
-various search procedures and applied them to shorter sentences. There were no substantial changes to the results. This is unsurprising, as in most sentences a single correction will fix the parse and in cases with multiple errors they are often in disjoint sections of the parse.}.
+Our algorithm finds a path from the parser output to the gold parse, where states are parse structures and steps are transformations.
+We define three general types of transformations:
+
+\begin{description}
+  \item[Create node] takes a set of nodes that are siblings and places them under a new node.
+  \item[Delete node] removes a node and re-attaches its children where it was.
+  \item[Move subtree] takes a node and moves it either up or down within the parse, with the constraint that it may not make the structure discontinuous. If this move leads to the creation of a unary production between two non-terminals of the same type, also remove one of them.
+\end{description}
+
+The first two of these are straightforward, while an example of the third can be seen in Figure~\ref{fig:PP-attachment}.
+The PP node spanning \emph{in 1986} is moved up in the parse until it is outside of all the extra spans.
+This fixes most of the errors, but leaves behind an NP to NP unary production.
+One of the NPs is deleted, leaving behind the correct parse.
+
+Once a transformation is performed, all of the nodes that were fixed are placed in a single group and information about the nearby parse structure before and after the transformation is recorded.
+This recording is necessary, since subsequent changes may alter the surrounding structure in ways that impact the classification process described in the next section.
+
+With this definition of states and transformations, a range of standard search algorithms are available to us.
+We considered search algorithms with guarantees for finding the shortest path, but found they were prohibitively slow.
 Instead, we find a path by applying a greedy bottom--up approach, iterating through the errors in the parse, deepest first.
+Fortunately, on the shorter sentences for which finding the optimal path was feasible, we found that the greedy approach had no substantial impact on results.
+This is the case becasue in many sentences a single correction will fix the parse and in cases with multiple errors they are often in disjoint sections of the parse.
 
-For example, in Figure~\ref{fig:PP-attachment} there are four extra
-nodes that all cover spans ending at \emph{Applied in 1986}: S, NP, PP, NP.
-There are also three missing nodes with spans ending between \emph{Applied} and
-\emph{in}: PP, NP, and S.
-
-%%%\begin{figure}
-%%%\begin{center}
-% TODO: Make figure
-%%%\begin{pspicture}(-0.07,-0.6)(7.9,0.6)
-%%%\psline(1.02,0.16)(1.02,0.75)(7.85,0.75)(7.85,0.16)
-%%%\psline(4.52,0.16)(4.52,0.65)(7.75,0.65)(7.75,0.16)
-%%%\psline(5.03,0.16)(5.03,0.55)(7.65,0.55)(7.65,0.16)
-%%%\psline[linestyle=dashed,dash=4pt 2pt](1.02,0.02)(1.02,-0.51)(6.35,-0.51)(6.35,0.02)
-%%%\psline[linestyle=dashed,dash=4pt 2pt](4.52,0.02)(4.52,-0.41)(6.25,-0.41)(6.25,0.02)
-%%%\small named$\;$ chief$\;$ executive$\;$ officer$\;$ of$\;$ Applied$\;$ in$\;$ 1986
-%%%\end{pspicture}
-%%%\end{center}
-%%%\caption{
-%%%	\label{fig:template}
-%%%	Templates are defined in terms of extra and missing spans, shown here with
-%%%	unbroken lines above and dashed lines below, respectively.  This is an
-%%%	example of a set of extra spans that cross a set of missing spans (which in
-%%%	both cases all end at the same position).  If the last two words are moved,
-%%%	two of the extra spans will match the two missing spans.  The other extra
-%%%	span is deleted during the move as it creates an NP$\rightarrow$NP unary
-%%%	production.
-%%%}
-%%%\end{figure}
-
-% TODO: Change \emph throughout to instead use my font for text examples (and in figures too)
-a single movement operation, of the PP node over \emph{in 1986}, will repair all nodes.
-Once a suitable template is identified we correct the error by moving subtrees,
-adding nodes and removing nodes.  In the example this is done by 
-
-We consider adding nodes, removing nodes, or moving a set of sibling nodes, to fix the error.
-In this case, moving the node spanning \emph{in 1986} up in the parse until it is outside of all the extra spans fixes most of the errors.
-Moving the PP leaves a unary production from an NP to an NP, which we collapse at the same time, resolving the final error.
-All of the nodes that were fixed are placed in a single group and information about the nearby parse structure before and after the transformation is recorded.
-
-We continue to make passes through the list until no errors are corrected on a pass.
-For each remaining node error an individual error group is created.
-
-\subsection{Transformation Classification}
+\subsection{Transformation Classification} \label{sec:classify}
 
 We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the test parse to the gold parse.
 Now we classify each group as one of the error types below.
@@ -176,8 +160,18 @@ Any case in which the transformation involved moving a Prepositional Phrase, or 
 \emph{He was} (VP \emph{named chief executive officer of} (NP \emph{Applied} (PP \emph{in 1986}))) \\
 where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Applied}.
 
+\paragraph{NP Attachment} (Figure~\ref{fig:NP-attachment})  Several cases in which NPs had to be moved, particularly for mistakes in appositive constructions and incorrect attachments within a verb phrase, \myeg \\
+\emph{The bonds} (VP \emph{go} (PP \emph{on sale} (NP \emph{Oct.\@\xspace 19}))) \\
+where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
+
+\paragraph{Clause Attachment} (Figure~\ref{fig:clause-attachment}) 
+Any group that involves movement of some form of S node.
+
+\begin{landscape}
 \begin{figure}
-\begin{center}
+\centering
+\begin{minipage}[b]{3.5in}
+\centering
 \scalebox{\derivscale}{
 \synttree
 [VP
@@ -213,22 +207,58 @@ where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Ap
 }
 
 (b) Gold parse
-\end{center}
 \derivspace
 \caption[Error analysis example: NP Attachment.]{ \label{fig:NP-attachment} 
-	\textbf{NP Attachment}: \emph{today} is too high, it should be the argument
-	of \emph{appearing}, rather than \emph{wrote}.  This causes three node errors
-	(extra NP, missing NP and VP).
+	\textbf{NP Attachment}: \emph{today} is too high, it should be the argument of \emph{appearing}, rather than \emph{wrote}.
 }
-\derivaftercompress
+\end{minipage}\hfill
+\begin{minipage}[b]{4.5in}
+\centering
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBZ [intends]]
+	[\extranode{S}
+		[\extranode{VP}
+			[TO [to]]
+			[\extranode{VP}
+				[VB [restrict]]
+				[NP [.t the RTC to \ldots]]
+				[SBAR [.t unless the agency \ldots]]]]]]
+}
+%%%% TODO: Avoid ldots, get text
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBZ [intends]]
+	[\missingnode{S}
+		[\missingnode{VP}
+			[TO [to]]
+			[\missingnode{VP}
+				[VB [restrict]]
+				[NP [.t the RTC to \ldots]]]]]
+	[SBAR [.t unless the agency \ldots]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: clause attachment.]{ \label{fig:clause-attachment} 
+	\textbf{Clause Attachment}: \emph{unless the agency receives specific congressional authorization} is attaching too low.
+}
+\end{minipage}
 \end{figure}
 
-\paragraph{NP Attachment} (Figure~\ref{fig:NP-attachment})  Several cases in which NPs had to be moved, particularly for mistakes in appositive constructions and incorrect attachments within a verb phrase, \myeg \\
-\emph{The bonds} (VP \emph{go} (PP \emph{on sale} (NP \emph{Oct.\@\xspace 19}))) \\
-where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
-
 \begin{figure}
-\begin{center}
+\centering
+\begin{minipage}[b]{3in}
+\centering
 \scalebox{\derivscale}{
 \synttree
 [VP
@@ -262,72 +292,14 @@ where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 
 \vspace{3mm}
 (b) Gold parse
-\end{center}
 \derivspace
 \caption[Error analysis example: modifier attachment.]{ \label{fig:modifier-attachment} 
 	\textbf{Modifier Attachment}: \emph{ahead of time} is too high, it should
-	modify \emph{think}, not \emph{had}.  This causes six node errors (extra
-	S, VP, and VP, missing S, VP, and VP).
+	modify \emph{think}, not \emph{had}.
 }
-\derivaftercompress
-\end{figure}
-
-\paragraph{Modifier Attachment} (Figure~\ref{fig:modifier-attachment})  Cases involving incorrectly placed adjectives
-and adverbs, including errors corrected by subtree movement and errors
-requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
-\emph{severe setbacks}) \\ where there should be an extra ADVP node over
-\emph{even more severe}.
-
-\begin{figure}
-\begin{center}
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBZ [intends]]
-	[\extranode{S}
-		[\extranode{VP}
-			[TO [to]]
-			[\extranode{VP}
-				[VB [restrict]]
-				[NP [.t the RTC to \ldots]] % TODO: Avoid ldots, get text
-				[SBAR [.t unless the agency \ldots]]]]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBZ [intends]]
-	[\missingnode{S}
-		[\missingnode{VP}
-			[TO [to]]
-			[\missingnode{VP}
-				[VB [restrict]]
-				[NP [.t the RTC to \ldots]]]]]
-	[SBAR [.t unless the agency \ldots]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-\end{center}
-\derivspace
-\caption[Error analysis example: clause attachment.]{ \label{fig:clause-attachment} 
-	\textbf{Clause Attachment}: \emph{unless the agency receives specific
-	congressional authorization} is attaching too low. This causes six
-	node errors (extra S, VP, and VP, missing S, VP and VP).
-}
-\derivaftercompress
-\end{figure}
-
-\paragraph{Clause Attachment} (Figure~\ref{fig:clause-attachment}) 
-Any group that involves movement of some form of S node.
-
-\begin{figure}
-\begin{center}
+\end{minipage}\hfill
+\begin{minipage}[b]{5in}
+\centering
 \scalebox{\derivscale}{
 \synttree
 [SINV
@@ -379,23 +351,30 @@ Any group that involves movement of some form of S node.
 
 \vspace{3mm}
 (c) Gold parse with traces and function tags
-\end{center}
 \derivspace
 \caption[Error analysis example: unary.]{ \label{fig:unary} 
-	Two \textbf{Unary} errors, a missing S and a missing NP.  The third parse is
-	the \ptb parse before traces and function tags are removed.  Note that the
-	missing NP is over another NP, a production that occurs widely in the
-	treebank, particularly over the word \emph{it}.
+	Two \textbf{Unary} errors: a missing S and a missing NP.
+	The third parse is the \ptb parse before traces and function tags are removed, included here to show the distinction between the two NPs in the production.
 }
-\derivaftercompress
+\end{minipage}
 \end{figure}
+\end{landscape}
+
+\paragraph{Modifier Attachment} (Figure~\ref{fig:modifier-attachment})  Cases involving incorrectly placed adjectives
+and adverbs, including errors corrected by subtree movement and errors
+requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
+\emph{severe setbacks}) \\ where there should be an extra ADVP node over
+\emph{even more severe}.
 
 \paragraph{Unary} (Figure~\ref{fig:unary}) 
 Mistakes involving unary productions that are not linked to a nearby error  such as a matching extra or missing node.
 We do not include a breakdown by unary type, though we did find that clause labeling (S, SINV, etc) accounted for a large proportion of the errors.
+%%%	.  Note that the
+%%%	missing NP is over another NP, a production that occurs widely in the
+%%%	treebank, particularly over the word \emph{it}.
 
 \begin{figure}
-\begin{center}
+\centering
 \scalebox{\derivscale}{
 \synttree
 [NP
@@ -427,20 +406,28 @@ We do not include a breakdown by unary type, though we did find that clause labe
 
 \vspace{3mm}
 (b) Gold parse
-\end{center}
 \derivspace
 \caption[Error analysis example: coordination.]{ \label{fig:coordination} 
 	\textbf{Coordination}: \emph{and Dresdner AG's 10\% decline} is too low.
-	This causes four node errors (extra PP and NP, missing NP and PP).
 }
-\derivaftercompress
 \end{figure}
 
 \paragraph{Coordination} (Figure~\ref{fig:coordination}) 
 Cases in which a conjunction is an immediate sibling of the nodes being moved, or is the leftmost or rightmost node being moved.
 
+\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) 
+While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
+We form a single group for each NP that has one or more errors involving these types of nodes.
+
+
+\begin{landscape}
 \begin{figure}
-\begin{center}
+\centering
+%%%\begin{minipage}[b]{5in}
+%%%\centering
+%%%\end{minipage}\hfill
+\begin{minipage}[b]{3in}
+\centering
 \scalebox{\derivscale}{
 \synttree
 [NP
@@ -470,18 +457,13 @@ Cases in which a conjunction is an immediate sibling of the nodes being moved, o
 
 \vspace{3mm}
 (b) Gold parse
-\end{center}
 \derivspace
 \caption[Error analysis example: NP internal structure.]{ \label{fig:NP-internal-structure} 
-	\textbf{NP Internal Structure}: \emph{Baker} is too low, causing four
-	errors (extra PP and NP, missing PP and NP).
+	\textbf{NP Internal Structure}: \emph{Baker} is too low.
 }
-\derivaftercompress
+\end{minipage}
 \end{figure}
-
-\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) 
-While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
-We form a single group for each NP that has one or more errors involving these types of nodes.
+\end{landscape}
 
 \paragraph{Different label}
 In many cases a node is present in the parse that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error.
