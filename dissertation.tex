@@ -5,7 +5,6 @@
 
 \documentclass{ucbthesis}
 \usepackage[style=authoryear-icomp,backref,sorting=nyt,sortcase=false,backend=biber,maxbibnames=999]{biblatex}
-% TODO: Work out how to always have author last name only (no initials)
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -14,7 +13,6 @@
 \newtheorem{theorem}{Jibberish}
 
 \bibliography{dissertation}
-%%%\usepackage{times}
 \usepackage{xspace}
 \usepackage{url}
 \usepackage{latexsym}
@@ -248,12 +246,12 @@ pdfpagelayout=OneColumn}
 \field{Computer Science}
 \campus{Berkeley}
 
-\maketitle
+%%%\maketitle
 %%%\approvalpage % Only needed for physical hand in
-\copyrightpage
-\include{abstract}
+%%%\copyrightpage
+%%%\include{abstract}
 
-\begin{frontmatter}
+%%%\begin{frontmatter}
 
 %%%\begin{dedication}
 %%%\null\vfil
@@ -263,32 +261,32 @@ pdfpagelayout=OneColumn}
 %%%\vfil\null
 %%%\end{dedication}
 
-\tableofcontents
-\clearpage
-\listofalgorithms
-\addcontentsline{toc}{chapter}{List of Algorithms}
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
-\include{acknowledgements}
+%%%\tableofcontents
+%%%\clearpage
+%%%\listofalgorithms
+%%%\addcontentsline{toc}{chapter}{List of Algorithms}
+%%%\clearpage
+%%%\listoffigures
+%%%\clearpage
+%%%\listoftables
+%%%\include{acknowledgements}
 
-\end{frontmatter}
+%%%\end{frontmatter}
 
 \pagestyle{headings}
 \pagenumbering{arabic}
 
-\include{introduction}
-\include{error-analysis}
-\include{ccg}
-\include{algorithm}
-\include{representation}
-\include{implementation}
-\include{conclusion}
-\appendix
-%%%\include{glossary}
-\include{resources}
-%%%\include{advice}
-\printbibliography
+%%%\input{introduction}
+%%%\input{error-analysis}
+%%%\input{ccg}
+\input{algorithm}
+\input{representation}
+\input{implementation}
+\input{conclusion}
+%%%\appendix
+%%%\input{glossary}
+%%%\input{resources}
+%%%\input{advice}
+%%%\printbibliography
 
 \end{document}

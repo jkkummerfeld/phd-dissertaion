@@ -2,7 +2,7 @@
 
 %TODO: Look at reviews for what else to add
 
-General treebank analyses are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
+Parses in the Penn Treebank \parencite{ptb} are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
 In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
 We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
@@ -11,11 +11,25 @@ We also implement a proof-of-concept parser that recovers a range of null elemen
 
 \section{Background}
 
-This work builds on two lines of research: non-projective tree parsing, and incorporation of null elements into parsing.
+For this work, we use several concepts from discrete mathematics:
 
-A parse is non-projective or discontinuous if, as in Figure~\ref{fig:alg-example}, the parse crosses itself when drawn in the plane above a sentence.
-Non-projectivity is important in syntax for representing many syntactic structures, but inference over the space of all non-projective parses is intractable.
-Fortunately, in practice almost all parses are covered by well-defined subsets of this space.
+\begin{description}
+  \item[Graph] A set of vertices and edges.
+  Here each word is a vertex, plus a root vertex not associated with any word.
+  \item[Tree] A graph in which every pair of vertices are connected by a unique path (ignoring directionality on edges).
+  \item[Cycle] A sequence of edges that begin and end at the same vertex (here we only allow traversal of edges in the direction indicated).
+\end{description}
+
+The linear order of words allows us to define an additional concept: projectivity.
+A projective graph can be drawn in a two dimensional half-plane with the vertices on the edge of the plane and without any edges crossing.
+% TODO: Make Venn diagram of tree, graph, DAG, projective, 1ec
+
+As discussed in Section~\ref{sec:intro-graph}, a range of algorithms have been developed for efficient parsing of projective trees.
+This efficiency comes from the ability to break the projective tree down into independent pieces.
+Since no edge can be crossed, every edge defines a division of the tree into two parts, inside and outside the edge, \myie one piece that includes all of the structure linking words between the two ends of the edge, and another piece for all other words.
+
+However, non-projectivity is important in syntax for representing many structures, to the point where Chomsky identifies it a distinguishing feature of syntax, called displacement \parencite{displacement}.
+Inference over the space of all non-projective parses is intractable, but in practice almost all parses are covered by well-defined subsets of this space.
 For dependency parsing, recent work has defined algorithms for inference within various subspaces \parencite{Gomez-Rodriguez:2010,ec}.
 We build upon these algorithms and adapt them to constituency parsing.
 For constituency parsing, a range of formalisms have been developed that are mildly-context sensitive, such as CCG \parencite{Steedman:2000}, LFG \parencite{Bresnan:1982}, and LTAG \parencite{Joshi:1997}.
