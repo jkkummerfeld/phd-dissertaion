@@ -201,6 +201,7 @@ pdfpagelayout=OneColumn}
 \childsidesep{1em}
 \childattachsep{0.5in}
 \newcommand{\derivscale}{1.0}
+\newcommand{\inlinederivscale}{0.8}
 \newcommand{\derivspace}{\vspace{0mm}}
 \newcommand{\derivaftercompress}{\vspace{0mm}}
 
@@ -208,7 +209,8 @@ pdfpagelayout=OneColumn}
 \setcounter{topnumber}{500}
 \setcounter{bottomnumber}{500}
  
-\newcommand{\wrongnode}[1]{\textbf{\fbox{#1}}}
+\newcommand{\missingnode}[1]{\textcolor{blue}{\textbf{\fbox{#1}}}}
+\newcommand{\extranode}[1]{\textcolor{red}{\textbf{\fbox{#1}}}}
 
 % Used for the bar diagrams in the error analysis work
 % Change these lengths inside the environment:
@@ -217,6 +219,14 @@ pdfpagelayout=OneColumn}
 \newcommand{\mybarheight}{2mm}
 \newcommand{\myboxwidth}{8mm}
 \newcommand{\mybar}[1]{\framebox[\myboxwidth][l]{\rule{#1mm}{\mybarheight}}}
+
+% Set spacing above and below environments to be 0.
+% Main use here is to avoid having space inserted before an align environment when inside a minipage.
+\newcommand{\zerodisplayskips}{%
+  \setlength{\abovedisplayskip}{0pt}
+  \setlength{\belowdisplayskip}{0pt}
+  \setlength{\abovedisplayshortskip}{0pt}
+  \setlength{\belowdisplayshortskip}{0pt}}
 
 % Example of specifying allowed hyphenation within a word
 \hyphenation{ana-ly-sis}
