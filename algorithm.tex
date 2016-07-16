@@ -3,7 +3,7 @@
 %TODO: Look at reviews for what else to add
 
 Parses in the Penn Treebank \parencite{ptb} are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
-In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit efficient learning and inference.
+In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit learning and inference that is almost as efficient as for trees.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
 We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
 Our dynamic program uniquely decomposes structures, is sound and complete with respect to a subset of the class of one-endpoint-crossing graphs, and covers $97.7\%$ of the Penn English treebank.
@@ -108,7 +108,7 @@ Rather than the conventional constituency parsing approach where items fully cov
 We use six item types, differing in the type of edge crossing they contain.  \\
 
 \begin{center}
-%%%\begin{tabular}{l@{\hskip 3pt}l}
+%%%%\begin{tabular}{l@{\hskip 3pt}l}
 \begin{tabular}{ll}
   \begin{tikzpicture}
     \node (p) at (0.5, 0) {$p$};
@@ -948,9 +948,9 @@ Each consists of a span, $[pq]$ and an optional point outside the span, $o$, eit
 \subsection{Complete Dynamic Program}
 
 \begin{algorithm}
-%%%\vspace{-5mm}
+%%%%\vspace{-5mm}
 \input{rules-all}
-%%%\vspace{-12mm}
+%%%%\vspace{-12mm}
 \caption{
   \label{fig:complete-dp}
   Complete graph parsing dynamic program.
@@ -980,20 +980,30 @@ Note, since we are considering graphs, two points could be linked both directly 
 We track parent information to know about parents of items, and existence of specific edges.
 As a result, if both an indirect link and a direct link are present, the state records a direct link being present.
 
-\subsection{Eisner's algorithm}
+\subsection{\textcite{eisner:1996}'s algorithm}
 
-In the same notation (for comparison) here is a graph version of Eisner's algorithm (to get back to trees only, replace the parts that are blue and boxed with $F$):
+This work and \textcite{ec}'s algorithm both extend upon the ideas first described by \textcite{eisner:1996}.
+Eisner's algorithm is an $O(n^3)$ dynamic program for projective dependency tree parsing.
+If the reader is familiar with Eisner's algorithm, then this definition of it using our notation may help build intuition for our algorithm:
 
-\scalebox{\mathscale}{\parbox{\linewidth}{
-\begin{flalign*} % Interpreter ignore
+\begin{figure}[H]
+\zerodisplayskips
+\begin{subfigure}[t]{0.4\linewidth}
+\subcaption*{\normalsize Arc creation rules:}
+\begin{align*}
 & \begin{array}{l}
   I[pq \; F \; P] \leftarrow \max \\
-  \;\;\; A[p \; q] \quad I[pq \; F \; \onlygraphs{\overline{P}}] \\
+  \;\;\; A[p \; q] \quad I[pq \; F \; \onlygraphs{F}] \\
 \end{array} \\
 & \begin{array}{l}
   I[pq \; Q \; F] \leftarrow \max \\
-  \;\;\; A[q \; p] \quad I[pq \; \onlygraphs{\overline{Q}} \; F] \\
+  \;\;\; A[q \; p] \quad I[pq \; \onlygraphs{F} \; F] \\
 \end{array} \\
+\end{align*}
+\end{subfigure}
+\begin{subfigure}[t]{0.55\linewidth}
+\subcaption*{\normalsize Binary composition rules:}
+\begin{align*}
 & \begin{array}{l}
   I[pq \; F \; F] \leftarrow \max
 \end{array} \\
@@ -1005,7 +1015,7 @@ In the same notation (for comparison) here is a graph version of Eisner's algori
     \max_{s \in (p, q)} \\
     \left\{
       \begin{array}{l}
-        I[ps \; F \; P] \quad I[sq \; \onlygraphs{.} \; F] \\
+        I[ps \; F \; P] \quad I[sq \; \onlygraphs{F} \; F] \\
       \end{array}
     \right. \\
   \end{array}
@@ -1018,8 +1028,17 @@ In the same notation (for comparison) here is a graph version of Eisner's algori
   I[pq \; q \; F] \leftarrow \max_{s \in (p, q)} \\
   \;\;\; I[ps \; \overline{F} \; F] \quad I[sq \; Q \; F] \\
 \end{array} \\
-\end{flalign*}
-}}
+\end{align*}
+\end{subfigure}
+\end{figure}
+% TODO: Add visual versions of each
+
+To be specific, this is a version of the algorithm in which the structure is built from the outside in\footnote{
+Alternatives are from the inside out, always left to right, or always right to left.
+}, and where arc creation is separated out into an independent step\footnote{
+Arc creation could be combined into the binary step, though for a first-order model there should be an independent search for the best arc over each span, so that complexity is $O(n^3 + an^2)$ rather than $O(an^3)$, where $a$ is the number of arc types.
+}.
+A projective graph parsing algorithm can be formed by changing the boxed blue parts to be $\textcolor{blue}{\overline{P}}$ (upper left), $\textcolor{blue}{\overline{Q}}$ (lower left), and \scalebox{2.0}{$\textcolor{blue}{.}$} (right).
 
 \subsection{Initialization}
 
