@@ -48,32 +48,32 @@ All of these approaches have the disadvantage that each additional trace dramati
 
 \section{Algorithm Sketch}
 
-\tikzset{% 
-  not allowed/.style={%
-    dotted,
-    very thick,
-    color=red
-  }
-}
-\tikzset{% 
-  required/.style={%
-  }
-}
-\tikzset{% 
-  optional/.style={%
-    dashed
-  }
-}
-\tikzset{% 
-  pointO/.style={%
-    fill=black,regular polygon, regular polygon sides=4,inner sep=1pt
-  }
-}
-\newlength\vertSmall
-\newlength\vertBig
-\newlength\vertBigger
-\newlength\labelGap
-\newlength\coordGap
+%%%\tikzset{% 
+%%%  not allowed/.style={%
+%%%    dotted,
+%%%    very thick,
+%%%    color=red
+%%%  }
+%%%}
+%%%\tikzset{% 
+%%%  required/.style={%
+%%%  }
+%%%}
+%%%\tikzset{% 
+%%%  optional/.style={%
+%%%    dashed
+%%%  }
+%%%}
+%%%\tikzset{% 
+%%%  pointO/.style={%
+%%%    fill=black,regular polygon, regular polygon sides=4,inner sep=1pt
+%%%  }
+%%%}
+%%%\newlength\vertSmall
+%%%\newlength\vertBig
+%%%\newlength\vertBigger
+%%%\newlength\labelGap
+%%%\newlength\coordGap
 
 % TODO - Add the intuition that when edges are added to/from the external point
 % to the span, those edges are all going to be crossed at some point in the
@@ -988,50 +988,197 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
 
 \begin{figure}[H]
 \zerodisplayskips
-\begin{subfigure}[t]{0.4\linewidth}
-\subcaption*{\normalsize Arc creation rules:}
-\begin{align*}
-& \begin{array}{l}
-  I[pq \; F \; P] \leftarrow \max \\
-  \;\;\; A[p \; q] \quad I[pq \; F \; \onlygraphs{F}] \\
-\end{array} \\
-& \begin{array}{l}
-  I[pq \; Q \; F] \leftarrow \max \\
-  \;\;\; A[q \; p] \quad I[pq \; \onlygraphs{F} \; F] \\
-\end{array} \\
-\end{align*}
+\begin{subfigure}[t]{0.41\linewidth}
+  \subcaption*{\normalsize Arc creation rules:}
+  \scalebox{0.8}{
+    \begin{minipage}[c]{0.15\linewidth}
+      \begin{align*}
+      & \begin{array}{l}
+        I[pq \; F \; P] \leftarrow \max \\
+        \;\;\; A[p \; q] \quad I[pq \; F \; \onlygraphs{F}] \\
+      \end{array}
+      \end{align*}
+    \end{minipage}
+  }
+  \begin{minipage}[c]{0.25\linewidth}
+    \begin{tikzpicture}
+      \node (p) at (0, 0) {\footnotesize \strut $p$};
+      \node (q) at (1.5, 0) {\footnotesize \strut $q$};
+      \draw (0,0.2) -- (1.5,0.2);
+      \draw [out=45,in=135,->,thin,>=Stealth] (p.north) to (q.north);
+    \end{tikzpicture}
+  \end{minipage}
+
+  \vspace{5mm}
+  \scalebox{0.8}{
+    \begin{minipage}[c]{0.15\linewidth}
+      \begin{align*}
+      & \begin{array}{l}
+        I[pq \; Q \; F] \leftarrow \max \\
+        \;\;\; A[q \; p] \quad I[pq \; \onlygraphs{F} \; F] \\
+      \end{array}
+      \end{align*}
+    \end{minipage}
+  }
+  \begin{minipage}[c]{0.25\linewidth}
+    \begin{tikzpicture}
+      \node (p) at (0, 0) {\footnotesize \strut $p$};
+      \node (q) at (1.5, 0) {\footnotesize \strut $q$};
+      \draw (0,0.2) -- (1.5,0.2);
+      \draw [out=45,in=135,<-,thin,>=Stealth] (p.north) to (q.north);
+    \end{tikzpicture}
+  \end{minipage}
 \end{subfigure}
 \begin{subfigure}[t]{0.55\linewidth}
-\subcaption*{\normalsize Binary composition rules:}
-\begin{align*}
-& \begin{array}{l}
-  I[pq \; F \; F] \leftarrow \max
-\end{array} \\
-& \left\{
-  \begin{array}{l}
-    \begin{array}{l}
-      I[p \; p{+}1 \; F \; F] \quad I[p{+}1 \; q \; \overline{F} \; F] \\
-    \end{array} \\
-    \max_{s \in (p, q)} \\
-    \left\{
-      \begin{array}{l}
-        I[ps \; F \; P] \quad I[sq \; \onlygraphs{F} \; F] \\
+  \subcaption*{\normalsize Binary composition rules:}
+  \scalebox{0.8}{
+    \begin{minipage}[t]{0.2\linewidth}
+      \begin{align*}
+      & \begin{array}{l}
+        I[pq \; F \; F] \leftarrow \max
+      \end{array} \\
+      & \left\{
+        \begin{array}{l}
+          \begin{array}{l}
+            I[p \; p{+}1 \; F \; F] \quad I[p{+}1 \; q \; \overline{F} \; F] \\
+          \end{array} \\
+          \\
+          \\
+          \max_{s \in (p, q)} \\
+          \left\{
+            \begin{array}{l}
+              I[ps \; F \; P] \quad I[sq \; \onlygraphs{F} \; F] \\
+            \end{array}
+          \right. \\
+        \end{array}
+      \right.
+      \end{align*}
+    \end{minipage}
+  }
+  \begin{minipage}[t]{0.34\linewidth}
+    \vspace{5mm}
+    \begin{tikzpicture}
+      \node (hlref) at (0, 0) {};
+      \node (hmref) at (1, 0) {};
+      \node (hrref) at (3, 0) {};
+
+      \node (p0) at (hlref) {};
+      \node (s0a) at (hmref) {};
+      \node (v0bref) [below=1ex of p0.center] {};
+      \node (s0b) at (v0bref -| hmref) {};
+      \node (q0) at (v0bref -| hrref) {};
+      \draw (p0.center) -- (s0a.center);
+      \draw (s0b.center) -- (q0.center);
+
+      \node (lb) at (v0bref -| hlref) {};
+      \node (sb) at (v0bref -| hmref) {};
+      \node (rb) at (v0bref -| hrref) {};
+      \node (ltext) [below=-0.5ex of lb.center] {\small \strut $p$};
+      \node (stext) [below=-0.5ex of sb.center] {\small \strut ${p+1}$};
+      \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
+      \node (halfa) at ($(s0b)!0.5!(q0)$) {};
+      \node (half) [above=3pt of halfa.center] {};
+      \draw [dashed,out=180,in=45,->,thin,>=Stealth] (half) to (s0b.center);
+
+      \node (hlrefL) at (0, -1.8) {};
+      \node (hmrefL) at (1.5, -1.8) {};
+      \node (hrrefL) at (3, -1.8) {};
+
+      \node (p0L) at (hlrefL) {};
+      \node (s0aL) at (hmrefL) {};
+      \node (v0brefL) [below=1ex of p0L.center] {};
+      \node (s0bL) at (v0brefL -| hmrefL) {};
+      \node (q0L) at (v0brefL -| hrrefL) {};
+      \draw (p0L.center) -- (s0aL.center);
+      \draw (s0bL.center) -- (q0L.center);
+
+      \node (lbL) at (v0brefL -| hlrefL) {};
+      \node (sbL) at (v0brefL -| hmrefL) {};
+      \node (rbL) at (v0brefL -| hrrefL) {};
+      \node (ltextL) [below=-0.5ex of lbL.center] {\small \strut $p$};
+      \node (stextL) [below=-0.5ex of sbL.center] {\small \strut ${s}$};
+      \node (rtextL) [below=-0.5ex of rbL.center] {\small \strut $q$};
+      \draw [out=45,in=135,->,thin,>=Stealth] (p0L.center) to (s0aL.center);
+    \end{tikzpicture}
+  \end{minipage}
+
+  \scalebox{0.8}{
+    \begin{minipage}[b]{0.2\linewidth}
+      \begin{align*}
+      & \begin{array}{l}
+        I[pq \; F \; p] \leftarrow \max_{s \in (p, q)} \\
+        \;\;\; I[ps \; F \; P] \quad I[sq \; F \; \overline{F}] \\
       \end{array}
-    \right. \\
-  \end{array}
-\right. \\
-& \begin{array}{l}
-  I[pq \; F \; p] \leftarrow \max_{s \in (p, q)} \\
-  \;\;\; I[ps \; F \; P] \quad I[sq \; F \; \overline{F}] \\
-\end{array} \\
-& \begin{array}{l}
-  I[pq \; q \; F] \leftarrow \max_{s \in (p, q)} \\
-  \;\;\; I[ps \; \overline{F} \; F] \quad I[sq \; Q \; F] \\
-\end{array} \\
-\end{align*}
+      \end{align*}
+    \end{minipage}
+  }
+  \begin{minipage}[c]{0.4\linewidth}
+    \vspace{2mm}
+    \begin{tikzpicture}
+      \node (hlref) at (0, 0) {};
+      \node (hmref) at (1.5, 0) {};
+      \node (hrref) at (3, 0) {};
+
+      \node (p0) at (hlref) {};
+      \node (s0a) at (hmref) {};
+      \node (v0bref) [below=1ex of p0.center] {};
+      \node (s0b) at (v0bref -| hmref) {};
+      \node (q0) at (v0bref -| hrref) {};
+      \draw (p0.center) -- (s0a.center);
+      \draw (s0b.center) -- (q0.center);
+
+      \node (lb) at (v0bref -| hlref) {};
+      \node (sb) at (v0bref -| hmref) {};
+      \node (rb) at (v0bref -| hrref) {};
+      \node (ltext) [below=-0.5ex of lb.center] {\small \strut $p$};
+      \node (stext) [below=-0.5ex of sb.center] {\small \strut ${s}$};
+      \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
+      \draw [out=45,in=135,->,thin,>=Stealth] (p0.center) to (s0a.center);
+      \node (halfa) at ($(s0b)!0.5!(q0)$) {};
+      \node (half) [above=3pt of halfa.center] {};
+      \draw [dashed,out=0,in=135,->,thin,>=Stealth] (half) to (q0.center);
+    \end{tikzpicture}
+  \end{minipage}
+
+  \scalebox{0.8}{
+    \begin{minipage}[b]{0.2\linewidth}
+      \begin{align*}
+      & \begin{array}{l}
+        I[pq \; q \; F] \leftarrow \max_{s \in (p, q)} \\
+        \;\;\; I[ps \; \overline{F} \; F] \quad I[sq \; Q \; F] \\
+      \end{array}
+      \end{align*}
+    \end{minipage}
+  }
+  \begin{minipage}[c]{0.4\linewidth}
+    \vspace{2mm}
+    \begin{tikzpicture}
+      \node (hlref) at (0, 0) {};
+      \node (hmref) at (1.5, 0) {};
+      \node (hrref) at (3, 0) {};
+
+      \node (p0) at (hlref) {};
+      \node (s0a) at (hmref) {};
+      \node (v0bref) [below=1ex of p0.center] {};
+      \node (s0b) at (v0bref -| hmref) {};
+      \node (q0) at (v0bref -| hrref) {};
+      \draw (p0.center) -- (s0a.center);
+      \draw (s0b.center) -- (q0.center);
+
+      \node (lb) at (v0bref -| hlref) {};
+      \node (sb) at (v0bref -| hmref) {};
+      \node (rb) at (v0bref -| hrref) {};
+      \node (ltext) [below=-0.5ex of lb.center] {\small \strut $p$};
+      \node (stext) [below=-0.5ex of sb.center] {\small \strut ${s}$};
+      \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
+      \node (halfa) at ($(p0)!0.5!(s0a)$) {};
+      \node (half) [above=3pt of halfa.center] {};
+      \draw [dashed,out=45,in=180,<-,thin,>=Stealth] (p0.center) to (half);
+      \draw [out=45,in=135,<-,thin,>=Stealth] (s0b.center) to (q0.center);
+    \end{tikzpicture}
+  \end{minipage}
 \end{subfigure}
 \end{figure}
-% TODO: Add visual versions of each
 
 To be specific, this is a version of the algorithm in which the structure is built from the outside in\footnote{
 Alternatives are from the inside out, always left to right, or always right to left.
@@ -1039,6 +1186,56 @@ Alternatives are from the inside out, always left to right, or always right to l
 Arc creation could be combined into the binary step, though for a first-order model there should be an independent search for the best arc over each span, so that complexity is $O(n^3 + an^2)$ rather than $O(an^3)$, where $a$ is the number of arc types.
 }.
 A projective graph parsing algorithm can be formed by changing the boxed blue parts to be $\textcolor{blue}{\overline{P}}$ (upper left), $\textcolor{blue}{\overline{Q}}$ (lower left), and \scalebox{2.0}{$\textcolor{blue}{.}$} (right).
+These rules are all present in our algorithm as well, they correspond to the rules that only use intervals.
+
+Eisner's algorithm has been formulated in several different ways that share the same core idea, but structure the deduction rules slightly differently.
+One well-known formulation of was presented by \textcite{eisner-smith-2005}.
+Their items are slightly different, with their triangle items going from on one word to between two words (whereas ours are always from on one word to on another word).
+However, we can roughly relate the inference rules as follows, where some of our rules take place in two steps in their rules:
+
+\begin{center}
+\begin{tabular}{ll}
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0,0.6) -- (0.4,0.4) -- (0.4,0) -- cycle;
+  \end{tikzpicture}
+  }
+  $+$
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0,0.4) -- (0.4,0) -- cycle;
+  \end{tikzpicture}
+  }
+  & \parbox{0.5\linewidth}{corresponds to the third binary rule, or one step of the second binary rule.}
+  \\[10pt]
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0.4,0) -- (0.4,0.4) -- cycle;
+  \end{tikzpicture}
+  }
+  $+$
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0,0.4) -- (0.4,0.6) -- (0.4,0) -- cycle;
+  \end{tikzpicture}
+  }
+  & \parbox{0.5\linewidth}{corresponds to the fourth binary rule, or one step of the first binary rule.}
+  \\[10pt]
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0,0.4) -- (0.4,0) -- cycle;
+  \end{tikzpicture}
+  }
+  $+$
+  \raisebox{-3pt}{
+  \begin{tikzpicture}
+    \draw (0,0) -- (0.4,0) -- (0.4,0.4) -- cycle;
+  \end{tikzpicture}
+  }
+  & \parbox{0.5\linewidth}{corresponds to the second step of the first two binary rules, plus either of the arc creation rules.}
+  \\
+\end{tabular}
+\end{center}
 
 \subsection{Initialization}
 
