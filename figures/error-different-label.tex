@@ -1,0 +1,31 @@
+\scalebox{\derivscale}{
+\synttree
+[PP
+	[IN [Unlike]]
+	[\extranode{ADVP}
+		[CD [two]]
+		[NNS [years]]
+		[RB [ago]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[PP
+	[IN [Unlike]]
+	[\missingnode{NP}
+		[CD [two]]
+		[NNS [years]]
+		[RB [ago]]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Different label.]{ \label{fig:different-label}
+	\textbf{Different Label}: \emph{two years ago} should be an NP.
+}

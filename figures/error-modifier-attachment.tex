@@ -1,0 +1,38 @@
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBD [had]]
+	[\extranode{S}
+		[\extranode{VP}
+			[TO [to]]
+			[\extranode{VP}
+				[VB [think]]
+				[PP [.t about it]]]]]
+	[ADVP [.t ahead of time]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBD [had]]
+	[\missingnode{S}
+		[\missingnode{VP}
+			[TO [to]]
+			[\missingnode{VP}
+				[VB [think]]
+				[PP [.t about it]]
+				[ADVP [.t ahead of time]]]]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Adverb and adjective modifier attachment.]{ \label{fig:modifier-attachment} 
+	\textbf{Adverb and Adjective Modifier Attachment}: \emph{ahead of time} is too high, it should
+	modify \emph{think}, not \emph{had}.
+}

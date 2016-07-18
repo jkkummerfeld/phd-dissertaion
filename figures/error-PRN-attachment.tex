@@ -1,0 +1,32 @@
+\scalebox{\derivscale}{
+\synttree
+[NP
+  [NP [.t other forms]]
+  [\extranode{PP} 
+    [IN [of]]
+    [\extranode{NP}
+      [NP [NN [housing]]]
+      [PRN [.t (such as low-income)]]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[NP
+  [NP [.t other forms]]
+  [\missingnode{PP} 
+    [IN [of]]
+    [NP [NN [housing]]]]
+  [PRN [.t (such as low-income)]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Parenthetical attachment.]{ \label{fig:PRN-attachment}
+	\textbf{Parenthetical Attachment}: the parenthetical should be higher.
+}

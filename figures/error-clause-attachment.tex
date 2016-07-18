@@ -1,0 +1,38 @@
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBZ [intends]]
+	[\extranode{S}
+		[\extranode{VP}
+			[TO [to]]
+			[\extranode{VP}
+				[VB [restrict]]
+				[NP [.t the RTC to \ldots]]
+				[SBAR [.t unless the agency \ldots]]]]]]
+}
+%%%% TODO: Avoid ldots, get text
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBZ [intends]]
+	[\missingnode{S}
+		[\missingnode{VP}
+			[TO [to]]
+			[\missingnode{VP}
+				[VB [restrict]]
+				[NP [.t the RTC to \ldots]]]]]
+	[SBAR [.t unless the agency \ldots]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Clause attachment.]{ \label{fig:clause-attachment} 
+	\textbf{Clause Attachment}: \emph{unless the agency receives specific congressional authorization} is attaching too low.
+}

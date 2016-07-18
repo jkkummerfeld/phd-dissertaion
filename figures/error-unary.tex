@@ -1,0 +1,56 @@
+\scalebox{\derivscale}{
+\synttree
+[SINV
+	[VP
+		[VBG [Following]]]
+	[VBZ [is]]
+	[NP
+		[NP [.t a breakdown]]
+		[PP [.t of major market activity]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[SINV
+	[\missingnode{S}
+		[VP
+			[VBG [Following]]]]
+	[VBZ [is]]
+	[\missingnode{NP}
+		[NP
+			[NP [.t a breakdown]]
+			[PP [.t of major market activity]]]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[SINV
+	[S-ADV
+		[NP-SBJ
+			[-NONE- [*-1]] ]
+		[VP
+			[VBG [Following]]]]
+	[VBZ [is]]
+	[NP-SBJ-1
+		[NP
+			[NP [.t a breakdown]]
+			[PP [.t of major market activity]]]]]
+}
+
+\vspace{3mm}
+(c) Gold parse with traces and function tags
+\derivspace
+\caption[Error analysis example: Unary.]{ \label{fig:unary} 
+	Two \textbf{Unary} errors: a missing S and a missing NP.
+	The third parse is the \ptb parse before traces and function tags are removed, included here to show the distinction between the two NPs in the production.
+}

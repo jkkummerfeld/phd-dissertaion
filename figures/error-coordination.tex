@@ -1,0 +1,35 @@
+\scalebox{\derivscale}{
+\synttree
+[NP
+	[NP [.t A 16\% drop]]
+	[\extranode{PP}
+		[IN [for]]
+		[\extranode{NP}
+			[NP [.t Mannesmann AG]]
+			[CC [and]]
+			[NP [.t Dresdner AG's 10\% decline]]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[NP
+	[\missingnode{NP}
+		[NP [.t A 16\% drop]]
+		[\missingnode{PP}
+			[IN [for]]
+			[NP [.t Mannesmann AG]]]]
+	[CC [and]]
+	[NP [.t Dresdner AG's 10\% decline]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Coordination.]{ \label{fig:coordination} 
+	\textbf{Coordination}: \emph{and Dresdner AG's 10\% decline} is too low.
+}

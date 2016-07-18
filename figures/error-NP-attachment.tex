@@ -1,0 +1,33 @@
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBD [wrote]]
+		[\extranode{NP}
+			[NP [.t another new ad]]
+			[VBG [appearing]]]
+		[NP
+			[NN [today]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{3mm}
+
+\scalebox{\derivscale}{
+\synttree
+[VP
+	[VBD [wrote]]
+		[\missingnode{NP}
+			[NP [.t another new ad]]
+			[\missingnode{VP}
+				[VBG [appearing]]
+				[NP
+					[NN [today]]]]]]
+}
+
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: NP Attachment.]{ \label{fig:NP-attachment} 
+	\textbf{NP Attachment}: \emph{today} is too high, it should be the argument of \emph{appearing}, rather than \emph{wrote}.
+}

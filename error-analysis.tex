@@ -152,336 +152,154 @@ This is the case becasue in many sentences a single correction will fix the pars
 
 \subsection{Transformation Classification} \label{sec:classify}
 
-We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the test parse to the gold parse.
+We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the automatically generated parse to the gold parse.
 Now we classify each group as one of the error types below.
+The ideal set of error classes would consider each group of incorrect constituents and show how their function has been misinterpreted by the parser, but it is difficult to define simple rules for such a classification.
+In future work it would be interesting to build statistical models for classifying errors, using expert analysis of parse errors to train the system.
+In the meantime, the approach we took was to construct general rules that classify errors mainly by the category of the nodes being moved and their surrounding context.
+We developed our rules by running the system with no classification, then progressively adding rules to decrease the number of unclassified errors.
+In the process of adding rules we also inspected observed classifications to check that they were correct, amending the rules if necessary.
 
-\paragraph{PP Attachment} (Figure~\ref{fig:PP-attachment}) 
+\paragraph{PP Attachment} (Figure~\ref{fig:PP-attachment}) \\
 Any case in which the transformation involved moving a Prepositional Phrase, or the incorrect bracket is over a PP, \myeg \\ 
 \emph{He was} (VP \emph{named chief executive officer of} (NP \emph{Applied} (PP \emph{in 1986}))) \\
 where (PP \emph{in 1986}) should modify the entire VP, rather than just \emph{Applied}.
 
-\paragraph{NP Attachment} (Figure~\ref{fig:NP-attachment})  Several cases in which NPs had to be moved, particularly for mistakes in appositive constructions and incorrect attachments within a verb phrase, \myeg \\
+\begin{figure}
+\centering
+\input{figures/error-coordination}
+\end{figure}
+
+\paragraph{Coordination} (Figure~\ref{fig:coordination}) \\
+Cases in which a conjunction is an immediate sibling of the nodes being moved, or is the leftmost or rightmost node being moved, \myeg \\
+(NP \emph{A 16\% drop} (PP \emph{for} (NP (NP \emph{Mannesmann AG}) \emph{and} (NP \emph{Dresdner AG's 10\% decline})))) \\
+where the conjunction and second NP should be at the top level, between \emph{A 16\% drop for Mannesmann AG} and \emph{Dresdner AG's 10\% decline}.
+
+\paragraph{NP Attachment} (Figure~\ref{fig:NP-attachment}) \\
+Several cases in which NPs had to be moved, particularly for mistakes in appositive constructions and incorrect attachments within a verb phrase, \myeg \\
 \emph{The bonds} (VP \emph{go} (PP \emph{on sale} (NP \emph{Oct.\@\xspace 19}))) \\
 where \emph{Oct.\@\xspace 19} should be an argument of \emph{go}.
 
-\paragraph{Clause Attachment} (Figure~\ref{fig:clause-attachment}) 
-Any group that involves movement of some form of S node.
+\paragraph{Clause Attachment} (Figure~\ref{fig:clause-attachment}) \\
+Any group that involves movement of some form of S node, \myeg \\
+\emph{intends} (S (VP \emph{to} (VP \emph{restrict the RTC to ...\@\xspace} (SBAR \emph{unless the agency ...\@\xspace})))) \\
+where the SBAR should be modifying \emph{intends}, rather than the lower VP.
 
 \begin{landscape}
 \begin{figure}
 \centering
 \begin{minipage}[b]{3.5in}
 \centering
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBD [wrote]]
-		[\extranode{NP}
-			[NP
-				[DT [another]]
-				[JJ [new]]
-				[NN [ad]]]
-			[VBG [appearing]]]
-		[NP
-			[NN [today]]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{3mm}
-
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBD [wrote]]
-		[\missingnode{NP}
-			[NP
-				[DT [another]]
-				[JJ [new]]
-				[NN [ad]]]
-			[\missingnode{VP}
-				[VBG [appearing]]
-				[NP
-					[NN [today]]]]]]
-}
-
-(b) Gold parse
-\derivspace
-\caption[Error analysis example: NP Attachment.]{ \label{fig:NP-attachment} 
-	\textbf{NP Attachment}: \emph{today} is too high, it should be the argument of \emph{appearing}, rather than \emph{wrote}.
-}
+\input{figures/error-NP-attachment}
 \end{minipage}\hfill
 \begin{minipage}[b]{4.5in}
 \centering
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBZ [intends]]
-	[\extranode{S}
-		[\extranode{VP}
-			[TO [to]]
-			[\extranode{VP}
-				[VB [restrict]]
-				[NP [.t the RTC to \ldots]]
-				[SBAR [.t unless the agency \ldots]]]]]]
-}
-%%%% TODO: Avoid ldots, get text
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBZ [intends]]
-	[\missingnode{S}
-		[\missingnode{VP}
-			[TO [to]]
-			[\missingnode{VP}
-				[VB [restrict]]
-				[NP [.t the RTC to \ldots]]]]]
-	[SBAR [.t unless the agency \ldots]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-\derivspace
-\caption[Error analysis example: clause attachment.]{ \label{fig:clause-attachment} 
-	\textbf{Clause Attachment}: \emph{unless the agency receives specific congressional authorization} is attaching too low.
-}
-\end{minipage}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{minipage}[b]{3in}
-\centering
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBD [had]]
-	[\extranode{S}
-		[\extranode{VP}
-			[TO [to]]
-			[\extranode{VP}
-				[VB [think]]
-				[PP [.t about it]]]]]
-	[ADVP [.t ahead of time]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[VP
-	[VBD [had]]
-	[\missingnode{S}
-		[\missingnode{VP}
-			[TO [to]]
-			[\missingnode{VP}
-				[VB [think]]
-				[PP [.t about it]]
-				[ADVP [.t ahead of time]]]]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-\derivspace
-\caption[Error analysis example: modifier attachment.]{ \label{fig:modifier-attachment} 
-	\textbf{Modifier Attachment}: \emph{ahead of time} is too high, it should
-	modify \emph{think}, not \emph{had}.
-}
-\end{minipage}\hfill
-\begin{minipage}[b]{5in}
-\centering
-\scalebox{\derivscale}{
-\synttree
-[SINV
-	[VP
-		[VBG [Following]]]
-	[VBZ [is]]
-	[NP
-		[NP [.t a breakdown]]
-		[PP [.t of major market activity]]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[SINV
-	[\missingnode{S}
-		[VP
-			[VBG [Following]]]]
-	[VBZ [is]]
-	[\missingnode{NP}
-		[NP
-			[NP [.t a breakdown]]
-			[PP [.t of major market activity]]]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[SINV
-	[S-ADV
-		[NP-SBJ
-			[-NONE- [*-1]] ]
-		[VP
-			[VBG [Following]]]]
-	[VBZ [is]]
-	[NP-SBJ-1
-		[NP
-			[NP [.t a breakdown]]
-			[PP [.t of major market activity]]]]]
-}
-
-\vspace{3mm}
-(c) Gold parse with traces and function tags
-\derivspace
-\caption[Error analysis example: unary.]{ \label{fig:unary} 
-	Two \textbf{Unary} errors: a missing S and a missing NP.
-	The third parse is the \ptb parse before traces and function tags are removed, included here to show the distinction between the two NPs in the production.
-}
+\input{figures/error-clause-attachment}
 \end{minipage}
 \end{figure}
 \end{landscape}
 
-\paragraph{Modifier Attachment} (Figure~\ref{fig:modifier-attachment})  Cases involving incorrectly placed adjectives
-and adverbs, including errors corrected by subtree movement and errors
-requiring only creation of a node, \myeg \\ (NP (ADVP \emph{even more})
-\emph{severe setbacks}) \\ where there should be an extra ADVP node over
-\emph{even more severe}.
+\paragraph{Adverb and Adjective Modifier Attachment} (Figure~\ref{fig:modifier-attachment}) \\
+Cases involving incorrectly placed adjectives and adverbs, including errors corrected by subtree movement and errors requiring only creation of a node, \myeg \\
+(NP (ADVP \emph{even more}) \emph{severe setbacks}) \\
+where there should be an extra ADVP node over \emph{even more severe}.
 
-\paragraph{Unary} (Figure~\ref{fig:unary}) 
-Mistakes involving unary productions that are not linked to a nearby error  such as a matching extra or missing node.
-We do not include a breakdown by unary type, though we did find that clause labeling (S, SINV, etc) accounted for a large proportion of the errors.
-%%%	.  Note that the
-%%%	missing NP is over another NP, a production that occurs widely in the
-%%%	treebank, particularly over the word \emph{it}.
-
-\begin{figure}
-\centering
-\scalebox{\derivscale}{
-\synttree
-[NP
-	[NP [.t A 16\% drop]]
-	[\extranode{PP}
-		[IN [for]]
-		[\extranode{NP}
-			[NP [.t Mannesmann AG]]
-			[CC [and]]
-			[NP [.t Dresdner AG's 10\% decline]]]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[NP
-	[\missingnode{NP}
-		[NP [.t A 16\% drop]]
-		[\missingnode{PP}
-			[IN [for]]
-			[NP [.t Mannesmann AG]]]]
-	[CC [and]]
-	[NP [.t Dresdner AG's 10\% decline]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-\derivspace
-\caption[Error analysis example: coordination.]{ \label{fig:coordination} 
-	\textbf{Coordination}: \emph{and Dresdner AG's 10\% decline} is too low.
-}
-\end{figure}
-
-\paragraph{Coordination} (Figure~\ref{fig:coordination}) 
-Cases in which a conjunction is an immediate sibling of the nodes being moved, or is the leftmost or rightmost node being moved.
-
-\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) 
-While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
-We form a single group for each NP that has one or more errors involving these types of nodes.
-
+\paragraph{Unary} (Figure~\ref{fig:unary}) \\
+Mistakes involving unary productions that are not linked to a nearby error such as a matching extra or missing node, \myeg \\
+(SINV (VP \emph{following}) \emph{is a breakdown of major market activity}) \\
+where the VP should have an S above it.
+In this particular example we can see how not modelling traces may be hurting performance--the S is intended to span both the VP and a null NP that is co-indexed with \emph{a breakdown of major market activity}.
 
 \begin{landscape}
 \begin{figure}
 \centering
-%%%\begin{minipage}[b]{5in}
-%%%\centering
-%%%\end{minipage}\hfill
 \begin{minipage}[b]{3in}
+\input{figures/error-modifier-attachment}
+\end{minipage}\hfill
+\begin{minipage}[b]{5in}
 \centering
-\scalebox{\derivscale}{
-\synttree
-[NP
-	[NNP [Secretary]]
-	[\extranode{PP}
-		[IN [of]]
-		[\extranode{NP}
-			[NNP [State]]
-			[NNP [Baker]]]]]
-}
-
-\vspace{3mm}
-(a) Parser output
-
-\vspace{6mm}
-
-\scalebox{\derivscale}{
-\synttree
-[NP
-	[NNP [Secretary]]
-	[\missingnode{PP}
-		[IN [of]]
-		[\missingnode{NP}
-			[NNP [State]]]]
-	[NNP [Baker]]]
-}
-
-\vspace{3mm}
-(b) Gold parse
-\derivspace
-\caption[Error analysis example: NP internal structure.]{ \label{fig:NP-internal-structure} 
-	\textbf{NP Internal Structure}: \emph{Baker} is too low.
-}
+\input{figures/error-unary}
 \end{minipage}
 \end{figure}
 \end{landscape}
 
-\paragraph{Different label}
-In many cases a node is present in the parse that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error.
+\begin{landscape}
+\begin{figure}
+\centering
+\begin{minipage}[b]{2.5in}
+\centering
+\input{figures/error-NP-internal-structure}
+\end{minipage}\hfill
+\begin{minipage}[b]{2.5in}
+\centering
+\input{figures/error-different-label}
+\end{minipage}\hfill
+\begin{minipage}[b]{2.5in}
+\centering
+\input{figures/error-single-word-phrase}
+\end{minipage}
+\end{figure}
+\end{landscape}
 
-\paragraph{Single word phrase}
-A range of node errors that span a single word, with checks to ensure this is not linked to another error (\myeg one part of a set of internal noun phrase errors).
+\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) \\
+While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
+We form a single group for each NP that has one or more errors involving these types of nodes, \myeg \\
+(PP \emph{Within} (NP \emph{about six months})) \\
+should have a QP over \emph{about six}.
+
+\paragraph{Different label} (Figure~\ref{fig:different-label}) \\
+In many cases a node is present in the parse that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error, \myeg \\
+(PP \emph{Unlike} (ADVP \emph{two years ago})) \\
+where the ADVP should be an NP.
+
+\paragraph{Single word phrase} (Figure~\ref{fig:single-word-phrase}) \\
+Node errors that span a single word, \myeg \\
+(PP (ADVP \emph{Shortly}) \emph{after 10 a.m.\@\xspace}) \\
+where the ADVP should not be present.
+We include checks to ensure this is not linked to another error, such as one part of a set of internal noun phrase errors.
+
+\begin{figure}
+\centering
+\input{figures/error-VP-attachment}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{figures/error-PRN-attachment}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{figures/error-missing-PRN}
+\end{figure}
+
+\paragraph{VP Attachment} (Figure~\ref{fig:VP-attachment}) \\
+When the correction involves moving a VP, \myeg \\
+(NP (NP \emph{federal financing}) (PP \emph{of research}) (VP \emph{using fetal tissue})) \\
+where the VP should modify \emph{research}, not \emph{financing}.
+
+\paragraph{Parenthetical Attachment} (Figure~\ref{fig:PRN-attachment})
+When a parenthetical node modifies at the wrong level, \myeg \\
+(NP \emph{other forms} (PP \emph{of} (NP \emph{housing} (PRN \emph{(such as low-income)})))) \\
+where the parenthetical should be higher.
+
+\paragraph{Missing Parenthetical} (Figure~\ref{fig:missing-PRN})
+When a parenthetical is entirely missing, \myeg \\
+(S \emph{Moreover, explains one official, \ldots}) \\
+where there shoudl be a PRN around \emph{, explains one official,}.
 
 \paragraph{Other}
 There is a long tail of other errors.
 Some could be placed within the categories above, but would require far more specific rules.
 
-For many of these error types it would be difficult to extract a meaningful understanding from only the list of node errors involved.
+Working from only a raw list of node errors in a parse, it would be difficult to determine errors like those described above.
 Even for error types that can be measured by counting node errors or rule production errors, our approach has the advantage that we identify groups of errors with a single cause.
-For example, a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
+For example, what appears as a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
+By grouping node errors and classifying each group as a single mistake, we are able to more precisely characterize the mistakes a parser makes.
 
 \section{Results}
 
-We used sections 00 and 24 as development data while constructing the tree transformation and error group classification methods.
+We used sections 00 and 24 of the WSJ section of the \ptb as development data while constructing the tree transformation and error group classification methods.
 All of our examples in text come from these sections as well, but for all tables of results we ran our system on section 23.
 We chose to run our analysis on section 23 as it is the only section we are sure was not used in the development of any of the parsers, either for tuning or feature development.
 Our evaluation is entirely focused on the errors of the parsers, so unless there is a particular construction that is unusually prevalent in section 23, we are not revealing any information about the test set that could bias future work.
@@ -570,7 +388,7 @@ not show which constructions are the source of those variations.
 		PP Attachment & 846 & 1455 & 1.7 \\
 		Single Word Phrase & 490 & 490 & 1.0 \\
 		Clause Attachment & 385 & 913 & 2.4 \\
-		Modifier Attachment & 383 & 599 & 1.6 \\
+		Adverb and Adjective Modifier Attachment & 383 & 599 & 1.6 \\
 		Different Label & 377 & 754 & 2.0 \\
 		Unary & 347 & 349 & 1.0 \\
 		NP Attachment & 321 & 597 & 1.9 \\
@@ -595,6 +413,12 @@ not show which constructions are the source of those variations.
 Our system enables us to answer questions about parser behaviour that could previously only be probed indirectly.
 We demonstrate its usefulness by applying it to a range of parsers (here), to reranked K-best lists of various lengths, and to output for out-of-domain parsing (following sections).
 
+First, in Table~\ref{tab:charniak-breakdown}, we focus on a detailed error breakdown for the best system we consider, the Charniak parser with a self-trained model and with reranking of the top fifty candidate parses produced by the parser \parencite{Charniak:2000,Charniak-Johnson:2005,McClosky-Charniak-Johnson:2006}.
+For each of our error types, the table shows how many times it occurred in the 2,416 sentences in \wsj section 23 of the \ptb (Occurrences), the total number of nodes involved in the groups that were classified as each error type (Nodes Involved), and the ratio between the two (Nodes / Occurrences).
+
+The ratios show that some errors typically cause only a single node error, where as others, such as coordination, generally cause several.
+This means that considering counts of error groups would over-emphasise some error types, \myeg single word phrase errors are second most important by number of groups, but seventh by total number of node errors (not counting `Unclassified', which corresponds to many different errors).
+
 \begin{landscape}
 % TODO: Make spacing consistent in columns of these figures
 \input{figures/wsj23_comparison.tex}
@@ -607,15 +431,16 @@ We demonstrate its usefulness by applying it to a range of parsers (here), to re
 In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on \wsj section 23.
 The shaded area of each bar indicates the frequency of parse errors (\myie empty means fewest errors).
 The area filled in is determined by the average number of node errors per sentence that are attributed to that type of error.
-The average number of node errors per sentence for a completely full bar is indicated by the Worst row, and the value for a completely empty bar is indicated by the Best row.
-
+The average number of node errors per sentence for a completely full bar is indicated by the bottom row (Worst), and the value for a completely empty bar is indicated by the top row (Best).
 We use counts of node errors to make the contributions of each error type to F-score more interpretable.
-As Table~\ref{tab:charniak-breakdown} shows, some errors typically cause only a single node error, where as others, such as coordination, generally cause several.
-This means that considering counts of error groups would over-emphasise some error types, \myeg single word phrase errors are second most important by number of groups (in Table~\ref{tab:charniak-breakdown}), but seventh by total number of node errors (in Table~\ref{tab:wsj23-comp}).
 
 As expected, PP attachment is the largest contributor to errors, across all parsers.
-Interestingly, coordination is sixth on the list, though that is partly due to the fact that there are fewer coordination decisions to be made in the treebank.\footnote{This is indicated by the frequency of CCs and PPs in sections 02--21 of the treebank, 16,844 and 95,581 respectively.
-These counts are only an indicator of the number of decisions as the nodes can be used in ways that do not involve a decision, such as sentences that start with a conjunction.}
+Interestingly, coordination is sixth on the list, though that is partly due to the fact that there are fewer coordination decisions to be made in the treebank\footnote{
+This is indicated by the frequency of CCs and PPs in sections 02--21 of the treebank, 16,844 and 95,581 respectively.
+These counts are only an indicator of the number of decisions as the nodes can be used in ways that do not involve a decision, such as sentences that start with a conjunction.
+}.
+One surprisingly common error involves unary productions.
+Looking at the breakdown by unary type we found that clause labeling (S, SINV, etc) accounted for a large proportion of the errors.
 
 By looking at the performance of the Collins parser we can see the development
 over the past fifteen years.  There has been improvement across
@@ -633,10 +458,6 @@ main sources of the 0.64 gain in F-score are PP attachment and coordination.
 Another interesting pair is the Berkeley parser and the BUBS parser, which uses
 a Berkeley grammar, but improves speed by pruning.  The pruning methods used in
 BUBS are particularly damaging for PP attachment errors and unary errors.
-%%%Performing experiments varying the parameters of their pruning method is beyond
-%%%the scope of this paper, but if these experiments were run our system could be
-%%%applied directly to the output to determine which parameters are causing this
-%%%behaviour.
 
 Various comparisons can be made between Charniak parser variants.  We discuss
 the reranker below.  For the self-trained model
@@ -891,7 +712,7 @@ errors.
               Coordination & 2781 & 10.49\% \\
    Verb taking wrong args* & 2310 &  8.71\% \\
                      Unary & 2262 &  8.53\% \\
-       Modifier Attachment & 1900 &  7.17\% \\
+Adverb and Adjective Modifier Attachment & 1900 &  7.17\% \\
              One Word Span & 1560 &  5.88\% \\
            Different label & 1418 &  5.35\% \\
             Unary A-over-A & 1208 &  4.56\% \\
@@ -928,7 +749,7 @@ Bracket counts are more informative than a direct count of each error type, beca
   }
 \end{figure}
 
-\paragraph{NP-internal} (Figure~\ref{fig:np_internal})
+\paragraph{NP-internal} (Figure~\ref{fig:np_internal}) \\
 The \pctb annotates more NP-internal structure than the \ptb.
 We assign this error type when a transformation involves words whose parts of speech in the gold parse are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
 
@@ -943,7 +764,7 @@ These errors arise when a parser proposes a parse in which POS tags (for instanc
   }
 \end{figure}
 
-\paragraph{Verb taking wrong args} (Figure~\ref{fig:wrong_arg})
+\paragraph{Verb taking wrong args} (Figure~\ref{fig:wrong_arg}) \\
 This error type
 arises when a verb \mbox{(\myeg~\glos{扭转}{reverse})} is hypothesized to take
 an incorrect argument (\mbox{\glos{布什}{Bush}} instead of
@@ -961,15 +782,14 @@ However, for parsers that do not return traces they are a benign error.
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-treemodatt} }
-  \caption[Error analysis example: modifier attachment (Chinese).]{ \label{fig:mod_att}
+  \caption[Error analysis example: adverb and adjective modifier attachment (Chinese).]{ \label{fig:mod_att}
     Modifier attachment ambiguity, gold structure (left) and parser hypothesis (right).
   }
 \end{figure}
 
-\paragraph{Modifier attachment} (Figure~\ref{fig:mod_att})  Incorrect modifier
-scope caused by modifier phrase attachment level. This is less frequent in
-Chinese than in English: while English VP modifiers occur in pre- and
-post-verbal positions, Chinese only allows pre-verbal modification.
+\paragraph{Adverb and Adjective Modifier attachment} (Figure~\ref{fig:mod_att}) \\
+Incorrect modifier scope caused by modifier phrase attachment level.
+This is less frequent in Chinese than in English: while English VP modifiers occur in pre- and post-verbal positions, Chinese only allows pre-verbal modification.
 
 \begin{figure}
 \centering
@@ -979,12 +799,9 @@ post-verbal positions, Chinese only allows pre-verbal modification.
   }
 \end{figure}
 
-\paragraph{Wrong sense/bad attach} (Figure~\ref{fig:sense})
-This applies
-when the head word of a phrase receives the wrong POS, leading to an attachment
-error.  This error type is common in Chinese because of POS fluidity, \myeg the
-well-known Chinese verb/noun ambiguity often causes mis-attachments that are
-classified as this error type.
+\paragraph{Wrong sense/bad attach} (Figure~\ref{fig:sense}) \\
+This applies when the head word of a phrase receives the wrong POS, leading to an attachment error.
+This error type is common in Chinese because of POS fluidity, \myeg the well-known Chinese verb/noun ambiguity often causes mis-attachments that are classified as this error type.
 
 In Figure~\ref{fig:sense}, the word \mbox{\glos{投资}{invest}} has both noun and
 verb senses. While the gold standard interpretation is the relative clause
@@ -1005,8 +822,7 @@ verb compounds are split, with the two halves of the compound placed in
 different phrases.
 
 \paragraph{Scope error}
-These are cases in which a new span must be added to
-more closely bind a modifier phrase (ADVP, ADJP, and PP).
+These are cases in which a new span must be added to more closely bind a modifier phrase (ADVP, ADJP, and PP).
 
 \paragraph{PP attachment} 
 This error type is rare in Chinese, as adjunct PPs are pre-verbal.  It does
@@ -1078,6 +894,7 @@ both languages, (ii) PP attachment is a much greater problem in English, and
 syntax in Chinese compared to English.
 
 \subsection{Cross-Parser Analysis} \label{sec:cross_parser_analysis}
+
 The previous section described the error types and their distribution for a single Chinese parser.
 Here we confirm that these are general trends, by showing that the same pattern
 is observed for several different parsers on the \pctb 6 dev set.\footnote{

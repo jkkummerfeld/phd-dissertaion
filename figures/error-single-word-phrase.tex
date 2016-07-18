@@ -1,0 +1,29 @@
+\scalebox{\derivscale}{
+\synttree
+[NP
+	[DT [a]]
+	[\missingnode{ADJP}
+	  [JJ [US-based]]]
+	[NN [company]]]
+}
+
+\vspace{3mm}
+(a) Missing node in parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[PP
+	[\extranode{ADVP}
+	  [RB [Shortly]]]
+	[IN [after]]
+	[NP [.t 10 am]]]
+}
+
+\vspace{3mm}
+(b) Extra node in parser output
+\derivspace
+\caption[Error analysis example: Single word phrase.]{ \label{fig:single-word-phrase}
+	\textbf{Single Word Phrase}: Two examples, one in which the parser missed a node spanning a single word, and one in which it had an extra node.
+}

@@ -1,0 +1,32 @@
+\scalebox{\derivscale}{
+\synttree
+[PP
+	[IN [Within]]
+	[NP
+    [IN [about]]
+    [CD [siz]]
+    [NNS [months]]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[PP
+	[IN [Within]]
+	[NP
+    [\missingnode{QP}
+      [IN [about]]
+      [CD [siz]]]
+    [NNS [months]]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: NP internal structure.]{ \label{fig:NP-internal-structure} 
+	\textbf{NP Internal Structure}: \emph{about six} should form a QP.
+}

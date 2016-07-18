@@ -1,0 +1,33 @@
+\scalebox{\derivscale}{
+\synttree
+[NP
+  [NP [.t federal financing]]
+  [\extranode{PP}
+    [IN [of]]
+    [NP
+      [NN [research]]]]
+  [VP [.t using fetal tissue]]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[NP
+  [NP [.t federal financing]]
+  [\missingnode{PP}
+    [IN [of]]
+    [\missingnode{NP}
+      [NP [NN [research]]]
+      [VP [.t using fetal tissue]]]]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: VP attachment.]{ \label{fig:VP-attachment}
+	\textbf{VP Attachment}: \emph{using fetal tissue} should modify \emph{research}, not \emph{financing}.
+}

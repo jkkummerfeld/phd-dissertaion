@@ -1,0 +1,35 @@
+\scalebox{\derivscale}{
+\synttree
+[S
+  [ADVP [RB [Moreover]]]
+  [,]
+  [VP [VBZ [explains]]]
+  [NP [.t one official]]
+  [,]
+  [\ldots]]
+}
+
+\vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
+
+\scalebox{\derivscale}{
+\synttree
+[S
+  [ADVP [RB [Moreover]]]
+  [\missingnode{PRN}
+    [\missingnode{SINV}
+      [,]
+      [VP [VBZ [explains]]]
+      [NP [.t one official]]
+      [,]]]
+  [\ldots]]
+}
+
+\vspace{3mm}
+(b) Gold parse
+\derivspace
+\caption[Error analysis example: Missing parenthetical.]{ \label{fig:missing-PRN}
+	\textbf{Missing Parenthetical}: \emph{, explains one official,} should be a parenthetical.
+}
