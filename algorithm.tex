@@ -48,32 +48,32 @@ All of these approaches have the disadvantage that each additional trace dramati
 
 \section{Algorithm Sketch}
 
-%%%\tikzset{% 
-%%%  not allowed/.style={%
-%%%    dotted,
-%%%    very thick,
-%%%    color=red
-%%%  }
-%%%}
-%%%\tikzset{% 
-%%%  required/.style={%
-%%%  }
-%%%}
-%%%\tikzset{% 
-%%%  optional/.style={%
-%%%    dashed
-%%%  }
-%%%}
-%%%\tikzset{% 
-%%%  pointO/.style={%
-%%%    fill=black,regular polygon, regular polygon sides=4,inner sep=1pt
-%%%  }
-%%%}
-%%%\newlength\vertSmall
-%%%\newlength\vertBig
-%%%\newlength\vertBigger
-%%%\newlength\labelGap
-%%%\newlength\coordGap
+\tikzset{% 
+  not allowed/.style={%
+    dotted,
+    very thick,
+    color=red
+  }
+}
+\tikzset{% 
+  required/.style={%
+  }
+}
+\tikzset{% 
+  optional/.style={%
+    dashed
+  }
+}
+\tikzset{% 
+  pointO/.style={%
+    fill=black,regular polygon, regular polygon sides=4,inner sep=1pt
+  }
+}
+\newlength\vertSmall
+\newlength\vertBig
+\newlength\vertBigger
+\newlength\labelGap
+\newlength\coordGap
 
 % TODO - Add the intuition that when edges are added to/from the external point
 % to the span, those edges are all going to be crossed at some point in the
@@ -108,7 +108,6 @@ Rather than the conventional constituency parsing approach where items fully cov
 We use six item types, differing in the type of edge crossing they contain.  \\
 
 \begin{center}
-%%%%\begin{tabular}{l@{\hskip 3pt}l}
 \begin{tabular}{ll}
   \begin{tikzpicture}
     \node (p) at (0.5, 0) {$p$};
@@ -948,9 +947,9 @@ Each consists of a span, $[pq]$ and an optional point outside the span, $o$, eit
 \subsection{Complete Dynamic Program}
 
 \begin{algorithm}
-%%%%\vspace{-5mm}
+\vspace{-2mm}
 \input{rules-all}
-%%%%\vspace{-12mm}
+\vspace{-10mm}
 \caption{
   \label{fig:complete-dp}
   Complete graph parsing dynamic program.
@@ -1817,7 +1816,7 @@ Next are rules to remove that edge:
   $L[pqo \; \overline{QO} \; P\overline{O} \; \overline{PQ}] \leftarrow \max A[p \; q] \quad L[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$
 }
 
-Now we are considering an $L$ with no direct edges:
+Now we are considering an $L$ with no direct edges (as indicated by the red dotted lines):
 
 \begin{center}
 \begin{tikzpicture}
@@ -2060,7 +2059,7 @@ Both of these can be enforced in the rule creation because we have the complete 
 \subsection{Derivational ambiguity}
 
 One key difference between our algorithm and the original one-endpoint-crossing algorithm presented by \textcite{ec} is that we avoid spurious ambiguity in the ways a parse can be decomposed.
-Most of the cases in which this ambiguity arises are due to symmetry that is not explicitly broken.
+Most of the cases in which this ambiguity arises in \textcite{ec}'s algorithm are due to symmetry that is not explicitly broken.
 For example, the choice of $t$ in the description of Intervals.
 We resolved these issues by breaking such cases of symmetry, and altering the definitions of the items to ensure they cannot represent equivalent structures.
 By avoiding derivational ambiguity we reduce the search space, and enable efficient summing over the space.

@@ -1,6 +1,7 @@
 \section{Implementation}
 
-While the core algorithm is fully described in the previous sections, a range of further ideas are needed to enable efficient parsing and modern training methods.
+While the core algorithm is fully described in the previous sections, and has desireable assymptotic speed properties, a simple implementation would be slow.
+Here we describe the additional design decisions needed to enable efficient parsing and modern training methods.
 Each section below describes one component of the system, its optimisations and the motivation behind them.
 
 \subsection{Model}
@@ -161,7 +162,7 @@ In our system we use the first approach.
 
 \subsection{Inference}
 
-One of the core contributions of this entire chapter is the inference algorithm presented in the previous section.
+The core contributions of this entire chapter is the inference algorithm presented in Section~\ref{sec:full-algorithm}.
 The core idea behind the algorithm is to constrain the space to consider so that it can be explored efficiently, while still covering the structures observed in language.
 Here we describe modifications at various scales that further improve speed by pruning the space further.
 
@@ -307,6 +308,9 @@ Unfortunately, it is difficult to characterize this space, aside from saying it 
   }
 \end{table}
 
+% TODO Experimental results for CC choices
+% TODO: breakdown of changes, one by one?
+
 Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
 Structures that are recoverable using our algorithm are bolded.
 The structures we consider cover almost all sentences, while projective trees, the standard output of parsers, account for less than half of sentences.
@@ -318,10 +322,20 @@ The largest gain comes from changing the head rules, which is unsurprising since
 
 \subsection{Problematic Structures}
 
-To understand what structures are still not covered by our approach we manually inspected twenty examples that contained a cycle and twenty that were not one-endpoint-crossing.
+To understand what structures are still not covered by our approach we manually inspected twenty examples that contained a cycle and twenty examples where the structure did not satsify the one-endpoint-crossing property.
+The reason these are a problem is that our algorithm can only generate graphs that do not contain cycles and that satisfy the \oneEC property.
+Adapting to cycles may be possible by adjusting the algorithm, further separating the enforcement of parent relations and the enforcement of connectivity and crossing properties, but this is beyond the scope of this work.
+Meanwhile, the \oneEC property is a fundamental assumption that we use to construct the algorithm, in the same way that the tree property is an assumption enabling \textcite{eisner:1996}'s algorithm.
+
 For the cycles, eleven of the cases related to sentences containing variations of NP \emph{said} interposed between two parts of a single quote.
-A cycle was present because the top node of the parse was co-indexed with a null argument of \emph{said} while \emph{said} was an argument of the head word of the quote.
-The remaining cases were split between use of Expletive (5) and Interpret Constituent Here (4) traces.
+A cycle was present because the top node of the parse was co-indexed with a null argument of \emph{said} while \emph{said} was an argument of the head word of the quote, together these edges create a cycle.
+The remaining cases were all instances of pseudo-attachment, which the treebank uses to show that non-adjacent constituents are related \parencite{ptb-guide}.
+These cases were split between use of Expletive (5) and Interpret Constituent Here (4) traces\footnote{
+For Expletive: ``When a clausal subject is postposed, expletive it appears in the structural subject position.
+Characteristic of it-extraposition is that the final clause can replace it.'' -- Section 17 of the PTB annotation guidelines \parencite{ptb-guide}. \\
+For Interpret Constituent Here: ``Used to indicate a relationship of constituency between elements separated by intervening material.
+For instance, *ICH*-attach is used in `heavy shift' constructions when the movement results in a configuration in which it is impossible to attach the constituent to the phrase it belongs with.'' -- Section 5.4 of the PTB annotation guidelines \parencite{ptb-guide}.
+}.
 
 %%% 3 EXP
 %%% 5 ICH
@@ -329,9 +343,9 @@ The remaining cases were split between use of Expletive (5) and Interpret Consti
 %%% 1 Gapping
 %%% 1 list
 %%% 8 other
-For the cases where the structure was not one-endpoint-crossing it was more difficult to determine trends.
-The same three cases, ICH, EXP, and NP \emph{said} accounted for half of the issues.
-Of the rest, most involved a set of arcs like the crossing arcs in Figure~\ref{fig:not-1ec}, but there was no clear way to avoid the crossings by adjusting head rules.
+For the cases where the parse structure does not satisfy the one-endpoint-crossing property, it was more difficult to determine trends.
+The same three cases, Expletive, Interpret Constituent Here, and NP \emph{said} accounted for half of the issues.
+Of the rest, most involved a set of arcs like the crossing arcs with no clear way to avoid the crossings by adjusting head rules.
 
 \subsection{Parsing Performance}
 
