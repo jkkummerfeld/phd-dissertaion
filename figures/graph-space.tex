@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+\begin{scope}
+  \clip (7,5) circle (1cm);
+  \fill[pattern=north west lines, pattern color=red] (9.5,5) circle (2cm);
+\end{scope}
+\begin{scope}
+  \clip (9,5) circle (3.5cm);
+  \fill[pattern=north east lines, pattern color=blue] (4.7,5) circle (4cm);
+\end{scope}
+  \draw (7,5) circle (1cm) node [above=0.2cm] {Tree\strut};
+  \draw (9.5,5) circle (2cm) node [above=1.2cm] {Projective\strut};
+  \draw (9,5) circle (3.5cm) node [above=2.7cm] {One-EC\strut};
+  \draw (4.7,5) circle (4cm) node [above=3.2cm] {DAG\strut};
+  \draw (0,0) -- (13.5,0) -- (13.5,10) -- node[midway,below] {Graphs} (0,10) -- cycle;
+\end{tikzpicture}

@@ -81,7 +81,7 @@ pdfauthor={Jonathan K. Kummerfeld},
 pdfsubject={Natural Language Processing},
 pdfpagelayout=OneColumn}
 
-\usetikzlibrary{arrows.meta,backgrounds,positioning,fit,calc,intersections,shapes}
+\usetikzlibrary{arrows.meta,backgrounds,positioning,fit,calc,intersections,shapes,patterns}
 
 \tikzset{% 
   not allowed/.style={%
@@ -194,7 +194,6 @@ pdfpagelayout=OneColumn}
   \vspace{3mm}
 }
 
-% TODO - switch away from syntax tree entirely
 % Syntax-tree settings
 \branchheight{0.33in}
 \trianglebalance{50}
@@ -248,47 +247,47 @@ pdfpagelayout=OneColumn}
 \field{Computer Science}
 \campus{Berkeley}
 
-\maketitle
-%%%\approvalpage % Only needed for physical hand in
-\copyrightpage
-\include{abstract}
+%%%\maketitle
+%%%%\approvalpage % Only needed for physical hand in
+%%%\copyrightpage
+%%%\include{abstract}
 
-\begin{frontmatter}
+%%%\begin{frontmatter}
 
-%%%\begin{dedication}
-%%%\null\vfil
-%%%\begin{center}
-%%%Dedicate?
-%%%\end{center}
-%%%\vfil\null
-%%%\end{dedication}
+%%%%\begin{dedication}
+%%%%\null\vfil
+%%%%\begin{center}
+%%%%Dedicate?
+%%%%\end{center}
+%%%%\vfil\null
+%%%%\end{dedication}
 
-\tableofcontents
-\clearpage
-\listofalgorithms
-\addcontentsline{toc}{chapter}{List of Algorithms}
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
-\include{acknowledgements}
+%%%\tableofcontents
+%%%\clearpage
+%%%\listofalgorithms
+%%%\addcontentsline{toc}{chapter}{List of Algorithms}
+%%%\clearpage
+%%%\listoffigures
+%%%\clearpage
+%%%\listoftables
+%%%\include{acknowledgements}
 
-\end{frontmatter}
+%%%\end{frontmatter}
 
-\pagestyle{headings}
-\pagenumbering{arabic}
+%%%\pagestyle{headings}
+%%%\pagenumbering{arabic}
 
-\input{introduction}
-\input{error-analysis}
-\input{ccg}
+%%%\input{introduction}
+%%%\input{error-analysis}
+%%%\input{ccg}
 \input{algorithm}
-\input{representation}
-\input{implementation}
-\input{conclusion}
-\appendix
-%%%\input{glossary}
-\input{resources}
-%%%\input{advice}
-\printbibliography
+%%%\input{representation}
+%%%\input{implementation}
+%%%\input{conclusion}
+%%%\appendix
+%%%%\input{glossary}
+%%%\input{resources}
+%%%%\input{advice}
+%%%\printbibliography
 
 \end{document}

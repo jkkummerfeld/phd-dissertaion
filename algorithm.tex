@@ -1,7 +1,5 @@
 \chapter{Graph Parsing} \label{chp:parsing}
 
-%TODO: Look at reviews for what else to add
-
 Parses in the Penn Treebank \parencite{ptb} are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
 In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit learning and inference that is almost as efficient as for trees.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
@@ -13,16 +11,41 @@ We also implement a proof-of-concept parser that recovers a range of null elemen
 
 For this work, we use several concepts from discrete mathematics:
 
-\begin{description}
-  \item[Graph] A set of vertices and edges.
-  Here each word is a vertex, plus a root vertex not associated with any word.
-  \item[Tree] A graph in which every pair of vertices are connected by a unique path (ignoring directionality on edges).
-  \item[Cycle] A sequence of edges that begin and end at the same vertex (here we only allow traversal of edges in the direction indicated).
-\end{description}
+\paragraph{Graph}
+A set of vertices and edges.
+Here each word is a vertex, plus a root vertex not associated with any word.
 
+\paragraph{Tree}
+A graph in which every pair of vertices are connected by a unique path (ignoring directionality on edges).
+
+\paragraph{Cycle}
+A sequence of edges that begin and end at the same vertex (here we only allow traversal of edges in the direction indicated).
+
+\paragraph{Projective}
 The linear order of words allows us to define an additional concept: projectivity.
 A projective graph can be drawn in a two dimensional half-plane with the vertices on the edge of the plane and without any edges crossing.
-% TODO: Make Venn diagram of tree, graph, DAG, projective, 1ec
+
+\paragraph{One-Endpoint Crossing}
+\textcite{ec} defined a space of tree structures named one-endpoint crossing (\oneEC).
+To be in the space, every edge in the tree must obey the \oneEC property.
+The property states that for a given edge $e$, all the edges that cross $e$ must share an endpoint (treating the edges as undirected).
+
+We generalize \textcite{ec}'s definition of one-endpoint crossing trees to graphs.
+The \oneEC property remains the same, we just relax the requirement that the edges form a tree.
+To enable efficient parsing we will further restrict the space we consider, not covering a few specific one-endpoint-crossing structures.
+In practice, these structures are rarely observed in the PTB, and when they do occur it is usually due to where punctuation attaches. \\
+
+Figure~\ref{fig:venn} shows the space of graphs divided up based on these properties.
+Note that by only using subsets of the rules in our algorithm, we could restrict the space of structures we generate to the projective tree space, the projective DAG space, or the tree space.
+Additionally, versions of these spaces with undirected edges could be easily handled with the same approach we apply.
+
+\begin{figure}
+\centering
+\scalebox{0.7}{
+\input{figures/graph-space}
+}
+\caption[Venn diagram of graph space by properties]{\label{fig:venn} Venn diagram showing the space of graphs divided into the properties we consider. DAG stands for Directed Acyclic Graph. Our algorithm is able to produce structures in the blue hatched region while the standard parsing approach only produces structures in the blue and red cross-hatched region. Regions are not scaled to reflect the actual number of possible structures of each type.}
+\end{figure}
 
 As discussed in Section~\ref{sec:intro-graph}, a range of algorithms have been developed for efficient parsing of projective trees.
 This efficiency comes from the ability to break the projective tree down into independent pieces.
@@ -85,16 +108,6 @@ For the full derivation see Section~\ref{sec:full-algorithm}.
 The algorithm is a dynamic program defined by (1) a set of items, and (2) deduction rules that define how an item can be composed from other items.
 To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforces additional constraints.
 Eventually we will show how we can support directed, labeled edges, and labeled words, but to simplify the presentation of the algorithm we first focus on deduction rules for undirected, unlabeled edges and ignore word labels.
-
-\paragraph{One-Endpoint Crossing}
-\textcite{ec} defined a space of tree structures named one-endpoint crossing (1ec).
-To be in the space, every edge in the tree must obey the 1ec property.
-The property states that for a given edge $e$, all the edges that cross $e$ must share an endpoint (treating the edges as undirected).
-
-We generalize \textcite{ec}'s definition of one-endpoint crossing trees to graphs.
-The 1ec property remains the same, we just relax the requirement that the edges form a tree.
-To enable efficient parsing we further restrict the space we consider, not covering a few specific one-endpoint-crossing structures.
-In practice, these structures are rarely observed in the PTB, and when they do occur it is usually due to where punctuation attaches.
 
 \paragraph{Notation}
 We use $p$, $q$, etc to refer to word positions.

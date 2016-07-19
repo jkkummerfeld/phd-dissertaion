@@ -19,26 +19,26 @@
 % Split head form
   \node (sntR0) at (0, 1.8) {\strut ROOT};
 
-  \node (snt00) [right=1em of sntR0.east] {\strut NP\textsubscript{SBJ}};
-  \node (sw0) [below=-0.3ex of snt00] {\strut Sam};
+  \node (snt00) [right=1.5em of sntR0.east] {\strut NP\textsubscript{SBJ}};
+  \node (sw0) [below=-0.3ex of snt00] {\strut Sarah};
 %%%  \draw (sw0.north) -- (snt00.south);
 
-  \node (snt10) [right=1em of snt00.east] {\strut S};
+  \node (snt10) [right=1.5em of snt00.east] {\strut S};
   \node (snt11) [right=1ex of snt10.east] {\strut VP};
   \draw (snt10.east) -- (snt11.west);
   \node (sw1a) at ($(snt10.west)!0.5!(snt11.east)$) {\strut};
   \node (sw1) [below=-0.3ex of sw1a] {\strut told};
 %%%  \draw (sw1.north) -- (sw1a.south);
 
-  \node (snt20) [right=1em of snt11.east] {\strut NP};
-  \node (sw2) [below=-0.3ex of snt20] {\strut Alex};
+  \node (snt20) [right=2.5em of snt11.east] {\strut NP};
+  \node (sw2) [below=-0.3ex of snt20] {\strut Rebecca};
 %%%  \draw (sw2.north) -- (snt20.south);
 
-  \node (snt30) [right=1.5em of snt20.east] {\strut -};
+  \node (snt30) [right=2.5em of snt20.east] {\strut -};
   \node (sw3) [below=-0.3ex of snt30] {\strut to};
 %%%  \draw (sw3.north) -- (snt30.south);
 
-  \node (snt50) [right=1em of snt30.east] {\strut S};
+  \node (snt50) [right=1.5em of snt30.east] {\strut S};
   \node (snt51) [right=1ex of snt50.east] {\strut VP};
   \draw (snt50.east) -- (snt51.west);
   \node (snt52) [right=1ex of snt51.east] {\strut VP};
@@ -55,9 +55,9 @@
   \draw [structural,out=60,in=120] (snt30.north) to (snt51.north);
 
 % Standard form
-  \node (w0) [above=8ex of sw0] {\strut Sam};
+  \node (w0) [above=8ex of sw0] {\strut Sarah};
   \node (w1) [right=3ex of w0.east] {\strut told};
-  \node (w2) [right=3ex of w1.east] {\strut Alex};
+  \node (w2) [right=3ex of w1.east] {\strut Rebecca};
   \node (w3) [right=3ex of w2.east] {\strut};
   \node (w4) [right=3ex of w3.east] {\strut to};
   \node (w5) [right=3ex of w4.east] {\strut run};

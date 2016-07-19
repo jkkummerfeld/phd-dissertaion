@@ -1,21 +1,25 @@
 \chapter{Conclusion}
 
-This dissertation has explored new algorithms for manipulating syntactic structure.
-These have extended our understanding and expanded the capacity of our tools.
-First, we looked at improving our understanding of the mistakes parsers make.
+The overall goal of this research has been to push the boundaries of the conventional parsing research methodology that has dominated the field for the two decades.
+The standard set up, using the Penn Treebank as training and evaluation data, tree structures as the basis of algorithms, and PARSEVAL as the evaluation metric, has led to substantial progress.
+However, this dissertation has shown how new algorithms for manipulating syntactic structure can go further.
+Most significantly, we explored parsing with aspects of syntax that are typically ignored for computational reasons.
+Our algorithm is the first to incorporate virtually all aspects of structure in the \ptb into a single inference method that is efficient.
+An alternative approach to handling these aspects of syntax, explored in prior work, has been to use different syntactic representations.
+Unfortunately, changing representation makes interaction between work using different representations more difficult, particularly for comparing system perfromance.
+Our novel method of converting from \ccg into \ptb-style parses explores one way to bridge this gap, and improved significantly over prior work.
+Finally, we worked on going beyond measurements of performance to more nuanced analysis of mistakes.
 Our error analysis method gives a summary of the types of errors in system output, with categories that are easily interpretable.
-We applied the technique to a range of systems, writing styles, and languages, confirming previously anecdotal claims such as the prevalence of prepositional phrase attachment errors.
-Next, we considered the connections between syntactic representations.
-Our method of converting from \ccg into \ptb-style trees improved significantly over prior work.
-Finally, we explored parsing with aspects of syntax that are typically ignored.
-Our algorithm is the first to incorporate virtually all aspects of structure in the \ptb into a single inference method.
+We applied the technique to a range of parsers, writing styles, and languages, confirming previously anecdotal claims such as the prevalence of prepositional phrase attachment errors.
 
-There are a range of possible extensions for each component of this work.
+There are a range of possible extensions for this work.
 Both the error analysis and conversion systems are designed around trees, and could be extended to cover graph structures.
 Doing so would require breaking assumptions built-in to the algorithms, but would be particularly illuminating regarding the challenge of long-distance dependencies.
 As for the graph parsing algorithm, there are a several interesting possibilities.
-In the structure of this dissertation, the parsing algorithm is kept separate from the definition of the syntactic representation we use.
+In the structure of the chapter presenting the algorithm, the parsing algorithm is kept separate from the definition of the syntactic representation we use.
 That choice was intentional, as the algorithm is a general parsing approach that could also be applied to exciting new resources like the Abstract Meaning Representation.
 Having non-local structure available also opens new opportunities for downstream applications.
 Finally, in the implementation of the algorithm we found that the vast majority of the deduction rules are not needed to cover the structures seen in language.
-More tightly characterizing the space of structures remains a fascinating open question.
+This suggests that there may be a property other than one-endpoint crossing, which could more tightly constrain the space of possible structures while capturing all observed structures.
+Characterizing such a space remains a fascinating open question, and our work on one-endpoint crossing graph parsing provides a great starting point.
+
