@@ -8,5 +8,5 @@ all: *.tex *.bib
 	$(tex) dissertation
 
 clean:
-	rm *.aux *.bbl *.bcf *.blg *.lof *.log *.lot *.pdf *.run.xml *.toc *.dvi *.out
+	rm *.aux *.bbl *.bcf *.blg *.lof *.log *.lot *.run.xml *.toc *.out
 

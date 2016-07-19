@@ -475,6 +475,10 @@ gives a close approximation.  The table has the same columns as
 Table~\ref{tab:wsj23-comp}, but the ranges on the bars now reflect the min and
 max for these sets.
 
+\begin{landscape}
+\input{figures/reranking.tex}
+\end{landscape}
+
 While there is improvement on all errors when using the reranker, there is very
 little additional gain beyond the first 5-10 parses.  Even for the oracle
 results, most of the improvement occurs within the first 5-10 parses.  The
@@ -493,42 +497,6 @@ to the differences for other errors, suggesting that the reranker lacks the
 features necessary to make the decision better than the parser.  The other
 interesting outlier is NP internal structure, which continues to make
 improvements for longer lists, unlike the other error types.
-
-\begin{landscape}
-\input{figures/reranking.tex}
-\end{landscape}
-
-\begin{landscape}
-\input{figures/domains_charniak.tex}
-\end{landscape}
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|llrr|}
-	\hline
-		Corpus & Description & Sentences & Av. Length \\
-	\hline
-	\hline
-		\wsj 23 & Newswire & 2416 & 23.5 \\
-		Brown F & Popular & 3164 & 23.4 \\
-		Brown G & Biographies & 3279 & 25.5 \\
-		Brown K & General & 3881 & 17.2 \\
-		Brown L & Mystery & 3714 & 15.7 \\
-		Brown M & Science & 881 & 16.6 \\
-		Brown N & Adventure & 4415 & 16.0 \\
-		Brown P & Romance & 3942 & 17.4 \\
-		Brown R & Humor & 967 & 22.7 \\
-		G-Web Blogs & Blogs & 1016 & 23.6 \\
-		G-Web Email & E-mail & 2450 & 11.9 \\
-	\hline
-\end{tabular}
-\caption[Variation in size and contents of the domains we consider.]{ \label{tab:domain-info}
-	Variation in size and contents of the domains we consider.	The variation in
-	average sentence lengths skews the results for errors per sentences, and so
-	in Table~\ref{tab:charniak-domains} we consider errors per word.
-}
-\end{center}
-\end{table}
 
 \subsection{Out-of-Domain}
 
@@ -562,6 +530,38 @@ more unusual uses of conjunctions, for example here \emph{no mistake} is a phras
 \vspace{3mm}
 \emph{She was a living doll and no mistake -- the ... }
 \vspace{3mm}
+
+\begin{landscape}
+\input{figures/domains_charniak.tex}
+\end{landscape}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|llrr|}
+	\hline
+		Corpus & Description & Sentences & Av. Length \\
+	\hline
+	\hline
+		\wsj 23 & Newswire & 2416 & 23.5 \\
+		Brown F & Popular & 3164 & 23.4 \\
+		Brown G & Biographies & 3279 & 25.5 \\
+		Brown K & General & 3881 & 17.2 \\
+		Brown L & Mystery & 3714 & 15.7 \\
+		Brown M & Science & 881 & 16.6 \\
+		Brown N & Adventure & 4415 & 16.0 \\
+		Brown P & Romance & 3942 & 17.4 \\
+		Brown R & Humor & 967 & 22.7 \\
+		G-Web Blogs & Blogs & 1016 & 23.6 \\
+		G-Web Email & E-mail & 2450 & 11.9 \\
+	\hline
+\end{tabular}
+\caption[Variation in size and contents of the domains we consider.]{ \label{tab:domain-info}
+	Variation in size and contents of the domains we consider.	The variation in
+	average sentence lengths skews the results for errors per sentences, and so
+	in Table~\ref{tab:charniak-domains} we consider errors per word.
+}
+\end{center}
+\end{table}
 
 Comparing the Brown corpora and the Google Web corpora, there are much larger
 divergences.  We see a particularly large decrease in NP internal structure.
@@ -832,6 +832,15 @@ the PP has scope over.  Whether this particular case is PP attachment or
 coordination is debatable; we follow the approach above and
 label it PP attachment.
 
+\subsection{Chinese-English Comparison} \label{subsec:chinese_english_comparison}
+
+It is difficult to directly compare error analysis results for Chinese and
+English parsing because of substantial changes in the classification method,
+and differences in treebank annotations.
+
+As described in the previous section, the set of error categories considered for Chinese is very different to the set of categories for English.  
+Even for some of the categories that were not substantially changed, errors may be classified differently because of cross-over between two categories (\myeg between Verb taking wrong args and NP Attachment).
+
 \begin{landscape}
 \begin{table*}
 \centering
@@ -869,15 +878,6 @@ label it PP attachment.
 }
 \end{table*}
 \end{landscape}
-
-\subsection{Chinese-English Comparison} \label{subsec:chinese_english_comparison}
-
-It is difficult to directly compare error analysis results for Chinese and
-English parsing because of substantial changes in the classification method,
-and differences in treebank annotations.
-
-As described in the previous section, the set of error categories considered for Chinese is very different to the set of categories for English.  
-Even for some of the categories that were not substantially changed, errors may be classified differently because of cross-over between two categories (\myeg between Verb taking wrong args and NP Attachment).
 
 Differences in treebank annotations also present a challenge for cross-language error comparison.
 The most common error type in Chinese, NP-internal structure, is rare in the English results, but the datasets are not comparable because the \ptb has much more limited NP-internal structure annotated than the \pctb.
