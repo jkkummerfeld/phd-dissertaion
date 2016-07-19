@@ -35,6 +35,7 @@
 \usepackage{framed}
 \usepackage{tikz}
 \usepackage{pgf}
+\usepackage{tikz-qtree}
 \usepackage{subcaption}
 \usepackage{mdwlist}
 \usepackage{makeidx}
@@ -146,6 +147,7 @@ pdfpagelayout=OneColumn}
 \newcommand{\myeg}{e.g.\@\xspace}
 \newcommand{\myie}{i.e.\@\xspace}
 \newcommand{\myvs}{vs.\@\xspace}
+\newcommand{\oneEC}{one-EC}
 
 % To get URL breaking in bib working always
 \setcounter{biburllcpenalty}{7000}
@@ -277,12 +279,12 @@ pdfpagelayout=OneColumn}
 \pagenumbering{arabic}
 
 %%%\input{introduction}
-%%%\input{error-analysis}
+\input{error-analysis}
 %%%\input{ccg}
-\input{algorithm}
-\input{representation}
-\input{implementation}
-\input{conclusion}
+%%%\input{algorithm}
+%%%\input{representation}
+%%%\input{implementation}
+%%%\input{conclusion}
 %%%\appendix
 %%%\input{glossary}
 %%%\input{resources}

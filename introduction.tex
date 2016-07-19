@@ -167,7 +167,7 @@ While syntactic formalisms are used in a variety of ways, our focus is on the au
 These programs take a sentence as input, consider possible structures and return the one that is best according to some scoring model\footnote{The sentence is assumed to be grammatical--a parse is always returned.}.
 Individually considering every possible structure for a sentence is infeasible as the number of possible parses is exponential in the length of the sentence.
 One way to avoid this issue is to perform an approximate search that incrementally builds the parse, maintaining only a few options at any given point.
-However, if the part of the optimal structure that is built first scores porrly, then it may drop out of the list of options, and so there is no guarantee of finding the optimal parse.
+However, if the part of the optimal structure that is built first scores poorly, then it may drop out of the list of options, and so there is no guarantee of finding the optimal parse.
 Alternatively, we can maintain optimality at the cost of model flexibility, constraining the model so that the score for a parse is the sum of scores for each of its components.
 This work follows the second approach, which enables dynamic programming methods, where the larger problem (find the optimal parse) is decomposed into independent sub-problems (find the optimal parse for part of the sentence) whose solutions can be used to solve the original problem (take the best solution from one half of the sentence and combine it with the best solution from the other half).
 The specific form of dynamic programming applied to the task of finding optimal parses structures is the CKY algorithm \parencite{Cocke:1969,Kasami:1966,Younger:1967}.

@@ -7,8 +7,8 @@
 \end{center}
 
 Constituency parser performance is primarily interpreted through a single metric, F-score on \wsj section 23, that conveys no linguistic information regarding the remaining errors.
-In this chapter, we descibe a new error analysis method that classifies errors within a set of linguistically meaningful types using tree transformations that repair groups of errors together.
-We use this analysis to answer a range of questions about parser behaviour, including what linguistic constructions are difficult for state-of-the-art parsers, what types of errors are being resolved by rerankers, what types are introduced when parsing out-of-domain text, and how the challenges change for Chinese.
+In this chapter, we describe a new error analysis method that classifies errors within a set of linguistically meaningful types using tree transformations that repair groups of errors together.
+We use this analysis to answer a range of questions about parser behavior, including what linguistic constructions are difficult for state-of-the-art parsers, what types of errors are being resolved by rerankers, what types are introduced when parsing out-of-domain text, and how the challenges change for Chinese.
 
 %%% TODO:
 %%% - Add 'treebank', 'parser' sideways labels to figures
@@ -71,7 +71,7 @@ We use this analysis to answer a range of questions about parser behaviour, incl
 \derivaftercompress
 \end{figure}
 
-\section{Error Classification}
+\section{Error Classification} \label{sec:errors-intro}
 
 The standard metric for parsing is:
 
@@ -81,7 +81,7 @@ The standard metric for parsing is:
 \end{align*}
 
 This is a robust metric that gives a sense of overall parser performance, but a single number cannot provide linguistically meaningful intuition for the source of remaining errors.
-Since the metric is defined in terms of nodes, one natural direction for analysis is to break down the errrors by node type.
+Since the metric is defined in terms of nodes, one natural direction for analysis is to break down the errors by node type.
 Unfortunately, that approach is not particularly informative, as a single attachment error can cause multiple node errors, without a clear link between the two once aggregated.
 For example, in Figure~\ref{fig:PP-attachment} there is a PP attachment error that causes seven bracket errors (extra S, NP, PP, and NP, missing S, NP, and PP).
 Determining that these correspond to a PP attachment error from just the labels of the missing and extra nodes is difficult.
@@ -148,7 +148,7 @@ With this definition of states and transformations, a range of standard search a
 We considered search algorithms with guarantees for finding the shortest path, but found they were prohibitively slow.
 Instead, we find a path by applying a greedy bottom--up approach, iterating through the errors in the parse, deepest first.
 Fortunately, on the shorter sentences for which finding the optimal path was feasible, we found that the greedy approach had no substantial impact on results.
-This is the case becasue in many sentences a single correction will fix the parse and in cases with multiple errors they are often in disjoint sections of the parse.
+This is the case because in many sentences a single correction will fix the parse and in cases with multiple errors they are often in disjoint sections of the parse.
 
 \subsection{Transformation Classification} \label{sec:classify}
 
@@ -199,6 +199,16 @@ where the SBAR should be modifying \emph{intends}, rather than the lower VP.
 \end{figure}
 \end{landscape}
 
+\begin{figure}
+\centering
+\input{figures/error-VP-attachment}
+\end{figure}
+
+\paragraph{VP Attachment} (Figure~\ref{fig:VP-attachment}) \\
+When the correction involves moving a VP, \myeg \\
+(NP (NP \emph{federal financing}) (PP \emph{of research}) (VP \emph{using fetal tissue})) \\
+where the VP should modify \emph{research}, not \emph{financing}.
+
 \paragraph{Adverb and Adjective Modifier Attachment} (Figure~\ref{fig:modifier-attachment}) \\
 Cases involving incorrectly placed adjectives and adverbs, including errors corrected by subtree movement and errors requiring only creation of a node, \myeg \\
 (NP (ADVP \emph{even more}) \emph{severe setbacks}) \\
@@ -208,7 +218,7 @@ where there should be an extra ADVP node over \emph{even more severe}.
 Mistakes involving unary productions that are not linked to a nearby error such as a matching extra or missing node, \myeg \\
 (SINV (VP \emph{following}) \emph{is a breakdown of major market activity}) \\
 where the VP should have an S above it.
-In this particular example we can see how not modelling traces may be hurting performance--the S is intended to span both the VP and a null NP that is co-indexed with \emph{a breakdown of major market activity}.
+In this particular example we can see how not modeling traces may be hurting performance--the S is intended to span both the VP and a null NP that is co-indexed with \emph{a breakdown of major market activity}.
 
 \begin{landscape}
 \begin{figure}
@@ -223,29 +233,17 @@ In this particular example we can see how not modelling traces may be hurting pe
 \end{figure}
 \end{landscape}
 
-\begin{landscape}
 \begin{figure}
-\centering
-\begin{minipage}[b]{2.5in}
-\centering
-\input{figures/error-NP-internal-structure}
-\end{minipage}\hfill
+\hfill
 \begin{minipage}[b]{2.5in}
 \centering
 \input{figures/error-different-label}
 \end{minipage}\hfill
-\begin{minipage}[b]{2.5in}
+\begin{minipage}[b]{3.5in}
 \centering
 \input{figures/error-single-word-phrase}
-\end{minipage}
+\end{minipage}\hfill
 \end{figure}
-\end{landscape}
-
-\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) \\
-While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
-We form a single group for each NP that has one or more errors involving these types of nodes, \myeg \\
-(PP \emph{Within} (NP \emph{about six months})) \\
-should have a QP over \emph{about six}.
 
 \paragraph{Different label} (Figure~\ref{fig:different-label}) \\
 In many cases a node is present in the parse that spans the correct set of words, but has the wrong label, in which case we group the two node errors, (one extra, one missing), as a single error, \myeg \\
@@ -258,26 +256,6 @@ Node errors that span a single word, \myeg \\
 where the ADVP should not be present.
 We include checks to ensure this is not linked to another error, such as one part of a set of internal noun phrase errors.
 
-\begin{figure}
-\centering
-\input{figures/error-VP-attachment}
-\end{figure}
-
-\begin{figure}
-\centering
-\input{figures/error-PRN-attachment}
-\end{figure}
-
-\begin{figure}
-\centering
-\input{figures/error-missing-PRN}
-\end{figure}
-
-\paragraph{VP Attachment} (Figure~\ref{fig:VP-attachment}) \\
-When the correction involves moving a VP, \myeg \\
-(NP (NP \emph{federal financing}) (PP \emph{of research}) (VP \emph{using fetal tissue})) \\
-where the VP should modify \emph{research}, not \emph{financing}.
-
 \paragraph{Parenthetical Attachment} (Figure~\ref{fig:PRN-attachment})
 When a parenthetical node modifies at the wrong level, \myeg \\
 (NP \emph{other forms} (PP \emph{of} (NP \emph{housing} (PRN \emph{(such as low-income)})))) \\
@@ -286,7 +264,31 @@ where the parenthetical should be higher.
 \paragraph{Missing Parenthetical} (Figure~\ref{fig:missing-PRN})
 When a parenthetical is entirely missing, \myeg \\
 (S \emph{Moreover, explains one official, \ldots}) \\
-where there shoudl be a PRN around \emph{, explains one official,}.
+where there should be a PRN around \emph{, explains one official,}.
+
+\begin{landscape}
+\begin{figure}
+\begin{minipage}[b]{4in}
+\centering
+\input{figures/error-PRN-attachment}
+\end{minipage}\hfill
+\begin{minipage}[b]{4in}
+\centering
+\input{figures/error-missing-PRN}
+\end{minipage}
+\end{figure}
+\end{landscape}
+
+\begin{figure}
+\centering
+\input{figures/error-NP-internal-structure}
+\end{figure}
+
+\paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) \\
+While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
+We form a single group for each NP that has one or more errors involving these types of nodes, \myeg \\
+(PP \emph{Within} (NP \emph{about six months})) \\
+should have a QP over \emph{about six}.
 
 \paragraph{Other}
 There is a long tail of other errors.
@@ -297,7 +299,7 @@ Even for error types that can be measured by counting node errors or rule produc
 For example, what appears as a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
 By grouping node errors and classifying each group as a single mistake, we are able to more precisely characterize the mistakes a parser makes.
 
-\section{Results}
+\section{Results} \label{sec:errors-results}
 
 We used sections 00 and 24 of the WSJ section of the \ptb as development data while constructing the tree transformation and error group classification methods.
 All of our examples in text come from these sections as well, but for all tables of results we ran our system on section 23.
@@ -306,37 +308,6 @@ Our evaluation is entirely focused on the errors of the parsers, so unless there
 
 Our evaluation is over a wide range of \ptb constituency parsers and their variants from the past twenty years.
 For all parsers we used the publicly available version, with the standard parameter settings.
-
-% TODO: Expand descriptions of parsers evaluated
-\begin{description}
-	\item[ Berkeley] \parencite{Petrov-etal:2006,Petrov-Klein:2007}. An
-	unlexicalised parser with a grammar constructed with automatic state
-	splitting.
-
-	\item[ Bikel] (\citeyear{Bikel:2004}) implementation of \textcite{Collins:1997}.
-
-	\item[ BUBS]
-	\parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}. A
-	`grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar,
-	but parses with various pruning techniques to improve speed, at the cost of
-	accuracy.
-
-	\item[ Charniak] (\citeyear{Charniak:2000}). A generative parser with a
-	maximum entropy-inspired model.  We also use the reranker
-	\parencite{Charniak-Johnson:2005}, and the self-trained model
-	\parencite{McClosky-Charniak-Johnson:2006}.
-
-	\item[ Collins] (\citeyear{Collins:1997}). A generative lexicalised parser, with
-	three models, a base model, a model that uses subcategorisation
-	frames for head words, and a model that takes into account traces.
-
-	\item[ SSN] \parencite{Henderson:2003,Henderson:2004}. A statistical left-corner
-	parser, with probabilities estimated by a neural network.
-
-	\item[ Stanford] \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}. We
-	consider both the unlexicalised PCFG parser (-U) and the lexicalized factored parser
-	(-L), which combines the PCFG parser with a lexicalised dependency parser.
-\end{description}
 
 \begin{table}
 \begin{center}
@@ -347,7 +318,7 @@ For all parsers we used the publicly available version, with the standard parame
 	\hline
 		\multicolumn{6}{|c|}{Enhanced Training / Systems} \\
 		Charniak S \& R (SR)       & 92.44 & 91.70 & 92.07 & 44.87 & 1.8 \\
-		Charniak Reranking (R)     & 91.78 & 91.04 & 91.41 & 44.04 & 1.8 \\
+		Charniak Re ranking (R)     & 91.78 & 91.04 & 91.41 & 44.04 & 1.8 \\
 		Charniak Self-trained (S)  & 91.16 & 90.89 & 91.02 & 40.77 & 1.8 \\
 	\hline
 		\multicolumn{6}{|c|}{Standard Parsers} \\
@@ -370,6 +341,28 @@ For all parsers we used the publicly available version, with the standard parame
 }
 \end{center}
 \end{table}
+
+% TODO: Expand descriptions of parsers evaluated
+\paragraph{Berkeley} \parencite{Petrov-etal:2006,Petrov-Klein:2007}.
+An unlexicalised parser with a grammar constructed with automatic state splitting.
+
+\paragraph{\textcite{Bikel:2004}} implementation of \textcite{Collins:1997}.
+
+\paragraph{BUBS} \parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}.
+A `grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar, but parses with various pruning techniques to improve speed, at the cost of accuracy.
+
+\paragraph{\textcite{Charniak:2000}}.
+A generative parser with a maximum entropy-inspired model.
+We also use the reranker \parencite{Charniak-Johnson:2005}, and the self-trained model \parencite{McClosky-Charniak-Johnson:2006}.
+
+\paragraph{\textcite{Collins:1997}}.
+A generative lexicalized parser, with three models, a base model, a model that uses subcategorisation frames for head words, and a model that takes into account traces.
+
+\paragraph{SSN} \parencite{Henderson:2003,Henderson:2004}.
+A statistical left-corner parser, with probabilities estimated by a neural network.
+
+\paragraph{Stanford} \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
+We consider both the unlexicalised PCFG parser (-U) and the lexicalized factored parser (-L), which combines the PCFG parser with a lexicalized dependency parser.
 
 Table~\ref{tab:standard-results} shows the standard performance metrics,
 measured on section 23 of the \wsj, using all sentences.  Speeds were measured
@@ -410,23 +403,14 @@ not show which constructions are the source of those variations.
 \end{center}
 \end{table}
 
-Our system enables us to answer questions about parser behaviour that could previously only be probed indirectly.
+Our system enables us to answer questions about parser behavior that could previously only be probed indirectly.
 We demonstrate its usefulness by applying it to a range of parsers (here), to reranked K-best lists of various lengths, and to output for out-of-domain parsing (following sections).
 
 First, in Table~\ref{tab:charniak-breakdown}, we focus on a detailed error breakdown for the best system we consider, the Charniak parser with a self-trained model and with reranking of the top fifty candidate parses produced by the parser \parencite{Charniak:2000,Charniak-Johnson:2005,McClosky-Charniak-Johnson:2006}.
 For each of our error types, the table shows how many times it occurred in the 2,416 sentences in \wsj section 23 of the \ptb (Occurrences), the total number of nodes involved in the groups that were classified as each error type (Nodes Involved), and the ratio between the two (Nodes / Occurrences).
 
 The ratios show that some errors typically cause only a single node error, where as others, such as coordination, generally cause several.
-This means that considering counts of error groups would over-emphasise some error types, \myeg single word phrase errors are second most important by number of groups, but seventh by total number of node errors (not counting `Unclassified', which corresponds to many different errors).
-
-\begin{landscape}
-% TODO: Make spacing consistent in columns of these figures
-\input{figures/wsj23_comparison.tex}
-
-\input{figures/reranking.tex}
-
-\input{figures/domains_charniak.tex}
-\end{landscape}
+This means that considering counts of error groups would over-emphasize some error types, \myeg single word phrase errors are second most important by number of groups, but seventh by total number of node errors (not counting `Unclassified', which corresponds to many different errors).
 
 In Table~\ref{tab:wsj23-comp} we consider the breakdown of parser errors on \wsj section 23.
 The shaded area of each bar indicates the frequency of parse errors (\myie empty means fewest errors).
@@ -435,24 +419,32 @@ The average number of node errors per sentence for a completely full bar is indi
 We use counts of node errors to make the contributions of each error type to F-score more interpretable.
 
 As expected, PP attachment is the largest contributor to errors, across all parsers.
-Interestingly, coordination is sixth on the list, though that is partly due to the fact that there are fewer coordination decisions to be made in the treebank\footnote{
-This is indicated by the frequency of CCs and PPs in sections 02--21 of the treebank, 16,844 and 95,581 respectively.
-These counts are only an indicator of the number of decisions as the nodes can be used in ways that do not involve a decision, such as sentences that start with a conjunction.
-}.
+Coordination is surprisingly low on the list (6th) given how significant the problem is considered in the community \parencite{N06-1020}.
+This appears to indicate that parsers are better at coordination than at PP attachment, but the raw counts do not take into consideration the relative frequency of the two decisions.
+We can get a sense of how frequent these decisions are by counting CCs and PPs in sections 02--21 of the treebank: 16,844 and 95,581 respectively.
+These counts are only an indicator of the number of decisions as the nodes can be used in ways that do not involve a decision.
+Taking into consideration the 6:1 ratio of decisions, the 4:1 ratio of errors is less surprising, and instead supports the belief that coordination scope ambiguity is very difficult.
+However, it does appear that improvements in coordination accuracy will have a limited impact on our performance metrics.
 One surprisingly common error involves unary productions.
 Looking at the breakdown by unary type we found that clause labeling (S, SINV, etc) accounted for a large proportion of the errors.
 
-By looking at the performance of the Collins parser we can see the development
-over the past fifteen years.  There has been improvement across
-the board, but in some cases, \myeg clause attachment errors and different label
-errors, the change has been more limited (24\% and 29\% reductions respectively).  We
-investigated the breakdown of the different label errors by label, but no
-particular cases of label confusion stand out, and we found that the most
-common cases remained the same between Collins and the top results.
+\begin{landscape}
+% TODO: Make spacing consistent in columns of these figures
+\input{figures/wsj23_comparison.tex}
+\end{landscape}
+
+By comparing the performance of the Collins parser with other systems we can see where performance has and has not changed over the past fifteen years.
+There has been improvement across the board, but in some cases, \myeg clause attachment errors and different label errors, the change has been more limited (24\% and 29\% reductions respectively).
+It is difficult to know why these ambiguities are more difficult, but three possibilities are:
+(1) annotation errors may be more prevalent, making the potential for improvement vary,
+(2) they pose fundamental difficulties for the community's overall approach to parsing,
+(3) there may be biases in our automatic classification scheme.
+We investigated the breakdown of the different label errors by label, but no particular cases of label confusion stand out, and we found that the most common cases remained the same between Collins and the top results.
+Overall, it seems that these error types may have been unintentionally neglected in research and could be a productive area for future investigation.
 
 It is also interesting to compare pairs of parsers that share aspects of their
 architecture.  One such pair is the Stanford parser, where the factored parser
-combines the unlexicalised parser with a lexicalised dependency parser.  The
+combines the unlexicalised parser with a lexicalized dependency parser.  The
 main sources of the 0.64 gain in F-score are PP attachment and coordination.
 
 Another interesting pair is the Berkeley parser and the BUBS parser, which uses
@@ -469,16 +461,11 @@ fits with their observations.
 
 \subsection{Reranking}
 
-The standard dynamic programming approach to parsing limits the range of
-features that can be employed.  One way to deal with this issue is to modify
-the parser to produce the top $K$ parses, rather than just the 1-best, then use
-a model with more sophisticated features to choose the best parse from this
-list \parencite{collins:00}.  While re-ranking has led to gains in performance
-\parencite{Charniak-Johnson:2005}, there has been limited analysis of how
-effectively rerankers are using the set of available options.  Recent work has
-explored this question in more depth, but focusing on how variation in the
-parameters impacts performance on standard metrics
-\parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
+The standard dynamic programming approach to parsing limits the range of features that can be employed.
+One way to deal with this issue is to modify the parser to produce the top $K$ parses, rather than just the 1-best, then use a model with more sophisticated features to choose the best parse from this list \parencite{collins:00}.
+While re-ranking has led to gains in overall performance \parencite{Charniak-Johnson:2005}, there has been limited analysis of how effectively rerankers are using the list of parses they are ranking.
+Recent work has explored this question in more depth, but focusing on how variation in inference and model parameters impacts performance on standard metrics \parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
+We will explore the question from the perspective of observed errors, considering the potential for improvement using only the n-best list of parses, and how many errors a re-ranker actually avoids.
 
 In Table~\ref{tab:reranking} we present a breakdown over error types for the
 Charniak parser, using the self-trained model and reranker.  The oracle results
@@ -494,22 +481,26 @@ results, most of the improvement occurs within the first 5-10 parses.  The
 limited utility of extra parses for the reranker may be due to the importance
 of the base parser output probability feature (which, by definition, decreases
 within the K-best list).
-%%%Another possibility is that there is less useful variation further down the K-best list.
-%%%The utility is higher for the oracle, but
-%%%we do not see greater improvement further down the list because 
-%%%those parses
-%%%will be combinations of a set of variations in the parse that change the
-%%%model probability only slightly, rather than providing useful variation.
+Another possibility is that there is less useful variation further down the K-best list.
+The utility is higher for the oracle, but we do not see greater improvement further down the list because those parses will be combinations of a set of variations in the parse that change the model probability only slightly, rather than providing useful variation.
 
-Interestingly, the oracle performance improves across all error types, even at
-the 2-best level.  This indicates that the base parser model is not
-particularly biased against a single error.  Focusing on the rows for $K=2$ we
+Interestingly, the oracle performance considerably improves across all error types, even at the 2-best level.
+This indicates that the base parser model is not particularly biased against particular error types, as if it were we would expect that fixing it would require going further down the list of parses given as options.
+Focusing on the rows for $K=2$ we
 can also see two interesting outliers.  The PP attachment improvement of the
 oracle is considerably higher than that of the reranker, particularly compared
 to the differences for other errors, suggesting that the reranker lacks the
 features necessary to make the decision better than the parser.  The other
 interesting outlier is NP internal structure, which continues to make
 improvements for longer lists, unlike the other error types.
+
+\begin{landscape}
+\input{figures/reranking.tex}
+\end{landscape}
+
+\begin{landscape}
+\input{figures/domains_charniak.tex}
+\end{landscape}
 
 \begin{table}
 \begin{center}
@@ -526,7 +517,7 @@ improvements for longer lists, unlike the other error types.
 		Brown M & Science & 881 & 16.6 \\
 		Brown N & Adventure & 4415 & 16.0 \\
 		Brown P & Romance & 3942 & 17.4 \\
-		Brown R & Humour & 967 & 22.7 \\
+		Brown R & Humor & 967 & 22.7 \\
 		G-Web Blogs & Blogs & 1016 & 23.6 \\
 		G-Web Email & E-mail & 2450 & 11.9 \\
 	\hline
@@ -549,7 +540,7 @@ designed a Wikipedia test set to evaluate parsers on dependencies representing
 ten specific linguistic phenomena.
 
 To provide a deeper understanding of the errors arising when parsing outside of
-the newswire domain, we analyse performance of the Charniak parser with
+the newswire domain, we analyze performance of the Charniak parser with
 reranker and self-trained model on the eight parts of the Brown corpus
 \parencite{ptb}, and two parts of the Google Web
 corpus \parencite{Petrov:2012}.  Table~\ref{tab:domain-info} shows statistics for
@@ -563,10 +554,10 @@ datasets, while the general trend is towards worse performance on all errors,
 NP internal structure is a notable exception and in some cases PP attachment
 and unaries are as well.
 
-In the other errors we see similar patterns across the corpora, except humour
+In the other errors we see similar patterns across the corpora, except humor
 (Brown R), on which the parser is particularly bad at coordination and clause
 attachment.  This makes sense, as the colloquial nature of the text includes
-more unusual uses of conjunctions, for example:
+more unusual uses of conjunctions, for example here \emph{no mistake} is a phrase that is unlikely to be in the \wsj, and if it were, would probably be preceded by a verb like \emph{make}:
 
 \vspace{3mm}
 \emph{She was a living doll and no mistake -- the ... }
@@ -582,8 +573,8 @@ not appear in the \ptb.  There are also some more difficult cases, for example:
 \emph{... going up for sale in the next month or do .}
 \vspace{3mm}
 
-\noindent where \emph{or do} is a QP.  This typographical error is extremely
-difficult to handle for a parser trained only on well-formed text.
+\noindent where \emph{or do} is a QP.
+This typographical error of \emph{do} instead of \emph{two} is extremely difficult to handle for a parser trained only on well-formed text.
 
 For e-mail there is a substantial drop on single word phrases.  Breaking the
 errors down by label we found that the majority of the new errors are missing
@@ -659,8 +650,8 @@ Aspects of Chinese syntax result in a distinctive mix of parsing challenges.
 However, the contribution of individual sources of error to overall difficulty is not well understood.  
 We conduct a comprehensive automatic analysis of error types made by Chinese parsers, covering a broad range of error types for large sets of sentences, enabling the first empirical ranking of Chinese error types by their performance impact.  
 To accommodate error classes that are absent in English, we augment the system to recognize Chinese-specific parse errors.
-To understand the impact of tagging errors on different error types, we also performed a part-of-speech ablation experiment, in which particular confusions are introduced in isolation.
-By analyzing the distribution of errors in the system output with and without gold part-of-speech tags, we are able to isolate and quantify the error types that can be resolved by improvements in tagging accuracy.
+To understand the impact of part-of-speech tagging errors on different error types, we also performed a part-of-speech ablation experiment, in which particular confusions are introduced in isolation.
+By analyzing the distribution of errors in the system output with and without gold part-of-speech tags, we are able to isolate and quantify the error types that can be resolved by improvements in POS tagging accuracy.
 Our analysis shows that improvements in tagging accuracy can only address a subset of the challenges of Chinese syntax.
 Further improvement in Chinese parsing performance will require research addressing other challenges, in particular, determining coordination scope.
 
@@ -678,7 +669,7 @@ However, as noted in their final section, their manual analysis of parse errors 
 
 \subsection{Adapting Error Analysis to Chinese} \label{sec:adapting_automatic_error_analysis_to_chinese}
 
-Our analysis builds on the system described above, which finds the shortest path from the system output to the gold annotations, then classifies each transformation step into one of several error types.
+Our analysis builds on the system described in Sections~\ref{sec:classify}~and~\ref{sec:tree-transform}, which finds the shortest path from the system output to the gold annotations, then classifies each transformation step into one of several error types.
 When directly applied to Chinese parser output, the system placed over 27\% of the errors in the catch-all `Other' type.
 Many of these errors clearly fall into one of a small set of error types, motivating an adaptation to Chinese syntax.
 
@@ -716,7 +707,7 @@ Adverb and Adjective Modifier Attachment & 1900 &  7.17\% \\
              One Word Span & 1560 &  5.88\% \\
            Different label & 1418 &  5.35\% \\
             Unary A-over-A & 1208 &  4.56\% \\
-   Wrong sense/bad attach* & 1018 &  3.84\% \\
+   Wrong sense/bad attachment* & 1018 &  3.84\% \\
       Noun boundary error* &  685 &  2.58\% \\
              VP Attachment &  626 &  2.36\% \\
          Clause Attachment &  542 &  2.04\% \\
@@ -739,13 +730,22 @@ Table~\ref{tab:errors} presents the errors made by the Berkeley parser.
 Below we describe the error types that are either new in this analysis, have had their definition altered, or have an interesting distribution.
 
 In all of our results we follow the same approach as earlier, presenting the number of bracket errors (missing or extra) attributed to each error type.
-Bracket counts are more informative than a direct count of each error type, because the impact on \parseval F-score varies between errors, \myeg a single attachment error can cause 20 bracket errors, while a unary error causes only one.
+As discussed in Section~\ref{sec:errors-results}, for the purpose of understanding the cause of the remaining performance gap, bracket counts are more informative than a direct count of each error type, because the impact on \parseval F-score varies between errors, \myeg a single attachment error can cause 20 bracket errors, while a unary error causes only one.
 
 \begin{figure}
 \centering
   \scalebox{1.2}{ \includegraphics{figures/chinese-tree2} }
+%%%  \begin{tikzpicture}
+%%%  \tikzset{every tree node/.style={align=center}}
+%%%  \Tree
+%%%  [.NP 
+%%%    [.NN 国家\\national ]
+%%%    [.NN 女足\\soccer ]
+%%%    [.NN 教练\\coach ] ]
+%%%  \end{tikzpicture}
   \caption[Error analysis example: NP internal (Chinese).]{ \label{fig:np_internal} 
     NP-internal structure errors, gold structure (left) and parser hypothesis (right).
+    Note, unlike in Section~\ref{sec:classify}, the trees are displayed sideways here, so that the Chinese is closer to the traditional writing order (top to bottom).
   }
 \end{figure}
 
@@ -753,7 +753,7 @@ Bracket counts are more informative than a direct count of each error type, beca
 The \pctb annotates more NP-internal structure than the \ptb.
 We assign this error type when a transformation involves words whose parts of speech in the gold parse are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
 
-We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-termianl phrasal bracket.
+We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-terminal phrasal bracket.
 These errors arise when a parser proposes a parse in which POS tags (for instance, JJ or NN) occur as siblings of phrasal tags (such as NP), a configuration used by the PCTB bracketing guidelines to indicate complementation as opposed to adjunction \parencite{Xue:2005:NLE}.
 
 \begin{figure}
@@ -799,7 +799,7 @@ This is less frequent in Chinese than in English: while English VP modifiers occ
   }
 \end{figure}
 
-\paragraph{Wrong sense/bad attach} (Figure~\ref{fig:sense}) \\
+\paragraph{Wrong sense/bad attachment} (Figure~\ref{fig:sense}) \\
 This applies when the head word of a phrase receives the wrong POS, leading to an attachment error.
 This error type is common in Chinese because of POS fluidity, \myeg the well-known Chinese verb/noun ambiguity often causes mis-attachments that are classified as this error type.
 
@@ -822,7 +822,8 @@ verb compounds are split, with the two halves of the compound placed in
 different phrases.
 
 \paragraph{Scope error}
-These are cases in which a new span must be added to more closely bind a modifier phrase (ADVP, ADJP, and PP).
+These are cases in which a new span must be added to more closely bind a modifier phrase (ADVP, ADJP, and PP), for example, in 
+(IP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year,}}) (NP \mbox{\glos{中国 银行}{Bank of China}}) \ldots), the ADVP should modify the first NP only, which can be indicated by adding an NP to form (NP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year}})).
 
 \paragraph{PP attachment} 
 This error type is rare in Chinese, as adjunct PPs are pre-verbal.  It does
@@ -875,23 +876,17 @@ It is difficult to directly compare error analysis results for Chinese and
 English parsing because of substantial changes in the classification method,
 and differences in treebank annotations.
 
-As described in the previous section, the set of error categories considered
-for Chinese is very different to the set of categories for English.  Even for
-	some of the categories that were not substantially changed, errors may be
-	classified differently because of cross-over between two
-	categories (\myeg between Verb taking wrong args and NP Attachment).
+As described in the previous section, the set of error categories considered for Chinese is very different to the set of categories for English.  
+Even for some of the categories that were not substantially changed, errors may be classified differently because of cross-over between two categories (\myeg between Verb taking wrong args and NP Attachment).
 
-Differences in treebank annotations also present a challenge for cross-language
-error comparison.  The most common error type in Chinese, NP-internal
-structure, is rare in the English results, but
-the datasets are not comparable because the \ptb has very limited NP-internal
-structure annotated.  Further characterization of the impact of annotation
-differences on errors is beyond the scope of this work.
+Differences in treebank annotations also present a challenge for cross-language error comparison.
+The most common error type in Chinese, NP-internal structure, is rare in the English results, but the datasets are not comparable because the \ptb has much more limited NP-internal structure annotated than the \pctb.
+Further characterization of the impact of annotation differences on errors is beyond the scope of this work.
 
-Three conclusions that can be made are that (i) coordination is a major issue in
+Three conclusions that can be made are that (i) coordination is a more common issue in Chinese, but remains difficult in
 both languages, (ii) PP attachment is a much greater problem in English, and
-(iii) substantial challenges are posed by the higher frequency of trace-generating
-syntax in Chinese compared to English.
+(iii) substantial challenges are posed by the higher frequency of
+syntactic structures generating traces and null-elements in Chinese compared to English.
 
 \subsection{Cross-Parser Analysis} \label{sec:cross_parser_analysis}
 
@@ -992,8 +987,8 @@ logical form.
 The single F-score objective over brackets or dependencies obscures important differences between statistical parsers.
 For instance, one or many mismatched brackets could be caused by a single attachment error.
 
-We created a novel tree-transformation methodology for
-evaluating parsers that categorises errors into linguistically meaningful
+In Sections~\ref{sec:tree-transform}~and~\ref{sec:classify}, we presented a novel tree-transformation methodology for
+evaluating parsers that categorizes errors into linguistically meaningful
 types.  Using this approach, we presented the first detailed examination of the
 errors produced by a wide range of constituency parsers for
 English and Chinese.  We found that PP attachment and clause attachment are the most
