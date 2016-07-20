@@ -1,4 +1,4 @@
-\section{Implementation}
+\section{Implementation} \label{sec:impl}
 
 While the core algorithm is fully described in the previous sections, and has desirable asymptotic speed properties, a simple implementation would be slow.
 Here we describe the additional design decisions needed to enable efficient parsing and modern training methods.
@@ -148,6 +148,8 @@ Rather than parsing immediately with the full model we use several passes with p
 
 Each pass prunes using max-marginals from the preceding pass and scores from the preceding classifier.
 The third pass also prunes spines that are not consistent with at least one unpruned edge from the second pass.
+
+% TODO: mention handling scores in inside pass too
 
 \subsubsection{Outside Pass Calculations}
 

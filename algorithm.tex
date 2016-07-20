@@ -55,7 +55,9 @@ However, non-projectivity is important in syntax for representing many structure
 Inference over the space of all non-projective parses is intractable, but in practice almost all parses are covered by well-defined subsets of this space.
 For dependency parsing, recent work has defined algorithms for inference within various subspaces \parencite{Gomez-Rodriguez:2010,ec}.
 We build upon these algorithms and adapt them to constituency parsing.
-For constituency parsing, a range of formalisms have been developed that are mildly-context sensitive, such as CCG \parencite{Steedman:2000}, LFG \parencite{Bresnan:1982}, and LTAG \parencite{Joshi:1997}.
+For constituency parsing, a range of alternative formalisms have been developed, starting with Generalized Phrase Structure Grammar \parencite{gpsg}, which used features and slash categories to encode traces.
+Further work built on these ideas, forming what was later described as mildly-context sensitive grammar formalisms, including LFG \parencite{Bresnan:1982}, LTAG \parencite{Joshi:1997}, and CCG \parencite{Steedman:2000}.
+
 Our representation is similar to LTAG-Spinal \parencite{Shen:2007}, but has the advantage that it can be converted back into the PTB representation.
 Recently, dependency parsers have been used to assist in constituency parsing, which has involved varying degrees of representation design, but only for trees \parencite{hall2007hybrid,hall-nivre:2008:PaGe,kong-rush-smith:2015:NAACL-HLT,fernandezgonzalez-martins:2015:ACL-IJCNLP}.
 
@@ -67,7 +69,6 @@ One challenge for a post-processing system is that it must deal with parser mist
 The other common approach has been to expand the grammar, threading a trace through the tree structure on the non-terminal symbols.
 \textcite{Collins:1997}'s third model used this approach to recover wh-traces, while \textcite{cai-chiang-goldberg:2011} used it to recover null pronouns, and others have used it for a range of movement types \parencite{dienes-dubey:2003,schmid:2006}.
 All of these approaches have the disadvantage that each additional trace dramatically expands the grammar.
-
 
 \section{Algorithm Sketch}
 
@@ -1252,6 +1253,9 @@ However, we can roughly relate the inference rules as follows, where some of our
   \\
 \end{tabular}
 \end{center}
+
+Another connection to make at this point is with the CFG version of Eisner's algorithm, presented by \textcite{P07-1022}.
+It is probably not possible to perform a similar transofmration on the algorithm we propose, though in Section~\ref{sec:impl} we discuss similar challenges in terms of correctly computing inside and outside scores as are raised in Section 4 of \textcite{P07-1022}.
 
 \subsection{Initialization}
 
