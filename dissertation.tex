@@ -27,6 +27,7 @@
 \usepackage{color}
 \usepackage[chapter]{algorithm}
 \usepackage{algpseudocode}
+\usepackage{enumitem}
 \usepackage{synttree}
 \usepackage{array}
 \usepackage{arydshln}
@@ -176,7 +177,16 @@ pdfpagelayout=OneColumn}
   \def\@fs@mid{\kern2pt\hrule\kern2pt}%
   \let\@fs@iftopcapt\iftrue}
 \makeatother
- 
+
+% Remove "end ..." text
+\algtext*{EndWhile}
+\algtext*{EndFor}
+\algtext*{EndIf}
+\algtext*{EndFunction}
+
+% Changing the style of comments
+\renewcommand{\algorithmiccomment}[1]{\hfill\textit{#1}}
+
 \newcolumntype{x}[1]{%
 >{\raggedleft\hspace{0pt}}p{#1}}%
  

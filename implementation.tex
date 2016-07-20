@@ -25,83 +25,46 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 \caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
 \algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
 \label{alg:ops}
-% TODO get rid of left margin
-\vspace{-5mm}
-\setlength\columnsep{-15pt}
-\begin{multicols}{2}
 \begin{algorithmic}[]
-    \State \textbf{Parameters:} \textcolor{white}{g} \\
-        \begin{tabular}{ll}
-            $\mathrm{iters}$ & \textcolor{gray}{Number of iterations} \\
-            C & \textcolor{gray}{Regularization constant ($10^{-1}$ to $10^{-8}$)} \\
-            $\eta$ & \textcolor{gray}{Learning rate ($10^0$ to $10^{-4}$)} \\
-            $\delta$ & \textcolor{gray}{Initializer for $q$ ($10^{-6}$)} \\[5pt]
-        \end{tabular}
-    \vspace{1mm}
-    \State
-    \hspace{-2.5mm}\begin{tabular}{ll}
-        $\mathbf{w} = \mathbf{0} $ & \textcolor{gray}{Weight vector} \\
-        $\mathbf{q} = \boldsymbol{\delta} $ & \textcolor{gray}{Cumulative squared gradient} \\
-        $\mathbf{u} = \mathbf{0} $ & \textcolor{gray}{Time of last update for each weight} \\
-        $n = 0$ & \textcolor{gray}{Number of updates so far} \\
-    \end{tabular}
-    \MyFor{$\mathrm{iter} \in [1, \mathrm{iters}]$}
-        \MyFor{$\mathrm{batch} \in \mathrm{data}$}
-            \State \textcolor{gray}{Sum gradients from loss-aug. decodes}
-            \State $\mathbf{g} = \mathbf{0}$
-            \State \textbf{for} $(x_i,y_i) \in \mathrm{batch}$ \textbf{do}
-                \State \textcolor{white}{\textbf{for}} $y = \argmax_{y' \in Y(x_i)} [${\footnotesize SCORE}$(y') + \mathbf{L}(y', y_i) ]$
-                \State \textcolor{white}{\textbf{for}}  $\mathbf{g} \pluseq (\mathbf{f}(y) - \mathbf{f}(y_i))$
-            \State \textcolor{gray}{Update the active features}
-            \State $\mathbf{q} \pluseq \mathbf{g}^2$\textcolor{white}{......}\textcolor{gray}{Element-wise square}
-            \State $n \pluseq 1$
-            \MyFor{$f \in \mathrm{nonzero} \; \mathrm{features} \; \mathrm{in} \; \mathbf{g}$}
-                \State $w_f =$ {\footnotesize UPDATE-ACTIVE}($w_f$, $g_f$, $q_f$)
-                \State $u_f = n$
-    \EndMyFor
-    \EndMyFor
-    \EndMyFor
-    \columnbreak
-    \State \textcolor{gray}{The AdaGrad update}
-    \MyFunction{UPDATE-ACTIVE}($w$, $g$, $q$) \\
-        \hspace{4mm}\begin{tabular}{ll}
-            $\mathbf{return} \; \frac{w \sqrt{q} - \eta g}{\eta \mathrm{C} + \sqrt{q}}$
-            & \textcolor{gray}{$\;\;\,[\ell_2]$} \\
-            $\mathrm{d} = |w - \frac{\eta}{\sqrt{q}} g| - \frac{\eta}{\sqrt{q}} \mathrm{C}$
-            & \textcolor{gray}{$\;\;\,[\ell_1]$} \\
-            $\mathbf{return} \; \mathrm{sign}(w - \frac{\eta}{\sqrt{q}} g) \cdot \max(0, \mathrm{d})$
-            & \textcolor{gray}{$\;\;\,[\ell_1]$} \\
-        \end{tabular}
-    \EndMyFunction
-    \vspace{1mm}
-    \begin{lefttopbot}[style=mdftight]
-    \vspace{-1mm}
-    \State \textcolor{gray}{Functions only needed for sparse updates}
-    \vspace{1mm}
-    \State \textcolor{gray}{A single update equivalent to a series of AdaGrad updates where the weight's subgradient was zero}
-    \MyFunction{UPDATE-CATCHUP}($w$, $q$, $t$) \\
-        \vspace{1mm}\hspace{4mm}\begin{tabular}{ll}
-            $\mathbf{return} \; w \left(\frac{\sqrt{q}}{\eta \mathrm{C} + \sqrt{q}}\right)^{t}$
-            & \textcolor{gray}{$[\ell_2]$} \\
-            $\mathbf{return} \; \mathrm{sign}(w) \cdot \max(0, |w| - \frac{\eta \mathrm{C}}{\sqrt{q}} t)$
-            & \textcolor{gray}{$[\ell_1]$} \\
-        \end{tabular}
-    \EndMyFunction
-    \vspace{-1mm}
-    \State \textcolor{gray}{Compute $\mathbf{w}^\top \mathbf{f}(y')$, but for each weight, apply an update to catch up on the steps in which the gradient for that weight was zero}
-    \MyFunction{SCORE}($y'$)
-        \State $s = 0$
-        \State \textbf{for} $f \in \mathbf{f}(y')$ \textbf{do}
-        \State \textcolor{white}{\textbf{for}} $w_f = $ {\footnotesize UPDATE-CATCHUP}($w_f, q_f, n - u_f$)
-        \State \textcolor{white}{\textbf{for}} $u_f = n$
-        \State \textcolor{white}{\textbf{for}} $s \pluseq w_f$
+    \State Parameter: $\mathrm{iters}$ \Comment{Number of iterations}
+    \State Parameter: C \Comment{Regularization constant ($10^{-1}$ to $10^{-8}$)}
+    \State Parameter: $\eta$ \Comment{Learning rate ($10^0$ to $10^{-4}$)}
+    \State Parameter: $\delta$ \Comment{Initializer for $q$ ($10^{-6}$)}
+    \State $\mathbf{w} = \mathbf{0} $ \Comment{Weight vector}
+    \State $\mathbf{q} = \boldsymbol{\delta} $ \Comment{Cumulative squared gradient}
+    \State $\mathbf{u} = \mathbf{0} $ \Comment{Time of last update for each weight}
+    \State $n = 0$ \Comment{Number of updates so far}
+    \For{$\mathrm{iter} \in [1, \mathrm{iters}]$}
+      \For{$\mathrm{batch} \in \mathrm{data}$}
+        \State $\mathbf{g} = \mathbf{0}$ \Comment{Sum of gradients from loss-augmented decodes}
+        \For{$(x_i,y_i) \in \mathrm{batch}$}
+          \State $y = \argmax_{y' \in Y(x_i)} [${\footnotesize SCORE}$(y') + \mathbf{L}(y', y_i) ]$
+          \State $\mathbf{g} \pluseq (\mathbf{f}(y) - \mathbf{f}(y_i))$ \Comment{Update the active features}
+        \EndFor
+        \State $\mathbf{q} \pluseq \mathbf{g}^2$ \Comment{Element-wise square}
+        \State $n \pluseq 1$
+        \For{$f \in \mathbf{g} \; \mathrm{where} \; g_f \neq 0 $} \Comment{Over all features if not doing sparse updates}
+          \State $w_f =$ {\footnotesize UPDATE-ACTIVE}($w_f$, $g_f$, $q_f$)
+          \State $u_f = n$
+        \EndFor
+      \EndFor
+    \EndFor
+    \Function{\footnotesize UPDATE-ACTIVE}{$w$, $g$, $q$}                                               \Comment{The AdaGrad update}
+      \State $[\ell_2]$ $\mathbf{return} \; \frac{w \sqrt{q} - \eta g}{\eta \mathrm{C} + \sqrt{q}}$               
+      \State $[\ell_1]$ $\mathrm{d} = |w - \frac{\eta}{\sqrt{q}} g| - \frac{\eta}{\sqrt{q}} \mathrm{C}$           
+      \State $[\ell_1]$ $\mathbf{return} \; \mathrm{sign}(w - \frac{\eta}{\sqrt{q}} g) \cdot \max(0, \mathrm{d})$ 
+    \EndFunction
+    \Function{\footnotesize SCORE}{$y'$} \Comment{Compute $\mathbf{w}^\top \mathbf{f}(y')$, but if doing sparse updates, then}
+        \State $s = 0$                   \Comment{for each weight, apply an update to catch up on the}
+        \For{$f \in \mathbf{f}(y')$}     \Comment{steps in which the gradient for that weight was zero}
+          \State $[\ell_2]$ $w_f = w_f \left(\frac{\sqrt{q_f}}{\eta \mathrm{C} + \sqrt{q_f}}\right)^{n - u_f}$
+          \State $[\ell_1]$ $w_f = \mathrm{sign}(w_f) \cdot \max(0, |w_f| - \frac{\eta \mathrm{C}}{\sqrt{q_f}} (n - u_f))$
+          \State $u_f = n$
+          \State $s \pluseq w_f$
+        \EndFor
         \State $\mathbf{return} \; s$
-    \EndMyFunction
-    \vspace{-3mm}
-    \end{lefttopbot}
+    \EndFunction
 \end{algorithmic}
-\end{multicols}
-\vspace{-8mm}
 \end{algorithm}
 
 We train with an online primal subgradient approach \parencite{Ratliff:2007} as described in \textcite{Kummerfeld-etal:2015:EMNLP}.
