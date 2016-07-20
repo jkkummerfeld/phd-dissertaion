@@ -98,16 +98,20 @@ All of these approaches have the disadvantage that each additional trace dramati
 \newlength\labelGap
 \newlength\coordGap
 
-% TODO - Add the intuition that when edges are added to/from the external point
-% to the span, those edges are all going to be crossed at some point in the
-% future.
-
 In this section we sketch our algorithm, focusing on how it differs from \textcite{ec}'s tree parsing algorithm.
 For the full derivation see Section~\ref{sec:full-algorithm}.
 
 The algorithm is a dynamic program defined by (1) a set of items, and (2) deduction rules that define how an item can be composed from other items.
 To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforces additional constraints.
 Eventually we will show how we can support directed, labeled edges, and labeled words, but to simplify the presentation of the algorithm we first focus on deduction rules for undirected, unlabeled edges and ignore word labels.
+
+We present the algorithm from a top-down perspective to easily show how it is and is not complete.
+In practice, when parsing we use a bottom-up approach (the deduction rules apply equivalently in either direction).
+The intuition for the algorithm is that items are either a span of the sentence in which all of the structure is complete, or a span plus a point outside the span, with some connection between the two.
+Edges can only be added between three points: the left end of the span, the right end of the span, and the point outside.
+Edges added between the two ends of the span will not be crossed, except if the item has an exterior point, in which case the edge is crossed as soon as it is added.
+Edges added between either end of the span and the exterior point will be crossed later in the derivation.
+This clean division of cases is partially due to choices we made in the definition of the deduction rules, it does not hold for \textcite{ec}'s algorithm.
 
 \paragraph{Notation}
 We use $p$, $q$, etc to refer to word positions.

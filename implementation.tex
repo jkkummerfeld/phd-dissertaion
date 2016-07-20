@@ -12,15 +12,8 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 
 \subsection{Learning}
 
-\newcommand{\Lone}{$L_1$\@\xspace}
-\newcommand{\Ltwo}{$L_2$\@\xspace}
-\newcommand*{\argmax}{\operatornamewithlimits{argmax}\limits}
-\newcommand{\pluseq}{\mathrel{+}=}
-\renewcommand{\algorithmicrequire}{\textbf{Parameters:}}
+\renewcommand{\algorithmicrequire}{}
 \renewcommand{\algorithmicensure}{}
-\algblockdefx[MyFunction]{MyFunction}{EndMyFunction}[1]{\textbf{function} {\footnotesize #1}}{}
-\algblockdefx[MyFor]{MyFor}{EndMyFor}[1]{\textbf{for} #1 \textbf{do}}{}
-
 \begin{algorithm}
 \caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
 \algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
@@ -273,7 +266,7 @@ Unfortunately, it is difficult to characterize this space, aside from saying it 
   }
 \end{table}
 
-% TODO Experimental results for CC choices
+% TODO: Experimental results for CC choices
 % TODO: breakdown of changes, one by one?
 
 Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
