@@ -191,7 +191,6 @@ Full dynamic program with rules unseen in training boxed and colored.
 Pruned dynamic program, including only rules observed in the training set, including tighter parent constraints.
 }
 \end{algorithm}
-% TODO: Include the full list of rules and frequency
 %%%   0  356191
 %%%   1  423587
 %%%   2    1230
@@ -236,17 +235,6 @@ In particular, it may be the case that this set of rules is impacted by variatio
 
 While this pruning opens new questions about the space of structures in parsing, for our purposes it is primarily a way of improving speed.
 The drastic reduction in rules to consider leads to a substantial improvement in the time required for parsing.
-
-%%%\subsection{Engineering Details}
-% TODO: Engineering details
-
-%%%The system is implemented in the Scala language, with several custom data structures and modules.
-
-%%%\subsubsection{Map}
-
-%%%\subsubsection{Array}
-
-%%%\subsubsection{Hash}
 
 \section{Results}
 
@@ -303,8 +291,6 @@ The drastic reduction in rules to consider leads to a substantial improvement in
     Edge results are when removing only the edges necessary to make a parse representable (\myeg removing one edge to break a cycle).
   }
 \end{table}
-
-% TODO: Experimental results for CC choices
 
 Table~\ref{tab:structures} divides sentences in the training set of the treebank by structure type and whether a directed cycle is present or not.
 Structures that are recoverable using our algorithm are bolded.

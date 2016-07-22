@@ -1,22 +1,26 @@
 \begin{abstract}
 
 Representation of syntactic structure is a core area of research in Computational Linguistics, disambiguating distinctions in meaning that are crucial for correct interpretation of language.
-Development of algorithms and statistical models over the past two decades has led to systems that are accurate enough to be deployed in industry, playing a key role in products such as Google Search and Apple Siri, and part of the foundation of startups such as SpaCy and WriteLab.
-However, syntactic parsers today are usually constrained to tree representations of language, and performance is interpreted through a single metric that coneys no linguistic information regarding remaining errors.
+Development of algorithms and statistical models over the past three decades has led to systems that are accurate enough to be deployed in industry, playing a key role in products such as Google Search and Apple Siri.
+However, syntactic parsers today are usually constrained to tree representations of language, and performance is interpreted through a single metric that conveys no linguistic information regarding remaining errors.
 
-In this dissertation, we present new tools for manipulating syntactic structures: modifying existing structures and making new ones.
-Each tool is based on a core algorithm and adaptations specific to linguistic structure.
+In this dissertation, we present new algorithms for error analysis and parsing.
+The heart of our approach to error analysis is the use of structural transformations to identify more meaningful classes of errors, and to enable comparisons across formalisms.
+For parsing, we combine a novel dynamic program with careful choices in syntactic representation to create an efficient parser that produces graph structured output.
+In both cases, we are pushing the boundaries of the conventional parsing task, bringing it closer to the linguistic theories it is based on.
 
-First, we consider a search algorithm that, given two structures, will find a sequence of modifications leading from one structure to the other.
-We apply this algorithm to syntactic error analysis, where one structure is the output of a parser, the other is the correct parse, and each modification corresponds to fixing one error.
+First, we present a search algorithm that, given two structures, finds a sequence of modifications leading from one structure to the other.
+We applied this algorithm to syntactic error analysis, where one structure is the output of a parser, the other is the correct parse, and each modification corresponds to fixing one error.
 We constructed a tool based on the algorithm and analyzed variations in behavior between parsers, types of text, and languages.
-Within the CL community there are a range of widely-held beliefs regarding the prevalence of certain errors and hence the nature of unsolved challenges in parsing.
-Our analysis provided new empirical evidence, supporting some beliefs, such as the high frequency of prepositional phrase attachment errors, while reframing others, for example coordination scope errors do not have a major impact on performance though resolving them remains a challenging problem.
+Our observations shine light on several assumptions about syntactic errors, showing some to be true and others to be false.
+For example, prepositional phrase attachment errors are indeed a major issue, while coordination scope errors do not hurt performance as much as expected.
 
-Next, we describe a mapping algorithm that converts one syntactic representation into another.
-Specifically, we map from Combinatory Categorial Grammar derivations to Phrase Structure trees.
-Our approach follows the philosophy of \ccg, defining a phrase structure for each lexical category and general rules for combining phrase structures.
-This produces significantly more accurate phrase structures than past work, and has the advantage that the mapping decomposes in the same way as the CKY parsing algorithm.
+Next, we describe an algorithm that builds a parse in one syntactic representation based on a parse in another.
+Specifically, we build phrase structure parses from Combinatory Categorial Grammar derivations.
+Our approach follows the philosophy of \ccg, defining specific phrase structures for each lexical category and generic rules for combinatory steps.
+The new parse is built by following the \ccg derivation bottom-up, gradually building the corresponding phrase structure parse.
+This produces significantly more accurate parses than past work, and has the advantage that the process decomposes in the same way as the CKY parsing algorithm.
+We use the tool to compare performance of parsers across formalisms % TODO
 
 Finally, we present a dynamic programming algorithm, which constructs the graph structure that has the highest score under an edge-factored scoring function.
 In the process of defining a parse representation compatible with the algorithm, we found that certain linguistic distinctions could dramatically impact coverage.

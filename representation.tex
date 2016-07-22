@@ -148,168 +148,155 @@ The dark edges in Figure~\ref{fig:not-1ec} show an example of how head rules can
 The trace edge from \emph{Page} to \emph{CEO of Google} does not satisfy the 1ec property because it is crossed by two edges with no endpoints in common.
 By switching the head rule for VPs to use a child VP rather than an auxiliary, we can resolve this case.
 
-\begin{figure}
-\centering
-\begin{tabular}{ccc}
+%%%\begin{figure}
+%%%\centering
+%%%\begin{tabular}{ccc}
+%%%%\scalebox{0.7}{
+%%%%\synttree
+%%%%[
+%%%%  [A]
+%%%%  [,]
+%%%%  [B]
+%%%%  [,]
+%%%%  [C]
+%%%%  [and]
+%%%%  [D]]
+%%%%}
+%%%%&
+%%%\scalebox{0.7}{
+%%%\synttree
+%%%[
+%%%  [A]
+%%%  [temp [,]
+%%%    [B]
+%%%    [temp [,]
+%%%      [C]
+%%%      [temp [and]
+%%%        [D]]]]]
+%%%}
+%%%&
 %%%\scalebox{0.7}{
 %%%\synttree
 %%%[
 %%%  [A]
 %%%  [,]
-%%%  [B]
-%%%  [,]
-%%%  [C]
+%%%  [temp [B]
+%%%    [,]
+%%%    [temp [C]
+%%%      [and]
+%%%      [D]]]]
+%%%}
+%%%&
+%%%\scalebox{0.7}{
+%%%\synttree
+%%%[
+%%%  [A]
+%%%  [temp [,]
+%%%    [B] ]
+%%%  [temp [,]
+%%%    [C] ]
+%%%  [temp [and]
+%%%    [D]]]
+%%%} \\[6pt]
+%%%(1) & (2) & (3) \\[10pt]
+%%%\scalebox{0.7}{
+%%%\synttree
+%%%[
+%%%  [temp [temp [temp
+%%%        [A]
+%%%        [,] ]
+%%%      [B]
+%%%      [,] ]
+%%%    [C]
+%%%    [and] ]
+%%%  [D]]
+%%%}
+%%%&
+%%%\scalebox{0.7}{
+%%%\synttree
+%%%[
+%%%  [temp [temp
+%%%      [A]
+%%%      [,]
+%%%      [B] ]
+%%%    [,]
+%%%    [C] ]
 %%%  [and]
 %%%  [D]]
 %%%}
 %%%&
-\scalebox{0.7}{
-\synttree
-[
-  [A]
-  [temp [,]
-    [B]
-    [temp [,]
-      [C]
-      [temp [and]
-        [D]]]]]
-}
-&
-\scalebox{0.7}{
-\synttree
-[
-  [A]
-  [,]
-  [temp [B]
-    [,]
-    [temp [C]
-      [and]
-      [D]]]]
-}
-&
-\scalebox{0.7}{
-\synttree
-[
-  [A]
-  [temp [,]
-    [B] ]
-  [temp [,]
-    [C] ]
-  [temp [and]
-    [D]]]
-} \\[6pt]
-(1) & (2) & (3) \\[10pt]
-\scalebox{0.7}{
-\synttree
-[
-  [temp [temp [temp
-        [A]
-        [,] ]
-      [B]
-      [,] ]
-    [C]
-    [and] ]
-  [D]]
-}
-&
-\scalebox{0.7}{
-\synttree
-[
-  [temp [temp
-      [A]
-      [,]
-      [B] ]
-    [,]
-    [C] ]
-  [and]
-  [D]]
-}
-&
-\scalebox{0.7}{
-\synttree
-[
-  [temp
-    [A]
-    [,]]
-  [temp
-    [B]
-    [,]]
-  [temp
-    [C]
-    [and]]
-  [D]]
-} \\[6pt]
-(4) & (5) & (6) \\
-\end{tabular}
-\caption[Binarization options considered for coordination.]{\label{fig:coord-options}
-Options considered for adding nodes (temp) to alter the structure of coordination.
-We also have an option (0), corresponding to the addition of no extra nodes.
-}
-\end{figure}
+%%%\scalebox{0.7}{
+%%%\synttree
+%%%[
+%%%  [temp
+%%%    [A]
+%%%    [,]]
+%%%  [temp
+%%%    [B]
+%%%    [,]]
+%%%  [temp
+%%%    [C]
+%%%    [and]]
+%%%  [D]]
+%%%} \\[6pt]
+%%%(4) & (5) & (6) \\
+%%%\end{tabular}
+%%%\caption[Binarization options considered for coordination.]{\label{fig:coord-options}
+%%%Options considered for adding nodes (temp) to alter the structure of coordination.
+%%%We also have an option (0), corresponding to the addition of no extra nodes.
+%%%}
+%%%\end{figure}
 
-\subsection{Modification of Coordination}
+%%%\subsection{Modification of Coordination}
 
-As part of their representation, \textcite{cck} changed the tree structure within coordination, placing each conjunction and its neighbor under a new node. For example:
+%%%As part of their representation, \textcite{cck} changed the tree structure within coordination, placing each conjunction and its neighbor under a new node. For example:
 
-\begin{center}
-\strut\hfill
-\begin{minipage}[c]{0.4\textwidth}
-\synttree
-[UCP
-  [smaller]
-  [and]
-  [ADVP [therefore]]
-  [ADJP [.t more affected]]]
-\end{minipage}\hfill
-$\Rightarrow$\hfill
-\begin{minipage}[c]{0.4\textwidth}
-\synttree
-[UCP
-  [smaller]
-  [UCP-CC
-    [and]
-    [ADVP [therefore]]]
-  [ADJP [.t more affected]]]
-\end{minipage}
-\hfill\strut
-\end{center}
+%%%\begin{center}
+%%%\strut\hfill
+%%%\begin{minipage}[c]{0.4\textwidth}
+%%%\synttree
+%%%[UCP
+%%%  [smaller]
+%%%  [and]
+%%%  [ADVP [therefore]]
+%%%  [ADJP [.t more affected]]]
+%%%\end{minipage}\hfill
+%%%$\Rightarrow$\hfill
+%%%\begin{minipage}[c]{0.4\textwidth}
+%%%\synttree
+%%%[UCP
+%%%  [smaller]
+%%%  [UCP-CC
+%%%    [and]
+%%%    [ADVP [therefore]]]
+%%%  [ADJP [.t more affected]]]
+%%%\end{minipage}
+%%%\hfill\strut
+%%%\end{center}
 
-We considered this approach, as well as several others shown in Figure~\ref{fig:coord-options}.
-However, for our options we extended the scope of the new node to cover everything up to the next conjunct.
-In the example above that means \emph{more affected} would be included in the UCP-CC.
-To avoid cases not conjoining two spans, we follow \textcite{cck} and do not apply any changes when the conjunction is the first word of the sentence and there is only one conjunct, \myeg \emph{But the ballplayers disagree}.
-In the most common case of conjunction, just \emph{A and B}, several sets of options are the same: 0, 2 and 5 are completely flat, 1 and 3 add a new node over \emph{and B}, while 4 and 6 place a new node over \emph{A and}.
+%%%We considered this approach, as well as several others shown in Figure~\ref{fig:coord-options}.
+%%%However, for our options we extended the scope of the new node to cover everything up to the next conjunct.
+%%%In the example above that means \emph{more affected} would be included in the UCP-CC.
+%%%To avoid cases not conjoining two spans, we follow \textcite{cck} and do not apply any changes when the conjunction is the first word of the sentence and there is only one conjunct, \myeg \emph{But the ballplayers disagree}.
+%%%In the most common case of conjunction, just \emph{A and B}, several sets of options are the same: 0, 2 and 5 are completely flat, 1 and 3 add a new node over \emph{and B}, while 4 and 6 place a new node over \emph{A and}.
 
-The choice of this method also interacts with the choice of head rules in conjunctions.
-\textcite{cck} make the head the first child that is not punctuation.
-We considered that, plus five other options:
+%%%The choice of this method also interacts with the choice of head rules in conjunctions.
+%%%\textcite{cck} make the head the first child that is not punctuation.
+%%%We considered that, plus five other options:
 
-\begin{itemize}
-  \item First non-punctuation \parencite{cck}
-  \item First conjunction
-  \item First non-punctuation non-conjunction
-  \item Last non-punctuation
-  \item Last conjunction
-  \item Last non-punctuation non-conjunction
-\end{itemize}
+%%%\begin{itemize}
+%%%  \item First non-punctuation \parencite{cck}
+%%%  \item First conjunction
+%%%  \item First non-punctuation non-conjunction
+%%%  \item Last non-punctuation
+%%%  \item Last conjunction
+%%%  \item Last non-punctuation non-conjunction
+%%%\end{itemize}
 
-Some combinations of head rules and node addition will lead to the same structure, particularly in the common \emph{A and B} case.
-However, the variations do have an impact on properties of the structures produced, and therefore on the coverage of our algorithm.
-Section~\ref{sec:results-coverage} shows an exhaustive comparison of the options.
-Based on that analysis, we chose to use a flat structure, with the head as the first non-punctuation non-conjunction.
-%%%# cc0 head0  cc0 head2
-%%%# cc4 head0  cc4 head2
-%%%# cc5 head0  cc5 head2
-%%%#
-%%%# cc1 head1  cc1 head4
-%%%# cc3 head1  cc3 head4
-%%%# cc4 head1  cc4 head4
-%%%#
-%%%# cc0 head3  cc0 head5
-%%%# cc1 head3  cc1 head5
-%%%# cc2 head3  cc2 head5
-%%%# cc3 head3  cc3 head5
-%%%# cc5 head3  cc5 head5
+%%%Some combinations of head rules and node addition will lead to the same structure, particularly in the common \emph{A and B} case.
+%%%However, the variations do have an impact on properties of the structures produced, and therefore on the coverage of our algorithm.
+%%%Section~\ref{sec:results-coverage} shows an exhaustive comparison of the options.
+%%%Based on that analysis, we chose to use a flat structure, with the head as the first non-punctuation non-conjunction.
 
 \section{Algorithm Extensions}
 To handle our representation, we extend the core algorithm described above to support labels on edges and labels on words (spines).
