@@ -1,0 +1,175 @@
+\begin{multicols}{4}
+\scalebox{\mathscale}{\parbox{\linewidth}{
+\begin{flalign*}
+& \begin{array}{l}
+  L[ijx \; JF \; F \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[j \; i] \quad L[ijx \; F \; \overline{I}F \; \overline{IJ}] \\
+\end{array} \\
+& \begin{array}{l}
+  L[ijx \; F \; IF \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[i \; j] \quad L[ijx \; F \; \overline{I}F \; \overline{IJ}] \\
+\end{array} \\
+& \begin{array}{l}
+  R[ijx \; JF \; F \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[j \; i] \quad R[ijx \; \overline{J}F \; F \; \overline{IJ}] \\
+\end{array} \\
+& \begin{array}{l}
+  R[ijx \; F \; IF \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[i \; j] \quad R[ijx \; F \; \overline{I}F \; \overline{IJ}] \\
+\end{array}
+\end{flalign*}
+}}
+
+\scalebox{\mathscale}{\parbox{\linewidth}{
+\begin{flalign*}
+& \begin{array}{l}
+  \uwave{N}[ijx \; .X \; .\overline{X} \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[x \; i] \quad N[ijx \; F\overline{X} \; F\overline{X} \; F] \\
+\end{array} \\
+& \begin{array}{l}
+  \uwave{N}[ijx \; .\overline{X} \; .X \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[x \; j] \quad N[ijx \; F\overline{X} \; F\overline{X} \; F] \\
+\end{array} \\
+& \begin{array}{l}
+  N[ijx \; J\overline{X} \; \overline{IX} \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[j \; i] \quad N[ijx \; \overline{J}F \; F \; \overline{IJ}] \\
+\end{array} \\
+& \begin{array}{l}
+  N[ijx \; \overline{JX} \; I\overline{X} \; \overline{IJ}] \leftarrow \max \\
+  \;\;\; A[i \; j] \quad N[ijx \; F \; \overline{IX} \; \overline{IJ}] \\
+\end{array}
+\end{flalign*}
+}}
+
+\scalebox{\mathscale}{\parbox{\linewidth}{
+\begin{flalign*}
+& \begin{array}{l}
+  X[ijx \; .X \; .\overline{X} \; F] \leftarrow \max \\
+  \;\;\; A[x \; i] \quad I[ij \; . \; .] \\
+\end{array} \\
+& \begin{array}{l}
+  X[ijx \; .\overline{X} \; .\overline{X} \; I\overline{J}] \leftarrow \max \\
+  \;\;\; A[i \; x] \quad I[ij \; . \; .] \\
+\end{array} \\
+& \begin{array}{l}
+  X[ijx \; .\overline{X} \; .X \; F] \leftarrow \max \\
+  \;\;\; A[x \; j] \quad I[ij \; . \; .] \\
+\end{array} \\
+& \begin{array}{l}
+  X[ijx \; .\overline{X} \; .\overline{X} \; \overline{I}J] \leftarrow \max \\
+  \;\;\; A[j \; x] \quad I[ij \; . \; .] \\
+\end{array}
+\end{flalign*}
+}}
+
+\scalebox{\mathscale}{\parbox{\linewidth}{
+\begin{flalign*}
+& \begin{array}{l}
+  I[ij \; F \; I] \leftarrow \max \\
+  \;\;\; A[i \; j] \quad I[ij \; F \; \overline{I}] \\
+\end{array} \\
+& \begin{array}{l}
+  I[ij \; J \; F] \leftarrow \max \\
+  \;\;\; A[j \; i] \quad I[ij \; \overline{J} \; F] \\
+\end{array}
+\end{flalign*}
+}}
+\end{multicols}
+
+\vspace{-10mm}
+\begin{multicols}{2}
+\scalebox{\mathscale}{\parbox{\invmathscale\linewidth}{
+\begin{flalign*}
+& \begin{array}{l}
+  I[ij \; F \; \overline{I}] \leftarrow \max \\
+  \left\{
+    \begin{array}{l}
+      \begin{array}{l}
+        I[i \; i{+}1 \; F \; F] \quad I[i{+}1 \; j \; \overline{F} \; F] \\
+      \end{array} \\
+      \max_{k \in (i, j)} \\
+      \left\{
+        \begin{array}{l}
+          I[ik \; F \; I] \quad I[kj \; . \; .] \\
+          LRN\cdotp [ikj \; F \; I\overline{J} \; \overline{I}F] \quad I[kj \; . \; .] \\
+          \max_{l \in (k, j)} \\
+          \left\{
+            \begin{array}{l}
+              RN\cdotp [ikl \; F \; IF \; \overline{IK}] \quad I[kl \; F \; .] \quad \cdotp N[ljk \; F\overline{K} \; F \; F] \\
+              LRN\cdotp [ikl \; F \; IF \; \overline{IK}] \quad I[kl \; F \; .] \quad I[lj \; . \; F] \\
+            \end{array}
+          \right. \\
+          \max_{l \in (i, k)} \\
+          \left\{
+            \begin{array}{l}
+              X\cdotp [ilk \; F \; .F \; IF] \quad I[lk \; F \; .] \quad \cdotp \uwave{N}[kjl \; F \; Fl \; F] \\
+            \end{array}
+          \right. \\
+        \end{array}
+      \right. \\
+    \end{array}
+  \right. \\
+\end{array} \\
+& \begin{array}{l}
+  I[ij \; j \; F] \leftarrow \max_{k \in (i, j)} \\
+  \left\{
+    \begin{array}{l}
+      I[ik \; \overline{F} \; F] \quad I[kj \; J \; F] \\
+      I[ik \; \overline{F} \; F] \quad \cdotp LRN[kji \; JF \; F \; \overline{KJ}] \\
+      \max_{l \in (i, k)} \\
+      \left\{
+        \begin{array}{l}
+          RNX\cdotp [ilk \; F\overline{F} \; .\overline{K} \; F] \quad I[lk \; . \; .] \quad \cdotp LN[kjl \; JF \; F \; \overline{KJ}] \\
+          I[il \; \overline{F} \; F] \quad I[lk \; . \; F] \quad \cdotp LN[kjl \; JF \; F \; \overline{KJ}] \\
+        \end{array}
+      \right. \\
+    \end{array}
+  \right. \\
+\end{array} \\
+\end{flalign*}
+}}
+
+\scalebox{\mathscale}{\parbox{\linewidth}{
+\begin{flalign*}
+\hspace{15mm}
+& \begin{array}{l}
+  \dotuline{L}[ijx \; \overline{JX} \; \overline{IX} \; \overline{IJ}] \leftarrow \max_{k \in (i, j)} \\
+  \left\{
+    \begin{array}{l}
+      X[ikx \; F \; .X \; F] \quad \cdotp N[kji \; .\overline{I} \; F \; F\overline{J}] \\
+      X[ikx \; F \; .\overline{X} \; \overline{I}K] \quad \cdotp N[kji \; .\overline{I} \; F \; F\overline{J}] \\
+    \end{array}
+  \right. \\
+\end{array} \\
+& \begin{array}{l}
+  \dotuline{R}[ijx \; \overline{JX} \; \overline{IX} \; \overline{IJ}] \leftarrow \max_{k \in (i, j)} \\
+  \left\{
+    \begin{array}{l}
+      N\cdotp [ikj \; F \; .\overline{J} \; \overline{I}F] \quad X[kjx \; .X \; F \; F] \\
+      N\cdotp [ikj \; F \; .\overline{J} \; \overline{I}F] \quad X[kjx \; .\overline{X} \; F \; K\overline{J}] \\
+    \end{array}
+  \right. \\
+\end{array} \\
+& \begin{array}{l}
+  \uwave{N}[ijx \; \overline{JX} \; \overline{IX} \; \overline{IJ}] \leftarrow \max_{k \in (i, j)} \\
+  \left\{
+    \begin{array}{l}
+      \cdotp N[ikx \; F\overline{X} \; \overline{I}X \; F] \quad I[kj \; F \; .] \\
+      I[ik \; . \; F] \quad N\cdotp [kjx \; \overline{J}X \; F\overline{X} \; F] \\
+    \end{array}
+  \right. \\
+\end{array} \\
+& \begin{array}{l}
+  \dotuline{N}[ijx \; \overline{JX} \; \overline{IX} \; \overline{IJ}] \leftarrow \max_{k \in (i, j)} \\
+  \left\{
+    \begin{array}{l}
+      \cdotp X[ikx \; .\overline{X} \; .X \; \overline{IK}] \quad I[kj \; . \; .] \\
+      \cdotp X[ikx \; .\overline{X} \; .\overline{X} \; \overline{I}K] \quad I[kj \; . \; .] \\
+      I[ik \; . \; .] \quad X\cdotp [kjx \; .X \; .\overline{X} \; \overline{KJ}] \\
+      I[ik \; . \; .] \quad X\cdotp [kjx \; .\overline{X} \; .\overline{X} \; K\overline{J}] \\
+    \end{array}
+  \right. \\
+\end{array} \\
+\end{flalign*}
+}}
+\end{multicols}
