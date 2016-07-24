@@ -72,6 +72,12 @@ All of these approaches have the disadvantage that each additional trace dramati
 
 \section{Algorithm Sketch}
 
+% TODO: Add a section 'why graphs?' mainly referring back to the intro
+% TODO: First sketch general CKY and the idea of defining deduction rules
+% TODO: Move all pitler et al references into the following section
+% TODO: Walk through the example carefully
+% TODO: Change the example to more clearly show separate items
+
 \tikzset{% 
   not allowed/.style={%
     dotted,
@@ -99,11 +105,11 @@ All of these approaches have the disadvantage that each additional trace dramati
 \newlength\labelGap
 \newlength\coordGap
 
-In this section we sketch our algorithm, focusing on how it differs from \textcite{ec}'s tree parsing algorithm.
-For the full derivation see Section~\ref{sec:full-algorithm}.
+In this section we sketch our algorithm, defining all of the key ideas needed to understand the deduction rules.
+In Section~\ref{sec:ec-comparison}, we discuss how it differs from \textcite{ec}'s tree parsing algorithm, and in Section~\ref{sec:full-algorithm} we provide the complete details of the algorithm definition and proof.
 
 The algorithm is a dynamic program defined by (1) a set of items, and (2) deduction rules that define how an item can be composed from other items.
-To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforces additional constraints.
+To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforce additional constraints.
 Eventually we will show how we can support directed, labeled edges, and labeled words, but to simplify the presentation of the algorithm we first focus on deduction rules for undirected, unlabeled edges and ignore word labels.
 
 We present the algorithm from a top-down perspective to easily show how it is and is not complete.
@@ -112,7 +118,6 @@ The intuition for the algorithm is that items are either a span of the sentence 
 Edges can only be added between three points: the left end of the span, the right end of the span, and the point outside.
 Edges added between the two ends of the span will not be crossed, except if the item has an exterior point, in which case the edge is crossed as soon as it is added.
 Edges added between either end of the span and the exterior point will be crossed later in the derivation.
-This clean division of cases is partially due to choices we made in the definition of the deduction rules, it does not hold for \textcite{ec}'s algorithm.
 
 \paragraph{Notation}
 We use $p$, $q$, etc to refer to word positions.
@@ -210,10 +215,6 @@ We use six item types, differing in the type of edge crossing they contain.  \\
 \end{tabular}
 \end{center}
 
-Comparing these definitions with the items in \textcite{ec}, we have one entirely new type, the Exterval, and we have added the requirement that the later items have at least one crossing of the specified type.
-These changes are necessary to avoid derivational ambiguity when a structure falls into multiple classes.
-Enforcing these difference involves changes throughout the deduction rules.
-
 \subsection{Example Derivation}
 
 \begin{figure}
@@ -237,21 +238,25 @@ Figure~\ref{fig:alg-example} presents a derivation of a sentence with crossing e
 \end{tabular}
 \end{center}
 
+\begin{landscape}
+\input{figures/algorithm-flow}
+\end{landscape}
+
 \subsection{Deduction Rules}
 One set of deduction rules is concerned with removing direct edges between the points $p$, $q$, and $o$ in each item.
 These are straightforward, so we leave them for the full derivation in Section~\ref{sec:full-algorithm}.
-
 The other type of deduction rules, which we sketch below, involve decomposing an item into parts.
-Since our item types are entirely disjoint, throughout the rules below we need to give multiple options for item types in many places where \textcite{ec} give only one type.
 
 Here we describe the rules top-down, using properties of the complete item to determine how it is decomposed.
 In this way we can show completeness, as we cover all possible settings of the properties we consider.
 
-\paragraph{Interval}\label{sec:interval}
+\subsubsection{Interval}\label{sec:interval}
 Is there a $p$--$(pq)$ edge? \\
 No, then split at $p+1$: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -275,15 +280,19 @@ No, then split at $p+1$: \\
   \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut ${p+1}$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-a}}}}
+\end{minipage}
+\vspace{5mm}
 
 \noindent
 Yes, then consider $ps$, the longest $p$--$(pq)$ edge. \\
 Do any edges cross $ps$? \\
 No, then split at $s$: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -308,19 +317,23 @@ No, then split at $s$: \\
   \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-b}}}}
+\end{minipage}
+\vspace{5mm}
 
 \noindent
 Yes, then consider the set of edges $C$, that cross $ps$.
-If $|C| > 1$, let $t$ be the common endpoint of all edges in $C$ (they must have a common endpoint to satisfy the 1ec property for $ps$).
-If $|C| = 1$, let $t$ be the endpoint outside $ps$ (this is one source of ambiguity in \textcite{ec}).
+If $|C| > 1$, let $t$ be the common endpoint of all edges in $C$ (they must have a common endpoint to satisfy the \oneEC property for $ps$).
+If $|C| = 1$, let $t$ be the endpoint outside $ps$.
 
 \noindent
 Is $s < t$ and are there any $s$--$(tq)$ edges? \\
 Yes to both: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -362,13 +375,17 @@ Yes to both: \\
   \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-d}}}}
+\end{minipage}
+\vspace{5mm}
 
 \noindent
 Yes $s < t$, no $s$--$(tq)$ edges: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -407,8 +424,10 @@ Yes $s < t$, no $s$--$(tq)$ edges: \\
   \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-c}}}}
+\end{minipage}
+\vspace{5mm}
 
 In this case it is also possible that $t = q$, in which case there is no $[tq]$ item.
 
@@ -417,8 +436,10 @@ Now consider $s > t$.
 In this case $C > 1$ by construction.
 Are there any $p$--$(ts)$ edges? \\
 Yes: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -462,13 +483,17 @@ Yes: \\
   \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-f}}}}
+\end{minipage}
+\vspace{5mm}
 
 \noindent
 No: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -511,19 +536,23 @@ No: \\
   \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-interval-e}}}}
+\end{minipage}
+\vspace{5mm}
 
-\paragraph{Exterval}
+\subsubsection{Exterval} \label{sec:alg:exterval}
 No decomposition rules are needed, as the removal of the $op$ or $oq$ edge leaves behind an Interval.
 
-\paragraph{Both} \label{sec:alg:both}
+\subsubsection{Both} \label{sec:alg:both}
 Consider the case when $o$ is to the right (the case when $o$ is to the left is symmetrical).
 Consider $ps_p$, the longest $p$--$(pq)$ edge. \\
 Does $ps_p$ cross any $q$--$(pq)$ edges? \\
 Yes: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -572,10 +601,12 @@ Yes: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s_q$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-both-fail-a}}}}
+\end{minipage}
+\vspace{5mm}
 
-The extra edges shown must be present because of the definition of $B$ items and the 1ec property.
+The extra edges shown must be present because of the definition of $B$ items and the \oneEC property.
 The $X'$ is a slight variation on our $X$, since it has both $s_qo$ and $s_po$.
 This structure does not come up in \textcite{ec}'s algorithm because of tree constraints that apply once directionality is considered.
 We do not include this rule because it would be $O(n^5)$, and this specific structure is almost never observed in the treebank.
@@ -583,7 +614,10 @@ We do not include this rule because it would be $O(n^5)$, and this specific stru
 \noindent
 Now consider the alternative, when $ps_p$ does not cross any $q$--$(pq)$ edges.
 In this case the possibilities follow a pattern: \\
-\begin{center}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\parbox{3in}{
 \begin{tikzpicture}
   \node (p) at (1, 0) {};
   \node (m0) at (1.5, 0) {};
@@ -680,7 +714,10 @@ In this case the possibilities follow a pattern: \\
   \node [fill=white] (dots) at (3,0.25) {\small . . .};
   \draw (p.north) -- (q.north);
 \end{tikzpicture}
-\end{center}
+}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-both-fail-b}}}}
+\end{minipage}
+\vspace{5mm}
 
 Does the pattern go all the way to the right, as shown in the last case? \\
 Yes:
@@ -695,8 +732,10 @@ This does not decrease treebank coverage. \\
 
 \noindent
 No, then use the end of the edge crossing pattern as $s$ and decompose the item as: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -734,14 +773,16 @@ No, then use the end of the edge crossing pattern as $s$ and decompose the item 
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-both}}}}
+\end{minipage}
+\vspace{5mm}
 
 The dashed edges are required for the $N$ items, but not the $L$ items.
 The choice of split point in this case is one source of derivational ambiguity in \textcite{ec}.
 Below we describe how to check that the chaining pattern is present in an $L$, but in practice we avoid it entirely by requiring the $L$ to have the edge $ps$, with no loss in coverage.
 
-\paragraph{Left and Right}
+\subsubsection{Left and Right}
 These are defined symmetrically.
 Consider the $o$--$(pq)$ edges in an $L$.
 Use the edge $os$ with $s$ furthest from $p$ to define the split point.
@@ -749,8 +790,10 @@ Use the edge $os$ with $s$ furthest from $p$ to define the split point.
 \noindent
 Is $os$ crossed by any $p$--$(pq)$ edges? \\
 No: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -784,56 +827,18 @@ No: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[c]{2in}{\captionof{figure}{\label{fig:rule-left-c}}}}
+\end{minipage}
+\vspace{5mm}
 
 \noindent
 Yes, then is $os$ the only $o$--$(pq)$ edge? \\
-Yes: \\
-\begin{center}
-\begin{tikzpicture}
-  \pgfmathsetlength{\vertSmall}{2ex}
-  \pgfmathsetlength{\labelGap}{1ex}
-  \pgfmathsetlength{\coordGap}{-0.5ex}
-  \node (l) at (0, 0) {};
-  \node (ls) at (1, 0) {};
-  \node (s) at (2, 0) {};
-  \node (sr) at (3, 0) {};
-  \node (r) at (4, 0) {};
-  \node (o) at (5, 0) {};
-
-  \node (v0) at (l) {};
-  \node (p0) at (v0 -| l) {};
-  \node (q0) at (v0 -| s) {};
-  \node (o0) at (v0 -| o) {};
-  \node [pointO] at (o0) {};
-  \node (label0) [left=\labelGap of v0] {$X$};
-  \node (v1) [below=\vertSmall of v0.center] {};
-  \node (p1) at (v1 -| s) {};
-  \node (q1) at (v1 -| r) {};
-  \node (o1) at (v1 -| l) {};
-  \node [pointO] at (o1) {};
-  \node (label1) [left=\labelGap of v1] {$L$ or $N$};
-  \draw (p0.center) -- (q0.center);
-  \draw (p1.center) -- (q1.center);
-  \draw [required,out=20,in=160] (q0.center) to (o0.center);
-  \draw [required,out=20,in=160] (o1.center) to (v1 -| sr);
-
-  \node (lb) at (v1 -| l) {};
-  \node (sb) at (v1 -| s) {};
-  \node (rb) at (v1 -| r) {};
-  \node (ob) at (v1 -| o) {};
-  \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
-  \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
-  \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-  \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
-
-\noindent
 No: \\
-\begin{center}
-\begin{tikzpicture}
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -870,8 +875,56 @@ No: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-left-a}}}}
+\end{minipage}
+\vspace{5mm}
+
+\noindent
+Yes: \\
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
+  \pgfmathsetlength{\vertSmall}{2ex}
+  \pgfmathsetlength{\labelGap}{1ex}
+  \pgfmathsetlength{\coordGap}{-0.5ex}
+  \node (l) at (0, 0) {};
+  \node (ls) at (1, 0) {};
+  \node (s) at (2, 0) {};
+  \node (sr) at (3, 0) {};
+  \node (r) at (4, 0) {};
+  \node (o) at (5, 0) {};
+
+  \node (v0) at (l) {};
+  \node (p0) at (v0 -| l) {};
+  \node (q0) at (v0 -| s) {};
+  \node (o0) at (v0 -| o) {};
+  \node [pointO] at (o0) {};
+  \node (label0) [left=\labelGap of v0] {$X$};
+  \node (v1) [below=\vertSmall of v0.center] {};
+  \node (p1) at (v1 -| s) {};
+  \node (q1) at (v1 -| r) {};
+  \node (o1) at (v1 -| l) {};
+  \node [pointO] at (o1) {};
+  \node (label1) [left=\labelGap of v1] {$L$ or $N$};
+  \draw (p0.center) -- (q0.center);
+  \draw (p1.center) -- (q1.center);
+  \draw [required,out=20,in=160] (q0.center) to (o0.center);
+  \draw [required,out=20,in=160] (o1.center) to (v1 -| sr);
+
+  \node (lb) at (v1 -| l) {};
+  \node (sb) at (v1 -| s) {};
+  \node (rb) at (v1 -| r) {};
+  \node (ob) at (v1 -| o) {};
+  \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
+  \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
+  \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
+  \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-left-b}}}}
+\end{minipage}
+\vspace{5mm}
 
 Our decomposition of this item differs from \textcite{ec}'s in several ways because of our decision to separate edge creation and item combination.
 We also have to track whether there are multiple edges or only a single $o$--$(pq)$ edge, to avoid derivational ambiguity in the $I$ decomposition.
@@ -879,13 +932,14 @@ The top and bottom cases lead to multiple such edges, while the middle case will
 Finally, we could track the chaining property discussed in the previous section.
 The property is only true in the following cases: when the edge $pq$ is present, when an $X$ is combined with an $L$ that has the property, and when an $X$ is combined with an $N$ that has the $pq$ edge.
 
-\paragraph{Neither}
+\subsubsection{Neither}
 Consider the $o$--$(pq)$ edges.
 Use the edge $os$ with $s$ furthest from $o$ to define the split point.
-Is $o$ to the right of the span? \\
-Yes: \\
-\begin{center}
-\begin{tikzpicture}
+The case with $o$ to the left is symmetrical to the case with $o$ on the right, which is: \\
+
+\begin{minipage}{\textwidth}
+\centering
+\hfill\begin{tikzpicture}
   \pgfmathsetlength{\vertSmall}{2ex}
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
@@ -918,15 +972,26 @@ Yes: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
-\end{tikzpicture}
-\end{center}
-
-\noindent
-No, symmetrical to the yes case.
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{2in}{\captionof{figure}{\label{fig:rule-neither}}}}
+\end{minipage}
+\vspace{5mm}
 
 As in the previous section, our decomposition differs from \textcite{ec}'s to meet our altered definition of $N$.
 Here, when a sub-item is an $X$ there is only one $o$--$(pq)$ edge, and when it is an $N$ there is more than one.
 
+\section{Comparison with \textcite{ec}} \label{sec:ec-comparison}
+
+The clean division of cases between edges that will be crossed and those that will be not is partially due to choices we made in the definition of the deduction rules; it does not hold for \textcite{ec}'s algorithm.
+
+Comparing th definitions of our items with the items in \textcite{ec}, we have one entirely new type, the Exterval, and we have added the requirement that the later items have at least one crossing of the specified type.
+These changes are necessary to avoid derivational ambiguity when a structure falls into multiple classes.
+Enforcing these difference involves changes throughout the deduction rules.
+
+Since our item types are entirely disjoint, throughout the rules we need to give multiple options for item types in many places where \textcite{ec} give only one type.
+
+If $|C| = 1$, let $t$ be the endpoint outside $ps$.
+(this is one source of ambiguity in \textcite{ec}).
 
 \section{Algorithm Definition and Proof} \label{sec:full-algorithm}
 
@@ -1348,7 +1413,7 @@ The right interval can have a range of options for parent sets, which we leave u
 Here we have made a choice, placing $t$ outside of $ps$.
 Placing it inside would also lead to a valid set of deduction rules, but allowing both creates an ambiguity.
 
-In this case there are no $(ps)$--$(st)$ edges by construction, and there are no $(st)$--$(tq]$ edges, as they would violate the 1ec property for the edge ending at $t$.
+In this case there are no $(ps)$--$(st)$ edges by construction, and there are no $(st)$--$(tq]$ edges, as they would violate the \oneEC property for the edge ending at $t$.
 We subdivide this into two cases, depending on whether there is an $s$--$(tq)$ edge.
 
 \begin{center}
@@ -1368,13 +1433,13 @@ We subdivide this into two cases, depending on whether there is an $s$--$(tq)$ e
 \end{center}
 
 In this case we have an item $[ps.t]$, because $|C| = 1$ means there are no further $[ps)$--$(sq)$ edges.
-The edge with an endpoint at $t$ could be crossed by an $s$--$(ps)$ edge, but not by a $p$--$(ps)$ edge, as that would violate the 1ec property.
+The edge with an endpoint at $t$ could be crossed by an $s$--$(ps)$ edge, but not by a $p$--$(ps)$ edge, as that would violate the \oneEC property.
 This means $[ps.t]$ is either an $N$ or and $R$, and in either case will have the edge $ps$.
 
-We also have an interval, $[st]$, because any $(st)$--$(tq)$ edges would violate the 1ec property for the edge with an endpoint at $t$, and there are no $(st)$--$(ps)$ edges by construction.
+We also have an interval, $[st]$, because any $(st)$--$(tq)$ edges would violate the \oneEC property for the edge with an endpoint at $t$, and there are no $(st)$--$(ps)$ edges by construction.
 
 The third item is $[tq.s]$, for reasons already given (in terms of what edges are allowed).
-This cannot be an $R$ or $B$ because that would violate the 1ec property for the $s$--$(tq)$ edge.
+This cannot be an $R$ or $B$ because that would violate the \oneEC property for the $s$--$(tq)$ edge.
 If there is only one $s$--$(tq]$ edge, and it is $sq$, then this item is an $X$.
 Otherwise it will be either an $L$ or $N$, depending on whether the $s$--$(tq)$ edge is crossed by a $t$--$(tq)$ edge.
 If $st$ or $ts$ exists, we attribute it to the middle sub-item (it could come from any of them, so this avoids a spurious ambiguity).
@@ -1452,8 +1517,8 @@ The same arguments given above apply here, giving the same derivation, the only 
 \end{tikzpicture}
 \end{center}
 
-In this case there are no $(pt)$--$(ts)$ edges, as they would violate the 1ec property for the edges in $C$.
-There are also no $(pt)$--$(sq)$ edges, as they would violate the 1ec property for $ps$.
+In this case there are no $(pt)$--$(ts)$ edges, as they would violate the \oneEC property for the edges in $C$.
+There are also no $(pt)$--$(sq)$ edges, as they would violate the \oneEC property for $ps$.
 As in the previous case there are two decomposition options, this time depending on whether there is a $p$--$(ts)$ edge.
 
 \begin{center}
@@ -1474,17 +1539,17 @@ As in the previous case there are two decomposition options, this time depending
 \end{tikzpicture}
 \end{center}
 
-In this case there are no $(pt)$--$(ts]$ edges, or between $(ts)$ and $(sq]$, because they would violate the 1ec property for the edges in $C$.
-There are also no $(pt)$--$[sq]$ edges, because they would violate the 1ec property for the $p$--$(ts)$ edges.
+In this case there are no $(pt)$--$(ts]$ edges, or between $(ts)$ and $(sq]$, because they would violate the \oneEC property for the edges in $C$.
+There are also no $(pt)$--$[sq]$ edges, because they would violate the \oneEC property for the $p$--$(ts)$ edges.
 There are no $p$--$(sq]$ edges by construction.
 This means the left item is $[pt]$, the middle item is $[ts.p]$, and the right item is $[sq.t]$.
 The left item is an $I$.
-The middle item can be an $L$ or $N$, but an $R$ would violate the 1ec property for the $p$--$(ts)$ edge.
+The middle item can be an $L$ or $N$, but an $R$ would violate the \oneEC property for the $p$--$(ts)$ edge.
 The right item must be an $N$ with multiple edges from the external point to the interior of the span.
-Any other option would violate the 1ec property for edges in $C$.
+Any other option would violate the \oneEC property for edges in $C$.
 
 Additional constraints are added to ensure direct $st$ and $pt$ edges can only occur in one of the items.
-Also, $sq$ cannot occur, as it would violate the 1ec property for edges in $C$.
+Also, $sq$ cannot occur, as it would violate the \oneEC property for edges in $C$.
 
 \finalequation{
   $I[pt \; F \; .] \quad \cdotp LN[tsp \; .\overline{P} \; .P \; F] \quad \cdotp \uwave{N}[sqt \; \overline{QT} \; \overline{S}. \; \overline{S}.]$
@@ -1637,8 +1702,8 @@ There are two general cases, depending on whether this edge crosses any $q$--$(p
 \end{center}
 
 The dashed edges must be present because this is a $B$.
-They must end at $s_p$ and $s_q$ because otherwise they would violate the 1ec property for either $ps_p$ or $qs_q$.
-Once those edges are set, the 1ec property blocks the following edge types:
+They must end at $s_p$ and $s_q$ because otherwise they would violate the \oneEC property for either $ps_p$ or $qs_q$.
+Once those edges are set, the \oneEC property blocks the following edge types:
 $o$-$(pq)$,
 $q$-$(ps_q)$,
 $p$-$(s_pq)$,
@@ -1646,7 +1711,7 @@ $(ps_q)$-$(s_pq)$,
 $[ps_q)$-$(s_qs_p)$,
 $(s_qs_p)$-$(s_pq]$.
 This means it can be decomposed into three items, $[ps_q.s_p]$, $[s_qs_p.o]$, $[s_pq.s_q]$.
-The left of these cannot be an $L$, as that would violate 1ec for $s_p$--$(ps_q)$ edges, but it can be an $R$ or $N$.
+The left of these cannot be an $L$, as that would violate \oneEC for $s_p$--$(ps_q)$ edges, but it can be an $R$ or $N$.
 Similarly, the right item cannot be an $R$, but can be an $L$ or $N$.
 The middle item would be an $X$, but with a modification to our definition to allow edges from both $s_p$ and $s_q$ to $o$.
 
@@ -1671,7 +1736,7 @@ The middle item would be an $X$, but with a modification to our definition to al
 
 The way we choose the split point in this case will mean we need to track an extra bit of information for $L$ items.
 If no $(ps)$--$(sq)$ edge exists, then $s$ is the split point.
-If an edge does exist, the 1ec property will mean there is only one $o$--$(ps)$ edge and these two edges share an endpoint:
+If an edge does exist, the \oneEC property will mean there is only one $o$--$(ps)$ edge and these two edges share an endpoint:
 
 \begin{center}
 \begin{tikzpicture}
@@ -1743,7 +1808,7 @@ Again, there will be two possibilities, either there are no $(pt)$--$(tq)$ edges
 \end{center}
 
 Eventually this chain of crossing edges will either stop in the middle, or cross the edge shown between $q$ and $(pq)$.
-In the second case it must have the following structure, or otherwise it would have a 1ec violation for reasons symmetrical to the constraints that started the chain:
+In the second case it must have the following structure, or otherwise it would have a \oneEC violation for reasons symmetrical to the constraints that started the chain:
 
 \begin{center}
 \begin{tikzpicture}
@@ -1943,7 +2008,7 @@ Also, the item being split in this case can be marked as containing only one edg
 Consider the case when $os$ is not the only $o$--$(pq)$ edge.
 If there is an $o$--$(ps)$ edge that is crossed by a $p$--$(ps)$ edge then $ps.o$ is an $L$.
 Otherwise, $[ps.o]$ is an $N$.
-For the second half, all $p$--$(sq)$ edges are going to cross two or more $o$--$(ps]$ edges, and so the 1ec property means they cannot be crossed by any $[sq]$--$[sq]$ edges.
+For the second half, all $p$--$(sq)$ edges are going to cross two or more $o$--$(ps]$ edges, and so the \oneEC property means they cannot be crossed by any $[sq]$--$[sq]$ edges.
 Therefore, $[sq.p]$ is an $N$.
 
 \finalequation{

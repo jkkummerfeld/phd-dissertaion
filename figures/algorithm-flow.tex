@@ -1,0 +1,161 @@
+\begin{figure}
+\newlength\spanWidth
+
+\tikzstyle{question} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+\tikzstyle{answer} = [thick,->,>=stealth]
+
+\centering
+\begin{tikzpicture}
+  [every fit/.style={rectangle,rounded corners,draw,inner sep=2pt}]
+  \pgfmathsetlength{\spanWidth}{2cm}
+
+  \node (top) at (10,3) [question] {Item type?};
+
+  \node (endX) at (6,0.2) {\S~\ref{sec:alg:exterval}};
+  \node (endB) at (9,0.2) {\S~\ref{sec:alg:both}};
+  \node (endN) at (12,0.2) {Fig.~\ref{fig:rule-neither}};
+  \node [align=left] (endR) at (19,0.2) {Symmetric\\with L};
+
+  \node (q1p) at (0, 0) {};
+  \node (q1q) [right=\spanWidth of q1p] {};
+  \node (q1t) at ($(q1p)!0.2!(q1q)$) {};
+  \node (q1s) at ($(q1p)!0.35!(q1q)$) {};
+  \node (q1a) at ($(q1p)!0.5!(q1q)$) {};
+  \node (q1c) at ($(q1p)!0.65!(q1q)$) {};
+  \node (q1b) at ($(q1p)!0.8!(q1q)$) {};
+  \draw [thick] (q1p.center) -- (q1q.center);
+  \draw [thick,out=60,in=120,color=white] (q1p.center) to node (q1pc) [midway] {} (q1c.center);
+  \draw [thick,out=60,in=120,color=white] (q1t.center) to node (q1ta) [midway] {} (q1a.center);
+  \draw [thick,out=60,in=120,color=white] (q1t.center) to node (q1tb) [midway] {} (q1b.center);
+  \draw [thick,out=60,in=120,color=blue] (q1p.center) to node (q1ps) [midway] {} (q1s.center);
+  \node (q1) [fit=(q1p) (q1q) (q1ps) (q1pc) (q1ta) (q1tb)] {};
+
+  \node (endIa) at (0,-1.8) {Fig.~\ref{fig:rule-interval-a}};
+
+  \node (q2p) at (3, -2) {};
+  \node (q2q) [right=\spanWidth of q2p] {};
+  \node (q2t) at ($(q2p)!0.2!(q2q)$) {};
+  \node (q2s) at ($(q2p)!0.35!(q2q)$) {};
+  \node (q2a) at ($(q2p)!0.5!(q2q)$) {};
+  \node (q2c) at ($(q2p)!0.65!(q2q)$) {};
+  \node (q2b) at ($(q2p)!0.8!(q2q)$) {};
+  \draw [thick] (q2p.center) -- (q2q.center);
+  \draw [thick,out=60,in=120,color=white] (q2p.center) to node (q2pc) [midway] {} (q2c.center);
+  \draw [thick,out=60,in=120,color=white] (q2t.center) to node (q2tb) [midway] {} (q2b.center);
+  \draw [thick,out=60,in=120,color=black] (q2p.center) to node (q2ps) [midway] {} (q2s.center);
+  \draw [thick,out=60,in=120,color=blue] (q2t.center) to node (q2ta) [midway] {} (q2a.center);
+  \node (q2) [fit=(q2p) (q2q) (q2ps) (q2pc) (q2ta) (q2tb)] {};
+
+  \node (endIb) at (2,-3.8) {Fig.~\ref{fig:rule-interval-b}};
+
+  \node (q3p) at (6, -4) {};
+  \node (q3q) [right=\spanWidth of q3p] {};
+  \node (q3t) at ($(q3p)!0.2!(q3q)$) {};
+  \node (q3s) at ($(q3p)!0.35!(q3q)$) {};
+  \node (q3a) at ($(q3p)!0.5!(q3q)$) {};
+  \node (q3c) at ($(q3p)!0.65!(q3q)$) {};
+  \node (q3b) at ($(q3p)!0.8!(q3q)$) {};
+  \draw [thick] (q3p.center) -- (q3q.center);
+  \draw [thick,out=60,in=120,color=white] (q3p.center) to node (q3pc) [midway] {} (q3c.center);
+  \draw [thick,out=60,in=120,color=black] (q3p.center) to node (q3ps) [midway] {} (q3s.center);
+  \draw [thick,out=60,in=120,color=black] (q3t.center) to node (q3ta) [midway] {} (q3a.center);
+  \draw [thick,out=60,in=120,color=blue] (q3t.center) to node (q3tb) [midway] {} (q3b.center);
+  \node (q3) [fit=(q3p) (q3q) (q3ps) (q3pc) (q3ta) (q3tb)] {};
+
+  \node (q4p) at (3, -6) {};
+  \node (q4q) [right=\spanWidth of q4p] {};
+  \node (q4t) at ($(q4p)!0.2!(q4q)$) {};
+  \node (q4s) at ($(q4p)!0.35!(q4q)$) {};
+  \node (q4a) at ($(q4p)!0.5!(q4q)$) {};
+  \node (q4c) at ($(q4p)!0.65!(q4q)$) {};
+  \node (q4b) at ($(q4p)!0.8!(q4q)$) {};
+  \draw [thick] (q4p.center) -- (q4q.center);
+  \draw [thick,out=60,in=120,color=white] (q4p.center) to node (q4pc) [midway] {} (q4c.center);
+  \draw [thick,out=60,in=120,color=white] (q4t.center) to node (q4tb) [midway] {} (q4b.center);
+  \draw [thick,out=60,in=120,color=black] (q4p.center) to node (q4ps) [midway] {} (q4s.center);
+  \draw [thick,out=60,in=120,color=black] (q4t.center) to node (q4ta) [midway] {} (q4a.center);
+  \draw [thick,out=60,in=120,color=blue] (q4s.center) to node (q4sc) [midway] {} (q4c.center);
+  \node (q4) [fit=(q4p) (q4q) (q4ps) (q4pc) (q4ta) (q4tb)] {};
+
+  \node (endIc) at (2,-7.8) {Fig.~\ref{fig:rule-interval-c}};
+  \node (endId) at (6,-7.8) {Fig.~\ref{fig:rule-interval-d}};
+
+  \node (q5p) at (9, -6) {};
+  \node (q5q) [right=\spanWidth of q5p] {};
+  \node (q5t) at ($(q5p)!0.2!(q5q)$) {};
+  \node (q5s) at ($(q5p)!0.35!(q5q)$) {};
+  \node (q5a) at ($(q5p)!0.5!(q5q)$) {};
+  \node (q5c) at ($(q5p)!0.65!(q5q)$) {};
+  \node (q5b) at ($(q5p)!0.8!(q5q)$) {};
+  \draw [thick] (q5p.center) -- (q5q.center);
+  \draw [thick,out=60,in=120] (q5p.center) to node (q5ps) [midway] {} (q5s.center);
+  \draw [thick,out=60,in=120] (q5t.center) to node (q5ta) [midway] {} (q5a.center);
+  \draw [thick,out=60,in=120] (q5t.center) to node (q5tb) [midway] {} (q5b.center);
+  \draw [thick,out=60,in=120,color=blue] (q5p.center) to node (q5pc) [midway] {} (q5c.center);
+  \node (q5) [fit=(q5p) (q5q) (q5ps) (q5pc) (q5ta) (q5tb)] {};
+
+  \node (endIe) at (9,-7.8) {Fig.~\ref{fig:rule-interval-e}};
+  \node (endIf) at (12,-7.8) {Fig.~\ref{fig:rule-interval-f}};
+
+  \node (q6p) at (14, 0) {};
+  \node (q6q) [right=0.7\spanWidth of q6p] {};
+  \node (q6x) [right=\spanWidth of q6p] {};
+  \node (q6a) at ($(q6p)!0.2!(q6q)$) {};
+  \node (q6b) at ($(q6p)!0.4!(q6q)$) {};
+  \node (q6s) at ($(q6p)!0.6!(q6q)$) {};
+  \node (q6c) at ($(q6p)!0.8!(q6q)$) {};
+  \draw [thick] (q6p.center) -- (q6q.center);
+  \draw [thick,out=60,in=120,color=white] (q6b.center) to node (q6bx) [midway] {} (q6x.center);
+  \draw [thick,out=60,in=120] (q6p.center) to node (q6ps) [midway] {} (q6s.center);
+  \draw [thick,out=60,in=120] (q6a.center) to node (q6ax) [midway] {} (q6x.center);
+  \draw [thick,out=60,in=120,color=blue] (q6c.center) to node (q6cx) [midway] {} (q6x.center);
+  \node (q6) [fit=(q6p) (q6q) (q6x) (q6ps) (q6ax) (q6bx) (q6cx)] {};
+
+  \node (endLc) at (17,-1.8) {Fig.~\ref{fig:rule-left-c}};
+
+  \node (q7p) at (12, -2) {};
+  \node (q7q) [right=0.7\spanWidth of q7p] {};
+  \node (q7x) [right=\spanWidth of q7p] {};
+  \node (q7a) at ($(q7p)!0.2!(q7q)$) {};
+  \node (q7b) at ($(q7p)!0.4!(q7q)$) {};
+  \node (q7s) at ($(q7p)!0.6!(q7q)$) {};
+  \node (q7c) at ($(q7p)!0.8!(q7q)$) {};
+  \draw [thick] (q7p.center) -- (q7q.center);
+  \draw [thick,out=60,in=120,color=white] (q7c.center) to node (q7cx) [midway] {} (q7x.center);
+  \draw [thick,out=60,in=120] (q7p.center) to node (q7ps) [midway] {} (q7s.center);
+  \draw [thick,out=60,in=120] (q7a.center) to node (q7ax) [midway] {} (q7x.center);
+  \draw [thick,out=60,in=120,color=blue] (q7b.center) to node (q7bx) [midway] {} (q7x.center);
+  \node (q7) [fit=(q7p) (q7q) (q7x) (q7ps) (q7ax) (q7bx) (q7cx)] {};
+
+  \node (endLa) at (11,-3.8) {Fig.~\ref{fig:rule-left-a}};
+  \node (endLb) at (15,-3.8) {Fig.~\ref{fig:rule-left-b}};
+
+  \draw [answer] (q1) -- node [midway,left=4pt] {Yes} (q2);
+  \draw [answer] (q1) -- node [midway,left=4pt] {No} (endIa);
+  \draw [answer] (q2) -- node [midway,left=4pt] {Yes} (q3);
+  \draw [answer] (q2) -- node [midway,left=4pt] {No} (endIb);
+  \draw [answer] (q3) -- node [midway,left=4pt] {No} (q4);
+  \draw [answer] (q3) -- node [midway,left=4pt] {Yes} (q5);
+  \draw [answer] (q4) -- node [midway,left=4pt] {No} (endIc);
+  \draw [answer] (q4) -- node [midway,left=4pt] {Yes} (endId);
+  \draw [answer] (q5) -- node [midway,left=4pt] {No} (endIe);
+  \draw [answer] (q5) -- node [midway,left=4pt] {Yes} (endIf);
+  \draw [answer] (top) -- node [midway,left=22pt] {I} (q1);
+  \draw [answer] (top) -- node [midway,left=8pt] {X} (endX);
+  \draw [answer] (top) -- node [midway,left=4pt] {B} (endB);
+  \draw [answer] (top) -- node [midway,right=8pt] {L} (q6);
+  \draw [answer] (top) -- node [midway,right=14pt] {R} (endR);
+  \draw [answer] (q6) -- node [midway,left=4pt] {No} (q7);
+  \draw [answer] (top) -- node [midway,right=4pt] {N} (endN);
+  \draw [answer] (q7) -- node [midway,left=4pt] {No} (endLa);
+  \draw [answer] (q7) -- node [midway,left=4pt] {Yes} (endLb);
+  \draw [answer] (q6) -- node [midway,left=4pt] {Yes} (endLc);
+
+\end{tikzpicture}
+\caption[Overall picture of deduction rule definitions]{\label{fig:deduction-defs}
+Our algorithm defines a unique decomposition for any structure.
+This chart shows how we define those decompositions.
+Each rectangle poses a questions, using the black structure to express what is known, and the blue edge to ask the question: is such an edge present or not?
+Leaves of the chart are labeled with the section in the text that gives the decomposition for that case.
+}
+\end{figure}

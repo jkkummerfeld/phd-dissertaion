@@ -85,13 +85,13 @@ We classify node errors in two phases.
 First, we find a set of tree transformations that convert the output parse into the gold parse (Section~\ref{sec:tree-transform}).
 Second, each transformation is classified as one of several error types (Section~\ref{sec:classify}).
 Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
-The tree transformation stage corresponds to the main loop, while the second stage corresponds to the final loop.
 
 \begin{algorithm}[t]
 \begin{algorithmic}
 \State $U =$ initial set of node errors
 \State Sort $U$ by the depth of the error in the parse, deepest first
-\State $G = \emptyset$
+\State
+\State $G = \emptyset$ \Comment{Transformation stage (Section~\ref{sec:tree-transform})}
 \Repeat
 	\ForAll{errors $e \in U$}
 		\If{$e$ fits an environment template $t$}
@@ -108,7 +108,8 @@ The tree transformation stage corresponds to the main loop, while the second sta
 \ForAll{remaining errors $e \in U$}
 	\State Insert a group into $G$ containing $e$
 \EndFor
-\ForAll{groups $g \in G$}
+\State
+\ForAll{groups $g \in G$} \Comment{Classification stage (Section~\ref{sec:classify})}
 	\State Classify $g$ based on properties of the group
 \EndFor
 \end{algorithmic}
@@ -125,13 +126,15 @@ We define three general types of transformations:
 \begin{description}
   \item[Create node] takes a set of nodes that are siblings and places them under a new node.
   \item[Delete node] removes a node and re-attaches its children where it was.
-  \item[Move subtree] takes a node and moves it either up or down within the parse, with the constraint that it may not make the structure discontinuous. If this move leads to the creation of a unary production between two non-terminals of the same type, also remove one of them.
+  \item[Move subtree] takes a node and moves it either up or down within the parse, with the constraint that it must not make the structure discontinuous. If this move leads to the creation of a unary production between two non-terminals of the same type, also remove one of them.
 \end{description}
 
-The first two of these are straightforward, while an example of the third can be seen in Figure~\ref{fig:PP-attachment}.
-The PP node spanning \emph{in 1986} is moved up in the parse until it is outside of all the extra spans.
-This fixes most of the errors, but leaves behind an NP to NP unary production.
-One of the NPs is deleted, leaving behind the correct parse.
+The first two of these are straightforward, to demonstrate the third we will describe the move transformation that fixes the errors in Figure~\ref{fig:PP-attachment}.
+The PP node spanning \emph{in 1986} is too low in the parser output (top half of the figure).
+We will make a move transformation, moving the PP up to be a child of the VP.
+By moving the PP, the extra nodes cover a shorter span of text and three of them now match the three missing nodes (shown in the bottom half of the figure).
+The remaining extra node is the lowest extra NP, which was originally over \emph{Applied in 1986}.
+After \emph{in 1986} moves up, an NP to NP unary production is left behind, and so one of the NPs is deleted.
 
 Once a transformation is performed, all of the nodes that were fixed are placed in a single group and information about the nearby parse structure before and after the transformation is recorded.
 This recording is necessary, since subsequent changes may alter the surrounding structure in ways that impact the classification process described in the next section.
@@ -423,7 +426,7 @@ Looking at the breakdown by unary type we found that clause labeling (S, SINV, e
 \input{figures/wsj23_comparison.tex}
 \end{landscape}
 
-By comparing the performance of the Collins parser with other systems we can see where performance has and has not changed over the past fifteen years.
+By comparing the performance of the three Collins parsers, which were released in 1997, with more recent systems we can see where performance has and has not changed over the past fifteen years.
 There has been improvement across the board, but in some cases, \myeg clause attachment errors and different label errors, the change has been more limited (24\% and 29\% reductions respectively).
 It is difficult to know why these ambiguities are more difficult, but three possibilities are:
 (1) annotation errors may be more prevalent, making the potential for improvement vary,
@@ -441,9 +444,9 @@ Another interesting pair is the Berkeley parser and the BUBS parser, which uses
 a Berkeley grammar, but improves speed by pruning.  The pruning methods used in
 BUBS are particularly damaging for PP attachment errors and unary errors.
 
-Various comparisons can be made between Charniak parser variants.  We discuss
-the reranker below.  For the self-trained model
-\textcite{McClosky-Charniak-Johnson:2006} performed some error analysis,
+Various comparisons can be made between Charniak parser variants (Charniak, Charniak-S, Charniak-R, and Charniak-RS).
+We discuss the reranker below (-R).
+For the self-trained model (Charniak-S), \textcite{McClosky-Charniak-Johnson:2006} performed some error analysis,
 considering variations in F-score depending on the frequency of tags such as
 PP, IN and CC in sentences.  Here we see gains on all error types, though
 particularly for clause attachment, modifier attachment and coordination, which
@@ -452,25 +455,27 @@ fits with their observations.
 \subsection{Reranking}
 
 The standard dynamic programming approach to parsing limits the range of features that can be employed.
-One way to deal with this issue is to modify the parser to produce the top $K$ parses, rather than just the 1-best, then use a model with more sophisticated features to choose the best parse from this list \parencite{collins:00}.
+One way to deal with this issue is to use a two-stage process.
+First, a modified version of the parser produces the top $K$ parses (rather than just the 1-best).
+Then, a model with more sophisticated features chooses the best parse from the $K$-best list \parencite{collins:00}.
 While re-ranking has led to gains in overall performance \parencite{Charniak-Johnson:2005}, there has been limited analysis of how effectively rerankers are using the list of parses they are ranking.
 Recent work has explored this question in more depth, but focusing on how variation in inference and model parameters impacts performance on standard metrics \parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
 We will explore the question from the perspective of observed errors, considering the potential for improvement using only the n-best list of parses, and how many errors a re-ranker actually avoids.
 
-In Table~\ref{tab:reranking} we present a breakdown over error types for the
-Charniak parser, using the self-trained model and reranker.  The oracle results
-use the parse in each K-best list with the highest F-score.  While this may not
-give the true oracle result, as F-score does not factor over sentences, it
-gives a close approximation.  The table has the same columns as
-Table~\ref{tab:wsj23-comp}, but the ranges on the bars now reflect the min and
-max for these sets.
+In Table~\ref{tab:reranking} we present a breakdown over error types for the Charniak parser, using the self-trained model and reranker.
+For both the top half and bottom half of the table, we first used the Charniak parser to create $K$-best lists of varying length (indicated by the $K$ column).
+In the top half, we chose the parse from the list that has the highest F-score (this is an oracle because to do it we use the correct answer, which we have for this data)\footnote{
+This result is not the absolute best possible result, as F-score does not factor over sentences and so it may be better to make slightly different choices. However, this is a close approximation.
+}.
+In the bottom half, we let the \textcite{Charniak-Johnson:2005} reranker select the parse from the list, with no gold information.
+The table has the same columns as Table~\ref{tab:wsj23-comp}, but the ranges on the bars now reflect the min and max for these sets.
 
 \begin{landscape}
 \input{figures/reranking.tex}
 \end{landscape}
 
-While there is improvement on all errors when using the reranker, there is very
-little additional gain beyond the first 5-10 parses.  Even for the oracle
+While there is improvement on all errors when using the reranker, there is very little additional gain beyond the first 5-10 parses (this may be easier to see by rotating the page containing the table).
+Even for the oracle
 results, most of the improvement occurs within the first 5-10 parses.  The
 limited utility of extra parses for the reranker may be due to the importance
 of the base parser output probability feature (which, by definition, decreases
@@ -831,26 +836,36 @@ is observed for several different parsers on the \pctb 6 dev set.\footnote{
   We use the standard data split suggested by the \pctb 6 file manifest.
   As a result, our results differ from those previously reported on other splits.
 }
-We include results for
-a transition-based parser \parencite[ZPAR;][]{Zhang-Clark:2009:ICPT},
-a split-merge PCFG parser \parencite{Petrov-etal:2006,Petrov-Klein:2007,Petrov:2010:NAACLHLT},
-a lexicalized parser \parencite{Bikel-Chiang:2000:CLP},
-and a factored PCFG and dependency parser
-\parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
-\footnote{These parsers represent a variety of parsing methods, though exclude
-some recently developed parsers that are not publicly
-available \parencite{Qian-Liu:2012:EMNLP,Xiong-etal:2005:IJCNLP}.}
+We include results for a range of parsers:
+
+\paragraph{ZPAR} \parencite{Zhang-Clark:2009:ICPT}.
+A transition-based parser.
+
+\paragraph{Berkeley} \parencite{Petrov-etal:2006,Petrov-Klein:2007}.
+The same unlexicalised split-merge parser described in Section~\ref{sec:errors-results}, but trained on Chinese instead of English.
+Here we also consider the product-parser version, which uses the same algorithm, but scoring with the product of multiple grammars trained with different random seeds \parencite{Petrov:2010:NAACLHLT}.
+This variation leads to models that are different enough to combine productively similarly to system combination approaches.
+We label the product parser as Berk-2, as opposed to Berk-1.
+
+\paragraph{Bikel} \parencite{Bikel-Chiang:2000:CLP}.
+A lexicalized parser.
+
+\paragraph{Stanford} \parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
+The same parsers described in Section~\ref{sec:errors-results}, but trained on Chinese instead of English.
+
+These parsers represent a variety of parsing methods, though exclude some recently developed parsers that are not publicly available \parencite{Qian-Liu:2012:EMNLP,Xiong-etal:2005:IJCNLP}.
 
 Comparing the two Stanford parsers in Table~\ref{tab:comparison}, the factored
 model provides clear improvements on sense disambiguation, but performs
 slightly worse on coordination.
 
-The Berkeley product parser we include uses only two grammars because we found,
-in contrast to the English results \parencite{Petrov:2010:NAACLHLT}, that further
-grammars provided limited benefits.  Comparing the performance with the
-standard Berkeley parser it seems that the diversity in the grammars only
-assists certain error types, with most of the improvement occurring in four of
-the categories, while there is no improvement, or a slight decrease, in five categories.
+We run the Berkeley product parser with only two grammars because we found, in contrast to the English results \parencite{Petrov:2010:NAACLHLT}, that further grammars provided limited benefits.
+Comparing its performance with the
+standard Berkeley parser, it seems that the diversity in the grammars only
+assists certain error types.
+Most of the improvement in score is due to reductions in four categories: NP Internal Structure, Verb Arguments, Modifier Attachment, and Clause Attachment.
+Meanwhile, there is no improvement in two categories (Unary and Wrong Sense), and a slight decrease in three (One-Word Spans, Different Label, VP Attachment).
+It is difficult to confidently say why some errors are reduced and others are not, but it does imply that there are systematic biases that cannot be avoided by training slightly different models.
 
 \begin{landscape}
 \begin{table*}
