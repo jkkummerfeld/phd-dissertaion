@@ -1,4 +1,49 @@
-\section{Parse Representation}
+\section{Parse Representation} \label{sec:representation}
+
+Our algorithm relies on the assumption that we can process the dependents to the left and right of a word independently, then combine the two halves.
+This means we need lexicalized structures, which the \ptb does not provide.
+To address this issue, we define a new representation in which each non-terminal symbol is associated with a specific word (the head).
+Unlike dependency parsing, we retain all the information required to reconstruct the constituency parse.
+
+Our representation is based on \textcite{cck}'s tree representation, with three key differences:
+(1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
+(2) we add representations of null elements and co-indexation,
+(3) we modify the head rules to avoid problematic structures.
+
+\subsection{Core Structure} \label{sec:rep-core}
+
+We represent parses with two components.
+Every word is assigned a \emph{spine}, and every word is the child of one non-trace edge.
+Together, these form the base tree structure of the parse.
+
+
+\begin{figure}
+  \centering
+  \scalebox{1.0}{
+    \input{figures/picture-simple-flat}
+  }
+  \caption[Parse representations for graph structures.]{ \label{fig:repr2}
+    Parse representations for graph structures: (a) constituency (b) ours.
+  }
+\end{figure}
+
+\paragraph{Spines}
+Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
+If a symbol occurs more than once in a spine, we use indices to distinguish between instances.
+
+\paragraph{Edges}
+A link between two words, with a label indicating: (1) the top of the child's spine, and (2) the symbol that it connects to in the parent's spine.
+In our figures the arcs show their label by starting and ending at the appropriate symbols.
+
+\subsubsection{Avoiding Adjunction Ambiguity}
+
+\textcite{cck} use r-adjunction to add additional non-terminals to spines.
+This introduces ambiguity, because edges modifying the same spine from different sides may not have a unique order of application.
+We resolve this issue by using more articulated spines that have the complete set of non-terminals.
+The potential drawback of our approach is that coverage of spines is more limited by the training set than their approach.
+In practice, coverage is high, with $99.93\%$ of spines in the development set observed in the training set.
+
+\subsection{Additional Structure} \label{sec:rep-other}
 
 \begin{figure}
 \hfill
@@ -45,50 +90,6 @@ Dashed edges are traces, solid edges are structural.
 Some edges are fainter to more clearly show the key edges for each case.
 }
 \end{figure}
-
-Our algorithm relies on the assumption that we can process the dependents to the left and right of a word independently, then combine the two halves.
-This means we need lexicalized structures, which the \ptb does not provide.
-To address this issue, we define a new representation in which each non-terminal symbol is associated with a specific word (the head).
-Unlike dependency parsing, we retain all the information required to reconstruct the constituency parse.
-
-Our representation is based on \textcite{cck}'s tree representation, with three key differences:
-(1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
-(2) we add representations of null elements and co-indexation,
-(3) we modify the head rules to avoid problematic structures.
-
-\subsection{Core Structure} \label{sec:rep-core}
-
-We represent parses with two components.
-Every word is assigned a spine, and every word is the child of one non-trace edge.
-Together, these form the base tree structure of the parse.
-
-\begin{figure}
-  \centering
-  \scalebox{1.0}{
-    \input{figures/picture-simple-flat}
-  }
-  \caption[Parse representations for graph structures.]{ \label{fig:repr2}
-    Parse representations for graph structures: (a) constituency (b) ours.
-  }
-\end{figure}
-
-\paragraph{Spines}
-Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
-If a symbol occurs more than once in a spine, we use indices to distinguish between instances.
-
-\paragraph{Edges}
-A link between two words, with a label indicating: (1) the top of the child's spine, and (2) the symbol that it connects to in the parent's spine.
-In our figures the arcs show their label by starting and ending at the appropriate symbols.
-
-\subsubsection{Avoiding Adjunction Ambiguity}
-
-\textcite{cck} use r-adjunction to add additional non-terminals to spines.
-This introduces ambiguity, because edges modifying the same spine from different sides may not have a unique order of application.
-We resolve this issue by using more articulated spines that have the complete set of non-terminals.
-The potential drawback of our approach is that coverage of spines is more limited by the training set than their approach.
-In practice, coverage is high, with $99.93\%$ of spines in the development set observed in the training set.
-
-\subsection{Additional Structure} \label{sec:rep-other}
 
 The base tree representation described above does not cover null elements or co-indexation, and so only fully represents $26.6\%$ of sentences.
 

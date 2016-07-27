@@ -123,7 +123,7 @@ To avoid counting twice (once for each end) we have a few options:
 \noindent
 In our system we use the first approach.
 
-\subsection{Inference}
+\subsection{Inference} \label{sec:inference}
 
 The core contributions of this entire chapter is the inference algorithm presented in Section~\ref{sec:full-algorithm}.
 The core idea behind the algorithm is to constrain the space to consider so that it can be explored efficiently, while still covering the structures observed in language.
@@ -136,12 +136,14 @@ We ensure diversity by dividing each beam into a collection of sub-beams.
 In all three passes, the sub-beams separate items based on their type ($N$, $L$, etc), and the parents of each position in the item.
 This subdivision enables us to avoid considering most incompatible items.
 The pass with spines also includes one of the spines in the sub-beam definition for the same reason.
+We tuned the beam size to prevent the gold structure being pruned in training, with values falling between 100 and 2000.
 
 \subsubsection{Cube pruning}
 
 We apply the standard cube pruning approach when doing binary and ternary compositions \parencite{Chiang:2007}.
 Since we are using sub-beams to determine which items are compatible, we use a heap of sub-cubes during composition.
 Using fine sub-beams to avoid comparing incompatible items means that there are many of these sub-cubes, and so we also prune entire sub-cubes based on the score of their top item.
+Again, we tuned how far through the cube we go when combining items by increasing the value until gold structures were not being pruned in training, with the value ranging from 500 to 8000.
 
 \subsubsection{Coarse to Fine Pruning}
 

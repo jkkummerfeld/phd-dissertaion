@@ -8,6 +8,9 @@ Our dynamic program uniquely decomposes structures, is sound and complete with r
 We also implement a proof-of-concept parser that recovers a range of null elements and trace types.
 % TODO: Update with results
 
+The algorithm is a new general-purpose parsing approach that could be applied more broadly than the specific use we consider for our experiments.
+To clearly separate the definition of the algorithm and our specific use of it, we start by defining the algorithm in Sections~\ref{sec:overall-algorithm} through \ref{sec:algorithm-properties}, then show how it can be applied to Penn Treebank parsing in Section~\ref{sec:representation}.
+
 \section{Background}
 
 Before discussing the motivation for this work and the previous work in this area, we need to mention several concepts from discrete mathematics:
@@ -126,7 +129,7 @@ To turn this into a specific algorithm we need to specify:
 The second and third of these needs can be described by deduction rules.
 Most of this chapter will be concerned with the definition of these deduction rules and the properties we are able to achieve by our choices.
 
-\section{Sketch of Deduction Rules}
+\section{Sketch of Deduction Rules} \label{sec:sketch-of-rules}
 
 % TODO: Move all pitler et al references into the following section
 % TODO: Walk through the example carefully
@@ -474,7 +477,7 @@ Next, a width four item is formed by combining items either side of \emph{run}.
 This creates a Neither item, as there is an uncrossed edge from the external point to within the span.
 Note that we can determine it is an $N$ with only limited information about the internal structure of the items being combined. \\
 }\hfill\mbox{
-  $X_{2,4} \; \land \; I_{462} \; \mapsto \; N_{2,6}$
+  $X_{2,4} \; \land \; I_{4,2} \; \mapsto \; N_{2,6}$
 }
 
 \noindent
@@ -1271,10 +1274,11 @@ Our algorithm is based on \textcite{ec}, which had the crucial ideas of one-endp
 Our changes give several overall benefits:
 
 \begin{itemize}
-  \item Extending to graph structures, which introduces particular challenges for the $B$ item type.
-  \item Avoiding derivational ambiguity, where a single parse can be decomposed in multiple ways.
+  \item We extend to graph structures, which introduces particular challenges for the $B$ item type.
+  \item We avoid derivational ambiguity, where a single parse can be decomposed in multiple ways.
   \item Changes that give new intuition about how the algorithm works, by being able to give guarantees about whether edges will be crossed at the time they are created.
   \item A somewhat more concise overall algorithm definition, mainly due to our use of a combination of templates and code to generate the final rules.
+  \item Separation of merging items from edge creation.
 \end{itemize}
 
 Below we provide some specific notes on where changes occurred and why.
@@ -2451,7 +2455,7 @@ They are enforced by the code that converts the templates into all valid deducti
 
 Both of these can be enforced in the rule creation because we have the complete set of parent connections present in the definition of what combinations are allowed.
 
-\section{Algorithm Properties}
+\section{Algorithm Properties} \label{sec:algorithm-properties}
 
 \subsection{Derivational ambiguity}
 
@@ -2463,15 +2467,43 @@ By avoiding derivational ambiguity we reduce the search space, and enable effici
 
 \subsection{Complexity}
 
-Without any labels, our algorithm is $O(n^4)$, where $n$ is the length of the sentence.
-This comes from all of the ternary deduction rules, which require two endpoints and two split points, and many of the binary deduction rules, which have two endpoints, a split point, and an external point.
+We will define the complexity in terms of:
 
-Adding edge labels changes the complexity to $O(n^4 + e n^2)$, where $e$ is the number of edge types, and the second term comes from having to score every possible edge.
-Adding spines, changes the complexity to $O(s^4 n^4 + e s^2 n^2)$, where $s$ is the number of spine types, though depending on features the second term could be simplified to either $e n^2$ or $s^2 n^2$.
-In constituency parsing $e$ and $s$ are both around a thousand, making full enumeration of the dynamic program too slow in practice.
-We resolve this issue through several types of pruning, described in the next section.
+\begin{itemize}
+  \item $n$, the number of words in a sentence.
+  \item $e$, the number of edge types in the model.
+  \item $s$, the number of word labels, \myeg Part-of-Speech tags, in the model.
+\end{itemize}
 
-Finally, there is an important constant in the complexity, relating to the number of rules.
+\paragraph{Unlabaled Structure}
+We can determine the complexity by considering how many different ways the deduction rules can apply.
+For the ternary rules, the left end could be one of $O(n)$ words, the right end could be one of $O(n)$ words, and each of the two split points could be one of $O(n)$ words, giving $O(n^4)$ overall.
+The precise number is smaller, since if we choose word $p$ as the left end then we have $n-p$ choices for the first split point, and similarly for the other two points, but the assymptotic complexity remains the same.
+Similarly, for binary rules with an external point there are four positions (left, right, split, external), and so the complexity is $O(n^4)$.
+The other rules have fewer possible instantiations, and so do not impact the overall complexity.
+This means the overall complexity is $O(n^4)$.
+
+\paragraph{Edge labels}
+Since our algorithm separates edge creation and item combination, these only impact the edge creation step.
+There are $O(n^3)$ possible items (left end, right end, external point), each of which could have up to six edges (two directions, between any pair of three points).
+However, that over counts drastically, since the same edge can appear in many different items.
+Instead we can compute all edge scores for each pair of words and store the best option.
+That gives a complexity of $O(e n^2)$, where there are $n$ possible left endpoints, $n$ possible right endpoints, and $e$ possible labels.
+Together with the complexity of combinations from above, we get $O(n^4 + e n^2)$.
+
+\paragraph{Word labels}
+Following the same logic as above, we can update the two terms in our complexity.
+In both cases the same logic follows, except now there are $s n$ options for each position, rather than $n$, this is because we need to consider word--label combinations rather than just words.
+This changes the complexity to $O(s^4 n^4 + e s^2 n^2)$ \\
+
+Depending on the number of edge types, the number of word labels, and the average length of sentences, either the first or second term could dominate the complexity.
+We will see in the next section that to formulate constituency parsing in a way compatible with our algorithm we will end up with $e$ and $s$ both around a thousand\footnote{
+While there are less than fifty Part-of-Speech tags in the Penn Treebank, we will be using word labels to do much more in our representation.
+}, making full enumeration of the dynamic program too slow in practice.
+We resolve this issue through several types of pruning, described in Section~\ref{sec:inference}.
+
+Finally, it is also worth noting that there is an important constant in the complexity, relating to the number of rules.
 For any set of split points there are multiple items that could be combined.
 Once our templates are expanded to show the possible state combinations there are 49,292 rules.
+However, in Section~\ref{sec:inference} we will also see how the number of rules can be drastically reduced, to 158, with almost no loss in coverage.
 
