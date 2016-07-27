@@ -5,9 +5,11 @@ The standard set up, using the Penn Treebank as training and evaluation data, tr
 However, this dissertation has shown how new algorithms for manipulating syntactic structure can go further.
 Most significantly, we explored parsing with aspects of syntax that are typically ignored for computational reasons.
 Our algorithm is the first to incorporate virtually all aspects of structure in the \ptb into a single inference method that is efficient.
-An alternative approach to handling these aspects of syntax, explored in prior work, has been to use different syntactic representations.
-Unfortunately, changing representation makes interaction between work using different representations more difficult, particularly for comparing system perfromance.
+
+An alternative approach to handling these aspects of syntax, explored in prior work, has been to use representations based on other syntactic theories.
+Unfortunately, it is difficult to compare performance of systems producing parses with different representations, and to provide consistent output across systems for downstream applications.
 Our novel method of converting from \ccg into \ptb-style parses explores one way to bridge this gap, and improved significantly over prior work.
+
 Finally, we worked on going beyond measurements of performance to more nuanced analysis of mistakes.
 Our error analysis method gives a summary of the types of errors in system output, with categories that are easily interpretable.
 We applied the technique to a range of parsers, writing styles, and languages, confirming previously anecdotal claims such as the prevalence of prepositional phrase attachment errors.
