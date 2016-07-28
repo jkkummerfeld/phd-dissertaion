@@ -131,10 +131,6 @@ Most of this chapter will be concerned with the definition of these deduction ru
 
 \section{Sketch of Deduction Rules} \label{sec:sketch-of-rules}
 
-% TODO: Move all pitler et al references into the following section
-% TODO: Walk through the example carefully
-% TODO: Change the example to more clearly show separate items
-
 \tikzset{% 
   not allowed/.style={%
     dotted,
@@ -1602,7 +1598,7 @@ However, we can roughly relate the inference rules as follows, where some of our
     \draw (0,0) -- (0,0.4) -- (0.4,0) -- cycle;
   \end{tikzpicture}
   }
-  & \parbox{0.5\linewidth}{corresponds to the third binary rule, or one step of the second binary rule.}
+  & \parbox{0.5\linewidth}{corresponds to the third binary rule, or half of the second binary rule.}
   \\[10pt]
   \raisebox{-3pt}{
   \begin{tikzpicture}
@@ -1615,7 +1611,7 @@ However, we can roughly relate the inference rules as follows, where some of our
     \draw (0,0) -- (0,0.4) -- (0.4,0.6) -- (0.4,0) -- cycle;
   \end{tikzpicture}
   }
-  & \parbox{0.5\linewidth}{corresponds to the fourth binary rule, or one step of the first binary rule.}
+  & \parbox{0.5\linewidth}{corresponds to the fourth binary rule, or half of the first binary rule.}
   \\[10pt]
   \raisebox{-3pt}{
   \begin{tikzpicture}
@@ -1628,7 +1624,7 @@ However, we can roughly relate the inference rules as follows, where some of our
     \draw (0,0) -- (0.4,0) -- (0.4,0.4) -- cycle;
   \end{tikzpicture}
   }
-  & \parbox{0.5\linewidth}{corresponds to the second step of the first two binary rules, plus either of the arc creation rules.}
+  & \parbox{0.5\linewidth}{corresponds to half of the first two binary rules, plus either of the arc creation rules.}
   \\
 \end{tabular}
 \end{center}
@@ -1664,10 +1660,11 @@ This covers two possible structures, one with the edge going from $p$ to $q$ and
 In both cases, the other end must have a parent state of $F$, as otherwise we would have a directed cycle.
 We can break these cases down into the edge, plus the item beneath it:
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$ with direct edges.}
   $I[pq \; F \; P] \leftarrow \max A[p \; q] \quad I[pq \; F \; \overline{P}]$ \\
   $I[pq \; Q \; F] \leftarrow \max A[q \; p] \quad I[pq \; \overline{Q} \; F]$
-}
+\end{finalEquation}
 
 If we were only considering trees then we would constrain the sub-item to be $I[pq \; F \; F]$.
 
@@ -1678,9 +1675,10 @@ First consider the case when $p$ does not have a parent in this item (the case w
 If there are no $p$--$(pq)$ edges, then this can be broken into two intervals, splitting at $p+1$.
 The second item has an $\overline{F}$ because $p+1$ must get a parent from somewhere.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$, case one.}
   $I[p \; p{+}1 \; F \; F] \quad I[p{+}1 \; q \; \overline{F} \; F]$
-}
+\end{finalEquation}
 
 If $p$--$(pq)$ edges do exist, consider the longest such edge, $ps$.
 Consider the set $C$, of edges that cross $ps$.
@@ -1706,9 +1704,10 @@ Therefore we can break this case down into two intervals.
 The left interval contains a direct edge from the left end to the right end.
 The right interval can have a range of options for parent sets, which we leave undefined in the template, to be constrained later using the general rules.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$, case two.}
   $I[ps \; F \; P] \quad I[sq \; . \; .]$
-}
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1758,9 +1757,10 @@ If there is only one $s$--$(tq]$ edge, and it is $sq$, then this item is an $X$.
 Otherwise it will be either an $L$ or $N$, depending on whether the $s$--$(tq)$ edge is crossed by a $t$--$(tq)$ edge.
 If $st$ or $ts$ exists, we attribute it to the middle sub-item (it could come from any of them, so this avoids a spurious ambiguity).
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$, case four.}
   $RN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad \cdotp LNX[tqs \; .\overline{S} \; . \; \overline{T}.]$
-}
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1785,10 +1785,11 @@ The first item is less restricted than before, it could be am $L$, $R$, or $N$.
 It cannot be a $B$ because there is only one $(ps)$--$t$ edge.
 In this case it's also possible that $t = q$, in which case there is no third item (it would have width 0).
 
-\finalequation{
-  $LRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$ \\
+\begin{finalEquation}
+\caption{Making $I$, cases three and five (part one).}
   $LRN\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
-}
+  $LRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1809,11 +1810,11 @@ In this case it's also possible that $t = q$, in which case there is no third it
 This is the first of two cases where $|C| > 1$, distinguished by the position of $t$, either inside or outside of $ps$.
 The same arguments given above apply here, giving the same derivation, the only differences is that $[ps.t]$ must contain at least two $t$--$(ps)$ edges, and as a result the left item could be a $B$ now.
 
-\finalequation{
-  $RN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad \cdotp LNX[tqs \; .\overline{S} \; . \; \overline{T}.]$ \\
-  $BLRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$ \\
-  $BLRN\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
-}
+\begin{finalEquation}
+\caption{Making $I$, cases three and five (part two).}
+  $B\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
+  $B\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1865,9 +1866,10 @@ Any other option would violate the \oneEC property for edges in $C$.
 Additional constraints are added to ensure direct $st$ and $pt$ edges can only occur in one of the items.
 Also, $sq$ cannot occur, as it would violate the \oneEC property for edges in $C$.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$, case six.}
   $I[pt \; F \; .] \quad \cdotp LN[tsp \; .\overline{P} \; .P \; F] \quad \cdotp \uwave{N}[sqt \; \overline{QT} \; \overline{S}. \; \overline{S}.]$
-}
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -1892,9 +1894,10 @@ The difference is that with the constraint of no edges as shown, $[ts]$ is an $I
 Meanwhile, there can be $s$--$(pt)$ edges.
 Again, we add extra constraints to ensure the direct $ts$ edge can only occur in one item.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $I$, case seven.}
   $RNX\cdotp [pts \; F \; .\overline{S} \; P\overline{T}] \quad I[ts \; . \; .] \quad \cdotp \uwave{LN}[sqt \; .\overline{T} \; . \; \overline{S}.]$
-}
+\end{finalEquation}
 
 \subsection{Exterval}
 In this case we simply need to remove the edge from $o$ to the span and we will have an interval.
@@ -1928,12 +1931,13 @@ We always remove the solid edges first, leaving the dashed edge (if present) for
 Since this is the only edge with an endpoint at $O$ we also know there are no indirect connections between $o$ and $p$ or $q$.
 There are four possibilities in total, depending on which direction the edge goes in:
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $X$ with direct edges.}
   $X[pqo \; .O \; .\overline{O} \; F] \leftarrow \max A[o \; p] \quad I[pq \; . \; .]$ \\
   $X[pqo \; .\overline{O} \; .\overline{O} \; P\overline{Q}] \leftarrow \max  A[p \; o] \quad I[pq \; . \; .]$ \\
   $X[pqo \; .\overline{O} \; .O \; F] \leftarrow \max A[o \; q] \quad I[pq \; . \; .]$ \\
-  $X[pqo \; .\overline{O} \; .\overline{O} \; \overline{P}Q] \leftarrow \max A[q \; o] \quad I[pq \; . \; .]$ \\
-}
+  $X[pqo \; .\overline{O} \; .\overline{O} \; \overline{P}Q] \leftarrow \max A[q \; o] \quad I[pq \; . \; .]$
+\end{finalEquation}
 
 \subsection{Both}
 The way we decomposed the Interval case has implications for the range of possible Both structures.
@@ -1988,10 +1992,11 @@ In this case we have these two structures, with all the edges shown required bec
 
 In each case we remove the $p$--$q$ edge.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $B$ with direct edges.}
   $B\cdotp [pqo \; F \; P\overline{O} \; \overline{PQ}] \leftarrow \max A[p \; q] \quad B\cdotp [pqo \; F \; \overline{PO} \; \overline{PQ}]$ \\
   $\cdotp B[pqo \; Q\overline{O} \; F \; \overline{PQ}] \leftarrow \max A[q \; p] \quad \cdotp B[pqo \; \overline{QO} \; F \; \overline{PQ}]$
-}
+\end{finalEquation}
 
 \subsubsection{No Direct Edges Present}
 Consider the case when $o$ is to the right of the span (the case when $o$ is to the left of the span is symmetrical).
@@ -2165,7 +2170,8 @@ For an $L$ we need to track whether the property is true or not.
 In practice we avoid the chaining pattern entirely, using the constraint that $L$ must also contain the edge $ps$, with no loss in coverage.
 How to track the chaining property is discussed below for completeness.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $B$.}
   $B\cdotp [pqo \; F \; \overline{PO} \; \overline{PQ}] \leftarrow \max_{s \in (p, q)}$\mbox{\hspace{2.5cm}} \\
   $LN\cdotp [pso \; F \; P\overline{O} \; \overline{PS}] \quad R\cdotp [sqo \; . \; .\overline{O} \; .\overline{Q}]$ \\
   $LN\cdotp [pso \; F \; P\overline{O} \; \overline{PS}] \quad N\cdotp [sqo \; \overline{Q}. \; S\overline{O} \; .\overline{Q}]$ \\
@@ -2175,7 +2181,7 @@ How to track the chaining property is discussed below for completeness.
   $\cdotp L[pso \; .\overline{O} \; . \; \overline{P}.] \quad \cdotp RN[sqo \; Q\overline{O} \; F \; \overline{SQ}]$ \\
   $\cdotp N[pso \; S\overline{O} \; \overline{P}. \; \overline{P}.] \quad \cdotp RN[sqo \; Q\overline{O} \; F \; \overline{SQ}]$ \\
   $\cdotp N[pso \; \overline{SO} \; P. \; \overline{P}.] \quad \cdotp RN[sqo \; Q\overline{O} \; F \; \overline{SQ}]$
-}
+\end{finalEquation}
 
 \subsection{Left}
 The other decompositions, and the way we will structure this one, enable us to constrain the possible direct edges for $L$ items.
@@ -2203,18 +2209,20 @@ First we have a rule to remove the $qo$ edge.
 For $L$ items we also have to track whether there are multiple $o$--$(pq)$ edges.
 Adding this edge guarantees that there are multiple such edges.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $L$ with direct edges (part one).}
   $\uwave{L}[pqo \; .\overline{O} \; .O \; \overline{PQ}] \leftarrow \max A[o \; q] \quad L[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$ \\
   $\uwave{L}[pqo \; .\overline{O} \; .\overline{O} \; \overline{P}Q] \leftarrow \max A[q \; o] \quad L[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$
-}
+\end{finalEquation}
 
 Once that edge is removed we are either left with an $L$ that has no direct edges, or one with the dashed edge above.
 Next are rules to remove that edge:
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $L$ with direct edges (part two).}
   $L[pqo \; Q\overline{O} \; \overline{PO} \; \overline{PQ}] \leftarrow \max A[q \; p] \quad L[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$ \\
   $L[pqo \; \overline{QO} \; P\overline{O} \; \overline{PQ}] \leftarrow \max A[p \; q] \quad L[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$
-}
+\end{finalEquation}
 
 Now we are considering an $L$ with no direct edges (as indicated by the red dotted lines):
 
@@ -2267,14 +2275,15 @@ If such a crossing exists, $[ps.o]$ is an $L$.
 Otherwise, it is an $N$.
 The $N$ case occurs when the only edge crossing the $o$--$(pq)$ edges is an edge $ps$, which ends inside $(pq)$, making the complete item an $L$, but does not once we split at $s$.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $L$, cases three through eight.}
   $L[pso \; .\overline{O} \; .O \; \overline{PS}] \quad I[sq \; . \; .]$ \\
   $L[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad I[sq \; . \; .]$ \\
   $N[pso \; \overline{SO} \; PO \; \overline{PS}] \quad I[sq \; . \; .]$ \\
   $N[pso \; \overline{SO} \; P\overline{O} \; \overline{P}S] \quad I[sq \; . \; .]$ \\
   $N[pso \; S\overline{O} \; \overline{P}O \; \overline{PS}] \quad I[sq \; . \; .]$ \\
   $N[pso \; S\overline{O} \; \overline{PO} \; \overline{P}S] \quad I[sq \; . \; .]$
-}
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -2297,10 +2306,11 @@ For the second sub-item, all $p$--$(s, q]$ edges will be crossed by $os$ and so 
 If there is an $s$--$(sq)$ edge that crosses an $p$--$(sq)$ edge then this sub-item is an $L$, otherwise it is an $N$.
 Also, the item being split in this case can be marked as containing only one edge from the external point into the span.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $L$, cases nine and ten.}
   $X[pso \; .\overline{O} \; .O \; F] \quad \cdotp LN[sqp \; .\overline{P} \; .\overline{P} \; \overline{SQ}]$ \\
-  $X[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp LN[sqp \; .\overline{P} \; .\overline{P} \; \overline{SQ}] $\\
-}
+  $X[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp LN[sqp \; .\overline{P} \; .\overline{P} \; \overline{SQ}]$
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -2325,10 +2335,11 @@ Otherwise, $[ps.o]$ is an $N$.
 For the second half, all $p$--$(sq)$ edges are going to cross two or more $o$--$(ps]$ edges, and so the \oneEC property means they cannot be crossed by any $[sq]$--$[sq]$ edges.
 Therefore, $[sq.p]$ is an $N$.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $L$, cases one and two.}
   $LN[pso \; .\overline{O} \; .O \; \overline{PS}] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$ \\
-  $LN[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$ \\
-}
+  $LN[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$
+\end{finalEquation}
 
 \subsection{Right}
 Defined symmetrically to $L$.
@@ -2365,14 +2376,15 @@ Here we have the most flexibility in direct edges, though the structure of the d
 As in the $L$ case, we remove the $op$ or $oq$ edge first, then the $pq$ edge.
 The definition of an $N$ item also means that any $N$ that has an $op$ or $oq$ edge also meets the criteria of having two $o$--$[pq]$ edges.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $N$ with direct edges.}
   $\uwave{N}[pqo \; .O \; .\overline{O} \; \overline{PQ}] \leftarrow \max A[x \; i] \; \; N[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$ \\
   $\uwave{N}[pqo \; .\overline{O} \; .\overline{O} \; P\overline{Q}] \leftarrow \max A[i \; x] \; \; N[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$ \\
   $\uwave{N}[pqo \; .\overline{O} \; .O \; \overline{PQ}] \leftarrow \max A[x \; j] \; \; N[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$ \\
   $\uwave{N}[pqo \; .\overline{O} \; .\overline{O} \; \overline{P}Q] \leftarrow \max A[j \; x] \; \; N[pqo \; .\overline{O} \; .\overline{O} \; \overline{PQ}]$ \\
   $N[pqo \; Q\overline{O} \; \overline{PO} \; \overline{PQ}] \leftarrow \max A[j \; i] \; \; N[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$ \\
-  $N[pqo \; \overline{QO} \; P\overline{O} \; \overline{PQ}] \leftarrow \max A[i \; j] \; \; N[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$ \\
-}
+  $N[pqo \; \overline{QO} \; P\overline{O} \; \overline{PQ}] \leftarrow \max A[i \; j] \; \; N[pqo \; \overline{QO} \; \overline{PO} \; \overline{PQ}]$
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -2414,10 +2426,11 @@ There are no $(ps)$--$(sq)$ edges by definition, and no $o$--$[ps)$ edges by con
 Therefore $[ps]$ is an $I$.
 There are two $o$--$[sq)$ edges, and neither is crossed by a $(pq)$--$(pq)$ edge by definition, therefore $[sq.o]$ is an $N$.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $N$, cases three and four.}
   $I[ps \; . \; .] \quad N\cdotp [sqo \; \overline{Q}O \; \overline{SO} \; \overline{SQ}]$ \\
   $I[ps \; . \; .] \quad N\cdotp [sqo \; \overline{QO} \; \overline{SO} \; S\overline{Q}]$
-}
+\end{finalEquation}
 
 \begin{center}
 \begin{tikzpicture}
@@ -2437,10 +2450,11 @@ There are two $o$--$[sq)$ edges, and neither is crossed by a $(pq)$--$(pq)$ edge
 The reasoning for $[ps]$ is the same as above.
 For $[sq.o]$ we only have one $o$--$[sq]$ edge, namely $os$, and so this is an $X$.
 
-\finalequation{
+\begin{finalEquation}
+\caption{Making $N$, cases seven and eight.}
   $I[ps \; . \; .] \quad X\cdotp [sqo \; .O \; .\overline{O} \; \overline{SQ}]$ \\
   $I[ps \; . \; .] \quad X\cdotp [sqo \; .\overline{O} \; .\overline{O} \; S\overline{Q}]$
-}
+\end{finalEquation}
 
 \subsection{Additional constraints}
 The description above gives the complete decomposition, additional general rules are used to determine the specific rule set.

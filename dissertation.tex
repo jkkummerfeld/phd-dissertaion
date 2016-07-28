@@ -82,6 +82,9 @@ pdfauthor={Jonathan K. Kummerfeld},
 pdfsubject={Natural Language Processing},
 pdfpagelayout=OneColumn}
 
+% Set subref captions to have parentheses, e.g. (a) rather than a
+\captionsetup{subrefformat=parens}
+
 \usetikzlibrary{arrows.meta,backgrounds,positioning,fit,calc,intersections,shapes,patterns}
 
 \tikzset{% 
@@ -149,6 +152,7 @@ pdfpagelayout=OneColumn}
 \newcommand{\myie}{i.e.,\@\xspace}
 \newcommand{\myvs}{vs.\@\xspace}
 \newcommand{\oneEC}{one-EC\@\xspace}
+\newcommand{\old}{\candc{}-Conv\xspace}
 
 % To get URL breaking in bib working always
 \setcounter{biburllcpenalty}{7000}
@@ -208,6 +212,15 @@ pdfpagelayout=OneColumn}
   \end{center}
   \vspace{3mm}
 }
+
+\newenvironment{finalEquation}
+{ \begin{center}
+\begin{minipage}{0.8\textwidth}
+\begin{algorithm}[H]}%
+{\vspace{1mm}
+\end{algorithm}
+\end{minipage}
+\end{center}}
 
 % Syntax-tree settings
 \branchheight{0.33in}

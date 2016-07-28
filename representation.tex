@@ -10,29 +10,45 @@ Our representation is based on \textcite{cck}'s tree representation, with three 
 (2) we add representations of null elements and co-indexation,
 (3) we modify the head rules to avoid problematic structures.
 
-\subsection{Core Structure} \label{sec:rep-core}
-
-We represent parses with two components.
-Every word is assigned a \emph{spine}, and every word is the child of one non-trace edge.
-Together, these form the base tree structure of the parse.
-
-
 \begin{figure}
-  \centering
-  \scalebox{1.0}{
-    \input{figures/picture-simple-flat}
-  }
+  \input{figures/representation-definition}
   \caption[Parse representations for graph structures.]{ \label{fig:repr2}
-    Parse representations for graph structures: (a) constituency (b) ours.
+    Parse representations for graph structures.
   }
 \end{figure}
+
+\subsection{Core Structure} \label{sec:rep-core}
+
+Figure~\ref{fig:repr2} shows a comparison of the standard \ptb representation, a lexicalized version of the \ptb, and our representation.
+The changes we make are motivated by constraints imposed by our algorithm.
+Specifically, the algorithm only allows two types of structure to be built: word labels, and edges between pairs of words.
+In contrast, the standard \ptb representation has structural components that do not fit directly into either labels or edges, for example, the S at the top in \subref{fig:repr-ptb} is not associated with any particular word (and so cannot be a label) and is not associated with a particular pair of words either (and so cannot be an edge).
+
+We address this issue by lexicalizing the \ptb, as shown in \subref{fig:repr-lex-ptb}.
+Going from \subref{fig:repr-ptb} to \subref{fig:repr-lex-ptb}, all we have done is shift some of the non-terminal symbols left or right, the connectivity is the same, and so the structure is the same.
+These shifts associate each non-terminal symbol with a specific word, it's \emph{head}.
+For example, the S mentioned above is associated with \emph{told}, indicated by the fact that it is now directly above \emph{told}.
+
+Going from \subref{fig:repr-lex-ptb} to \subref{fig:repr-ours}, we are pushing non-terminals down to be directly above their head, and adjusting the lines to suit that change.
+Diagonal lines in \subref{fig:repr-lex-ptb} become curved lines in \subref{fig:repr-ours}; these will be the edges in our algorithm.
+The direction of the curved lines indicates which way was up in \subref{fig:repr-lex-ptb}.
+Vertical lines in \subref{fig:repr-lex-ptb} become horizontal lines in \subref{fig:repr-ours}; together with the non-terminals these become special symbols called \emph{spines}.
+We will discuss how the null element is handled in Section~\ref{sec:rep-other}.
+
+Aside from lexicalization, which adds information (the choice of head), this process has only pushed around notation without changing the structure.
+However, we now have the structure formulated as two components.
+Every word is assigned a \emph{spine}, and every word is the child of one non-trace edge.
+Together, these form the base tree structure of the parse.
 
 \paragraph{Spines}
 Shown in black immediately above each word, a spine is the ordered set of non-terminals that the word is the head for, \myeg S-NP for \emph{told}.
 If a symbol occurs more than once in a spine, we use indices to distinguish between instances.
 
 \paragraph{Edges}
-A link between two words, with a label indicating: (1) the top of the child's spine, and (2) the symbol that it connects to in the parent's spine.
+A link between two words, with a label indicating: (1) the top of the child's spine, and (2) the symbol that it connects to in the parent's spine\footnote{
+In practise we also indicate the sibling symbol, \myie the symbol preceding the parent in the parent's spine.
+This is redundant for representing the structure, but is helpful for modeling.
+}.
 In our figures the arcs show their label by starting and ending at the appropriate symbols.
 
 \subsubsection{Avoiding Adjunction Ambiguity}
@@ -46,44 +62,21 @@ In practice, coverage is high, with $99.93\%$ of spines in the development set o
 \subsection{Additional Structure} \label{sec:rep-other}
 
 \begin{figure}
-\hfill
-\begin{subfigure}[b]{0.39\textwidth}
+\begin{subfigure}[b]{0.38\textwidth}
   \centering
-  \scalebox{0.8}{\input{figures/picture-null-to-null-flat}}
+  \scalebox{0.9}{\input{figures/picture-null-to-null-flat}}
   \caption{\label{fig:null-null}
     Null to null
   }
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.5\textwidth}
+\begin{subfigure}[b]{0.52\textwidth}
   \centering
-  \scalebox{0.8}{\input{figures/picture-non1ec-flat}}
-  \caption{\label{fig:not-1ec}
-    Not One-Endpoint Crossing
-  }
-\end{subfigure}
-\hfill
-\strut
-
-\vspace{5mm}
-\hfill
-\begin{subfigure}[b]{0.33\textwidth}
-  \centering
-  \scalebox{0.8}{\input{figures/picture-cycle-flat}}
-  \caption{\label{fig:cycle}
-    Cycle
-  }
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.46\textwidth}
-  \centering
-  \scalebox{0.8}{\input{figures/picture-gapping-flat}}
+  \scalebox{0.9}{\input{figures/picture-gapping-flat}}
   \caption{\label{fig:gapping}
     Gapping
   }
 \end{subfigure}
-\hfill
-\strut
 \caption[Examples of graph structured syntactic phenomena.]{
 Examples of syntactic phenomena.
 Dashed edges are traces, solid edges are structural.
@@ -131,6 +124,29 @@ We considered two approaches for these cases: (1) add edges from the repetition 
 The second approach produces more structures that fall within the graph space we consider and explicitly represents all predicates, but only implicitly captures the original treebank structure.
 
 \subsection{Head Rules} \label{sec:rep-head}
+
+\begin{figure}
+\begin{subfigure}[b]{0.32\textwidth}
+  \centering
+  \scalebox{0.9}{\input{figures/picture-cycle-flat}}
+  \caption{\label{fig:cycle}
+    Cycle
+  }
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.58\textwidth}
+  \centering
+  \scalebox{0.9}{\input{figures/picture-non1ec-flat}}
+  \caption{\label{fig:not-1ec}
+    Not One-Endpoint Crossing
+  }
+\end{subfigure}
+\caption[Examples of problematic graph structured syntactic phenomena.]{
+Examples of problematic structures.
+Dashed edges are traces, solid edges are structural.
+The edges that are problematic are shown in a darker color.
+}
+\end{figure}
 
 To construct the spines we use head rules that consider the type of a non-terminal and its children.
 In many cases different head word options represent more syntactic or semantic aspects of the span.
@@ -328,7 +344,7 @@ We do not create a crossing with edges $oq$ or $op$, but our ordering of edge cr
 
 We set the boolean for structural $o$--$[pq]$ edges to true if it is currently true or we are creating a structural $op$ or $oq$ edge, and false otherwise.
 
-\begin{figure}
+\begin{algorithm}
 \centering
 \scalebox{0.85}{
 \begin{tabular}{l|l}
@@ -350,7 +366,7 @@ We set the boolean for structural $o$--$[pq]$ edges to true if it is currently t
 }
 \caption{\label{fig:backbone} Rules that could create crossing arcs.
 }
-\end{figure}
+\end{algorithm}
 
 \subsubsection{When combining items}
 We never introduce a crossing when making a $B$, or in any rule that combines a set of items with only one non-$I$.

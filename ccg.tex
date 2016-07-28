@@ -1,100 +1,3 @@
-%%% Possible todos:
-%%% - Make it clearer what 'robustness' means
-%%% - Average distance from the diagonal in the plots (all, and just below):
-%%%   1192 6.78926 sentences, average distance below diagonal
-%%%   721 12.63 sentences, average distance above diagonal
-%%% - deps numbers for all ptb output (do some of the distinctions go away again,
-%%%   and so things get closer?)
-%%% - Improve the fallback to be smarter (not just an NP bracket always)
-%%% - Consider discussing extremely rare constructions, which become a grammar
-%%%   rule in a PTB parser, and a crazy category in CCG (but then that category
-%%%   isn't used by the parser, as it is below the threshold)
-
-%%% From revierwers:
-%%% - Re-pitch the motivation
-%%% - Make the details of our method more explicit
-
-%%%  ============================================================================
-%%%  
-%%%  The paper shows a clear improvement over previous conversion attempts, and
-%%%  tackles an important mapping problem between CCG parsing and CFG parsing. The
-%%%  evaluation is very interesting.
-%%%  
-%%%  However, more detail is necessary in explaining what information goes into each
-%%%  of the rules for your method (an overview table would be good), and what the
-%%%  coverage of the rules is. Just make this a bit more explicit, like you do for
-%%%  explaining the C&C parser.
-%%%  
-%%%  I think it would help the paper to work through the PP/ADVP example in detail
-%%%  instead of the discussion of the Italian magistrates example.
-%%%  
-%%%  Also, please check the following for correctness:
-%%%  S[ng]\NP + (S\NP)\(S\NP)
-%%%  “coming” + “closer to achieving...” (1)
-%%%  “gaining” + “circulation in recent years” (2)
-%%%  In Example 1, the correct PTB bracket is a PP,
-%%%  while in Example 2 it is an ADVP.
-%%%  
-%%%  It is not obvious what is the PP in "coming closer to achieving" and the ADVP
-%%%  in "gaining circulation in recent years" - do you mean PP in 2 and ADVP in 1?
-%%%  
-%%%  Also, the number of rules used seems to be in the same order of magnitude as
-%%%  number of rules in C&C, although the introduction criticizes C&C for the number
-%%%  of hand crafted rules. Please clarify if this is not correct.
-%%%  
-%%%  At some point, you say "Using sections 00 and 02-21 of the treebanks we
-%%%  hand-crafted instructions for 527 lexical categories, including all those used
-%%%  by the C&C parser." Are there any additional lexical categories in the treebank
-%%%  which the C&C parser doesn't use (but other parsers might use)?
-%%%  
-%%%  ============================================================================
-%%%  
-%%%  This paper presents an improvement to previous CCG to PTB transformation
-%%%  algorithms. However, one of the motivations of the Clark and Curran paper on
-%%%  which this paper was based was to show that the conversion from CCG derivation
-%%%  to PTB tree is hard, and that because of this CCG parsers should not be
-%%%  evaluated according to PTB trees. We are shown an improved mapping between
-%%%  representations but it is not clear that this is a problem that can be solved
-%%%  or whether it is needed. The authors should make it clearer whether they
-%%%  consider the improvement of this mapping to be an ongoing research goal and why
-%%%  it is important when we have other ways of comparing parser output.
-%%%  
-%%%  The exact contributions are unclear from the paper alone but all rules are
-%%%  included in the attached code. The authors are right to warn against reading
-%%%  too much into the evaluation in Table 4 and I am especially sceptical about the
-%%%  usefulness of the PROJ score. However, while I am not convinced that there is
-%%%  any need to judge CCG derivations on the basis of the PTB trees that they can
-%%%  generate, I think that this software would be useful to the community as a
-%%%  development aid.
-%%%  
-%%%  ============================================================================
-%%%  
-%%%  This paper presents a new method for converting CCGBank-style parse tree to
-%%%  Penn treebank-style trees. The approach makes use of a large number of
-%%%  hand-written transaction procedures, that covert more sentences correctly when
-%%%  compared to previous work. Evaluations are performed on gold and automatically
-%%%  produced trees and used to compare a number of existing parsers.
-%%%  
-%%%  This paper presents a well throughout out approach to tree conversion. The use
-%%%  of instructions for individual lexical categories (instead of all pairs of
-%%%  categories in a parse) is well motivated and interesting. One open question
-%%%  that I had was relative to the complexity of writing the instructions/rules. It
-%%%  would be helpful to quantify, even anecdotally, how much effort was involved.
-%%%  The evaluation is well done and the approach does seem to work better, in terms
-%%%  of conversion coverage. However, the CCG parsers still seem to lack behind in
-%%%  traditional evaluations and I am left wondering how important that comparison
-%%%  is in the first place, given the difference in representations between CCG and
-%%%  PTB parsers.
-%%%  
-%%%  My main complaint with this paper is the informality of Section 3 (Our
-%%%  Approach). All of the operations are introduced anecdotally by example.
-%%%  Although the examples are very helpful, it would be much better if there were
-%%%  some formal specification of the set of possible operations/instructions. The
-%%%  inclusion of the source code is helpful, but does not really solve the problem.
-%%%  However, this complaint is relatively minor since the overall story was= clear.
-
-\newcommand{\old}{\candc{}-Conv\xspace}
-
 \chapter{Formalism Conversion} \label{chp:conversion}
 
 \begin{center}
@@ -568,9 +471,6 @@ Many of these errors are unrecoverable from CCGbank, either because inconsistenc
     \hfill
     \includegraphics[trim={15mm 0 65mm 40mm},clip]{figures/heat-both}
   }
-%%%  \framebox{
-%%%  \scalebox{0.6}{ \includegraphics[trim={25mm 0 15mm 0},clip]{figures/heat-both} }
-%%%  }
 	\caption[Heatmaps comparing gold conversion accuracy, \ccg native evaluation, and converted evaluation.]{ \label{fig:scatter_plots}
 		For each sentence in the treebank, we plot the converted parser output against gold conversion (top), the original parser evaluation against gold conversion (left), and the converted parser output against the original parser evaluation against (right).
 		A diagonal line indicating $x=y$ is also included.
@@ -661,36 +561,4 @@ parsers is somewhere between the Stanford and Petrov parsers.
 By exploiting the generalized combinators of the \ccg formalism, we developed a new method of converting \ccg derivations into \ptb-style trees.
 Our system is more effective than previous work, increasing exact sentence match by more than 11\% (absolute), and can be directly integrated with a \ccg parser.
 The system is available online, see Appendix~\ref{chp:resources}.
-
-%%% Consider pusing the idea that we have found the inconsistencies in the treebank / the sentences that are inconsistent
-
-% Further info on plots
-
-%%%Perfect on gold and deps, but 0 converted
-%%%New York City :
-%%%New Jersey :
-%%%+6 more
-%%%Missing an NP bracket over the whole thing (had just an N, which was remoed)
-%%%
-%%%Moved above the diagonal (from left to right)
-%%%100 <100 100
-%%%That year the Apple II , Commodore Pet and Tandy TRS-80 came to market .
-%%%For the first time , the October survey polled members on imports .
-%%%Argentine negotiator Carlos Carballo was in Washington and New York this week to meet with banks .
-%%%Mostly just NPs, but is 'to market' an argument of 'came' or a modifier? Parser gets it wrong, but conversion 'fixes' it.
-%%% X/PP + PP
-%%%     v 
-%%%  X   + X\X
-%%%prepositions in general
-
-%%%Moved above the diagonal (right plot)
-%%%The Japanese industrial companies should know better .
-%%%They do n't have plans to cut back .
-%%%ADVP v ADJP (is my schema wrong? Or maybe it just gets lucky?)
-%%%Ask Matt, is there an inconsistency in the labelling of these sentences?
-%%%Is there documentation that makes this difference clearer
-
-%%%Moreover , the Japanese government , now the world's largest aid donor , is
-%%%pumping far more assistance into the region than the U.S. is .
-%%%Extra nested NPs because of modifier, rather than argument
 
