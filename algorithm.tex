@@ -101,7 +101,7 @@ All of these approaches have the disadvantage that each additional trace dramati
 Our algorithm falls into the dynamic programming class, and specifically the type defined by \textcite{Cocke:1969,Kasami:1966,Younger:1967}.
 Algorithm~\ref{alg:general-cky} shows a pseudocode outline of the CKY algorithm.
 
-\begin{algorithm}
+\begin{algorithm}[t]
 \centering
 \begin{algorithmic}[]
   \State Initialize with an empty parse item for each position in the sentence
@@ -192,7 +192,7 @@ Or a span plus a point outside the span: \\
 \end{tikzpicture}\hfill\strut
 
 \noindent
-\parbox[c]{2in}{
+\parbox[c]{2.3in}{
 Whether a word in the item has edges, and whether the item can be modified to give it an edge, depends on its location: \\
 }\hfill\begin{tabular}{lcrr}
   \hline
@@ -206,7 +206,7 @@ Whether a word in the item has edges, and whether the item can be modified to gi
   the exterior point & & & \\
   At the exterior point & w$_8$ & Yes & Yes \\
   \hline \\
-\end{tabular}\hfill\strut
+\end{tabular}
 
 \noindent
 \parbox{4in}{
@@ -306,10 +306,9 @@ By carefully deciding which combinations are permitted and which are not, we are
 \end{tikzpicture}\hfill\strut
 \end{minipage}\hfill\strut
 
-Crucially, the guarantees for the final structure can be made while only tracking certain properties of the sub-parts of the structure along the way.
-That means for each item we can store just the max over sub-structures, rather than every individual sub-structure.
-That in turn means that when creating a new item, we only consider how to combine these max-structures, not every structure.
-As a result, the time complexity of our algorithm does not depend on the number of possible structures (exponential complexity), but instead on the number of possible items (polynomial complexity).
+Crucially, our items are defined by a small number of values, such as the start and end points of the span, rather than their full internal structure.
+During parsing we only need to store the best structure corresponding to each item, not every structure.
+That means the time complexity of our algorithm depends on the number of possible items (polynomial complexity), rather than the number of structures (exponential complexity).
 
 \subsection{Notation}
 
@@ -1396,7 +1395,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \end{array}
       \end{align*}
     \end{minipage}
-  }
+  }\hspace{3mm}
   \begin{minipage}[c]{0.25\linewidth}
     \begin{tikzpicture}
       \node (p) at (0, 0) {\footnotesize \strut $p$};
@@ -1416,7 +1415,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \end{array}
       \end{align*}
     \end{minipage}
-  }
+  }\hspace{3mm}
   \begin{minipage}[c]{0.25\linewidth}
     \begin{tikzpicture}
       \node (p) at (0, 0) {\footnotesize \strut $p$};
@@ -1508,7 +1507,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \end{array}
       \end{align*}
     \end{minipage}
-  }
+  }\hspace{15mm}
   \begin{minipage}[c]{0.4\linewidth}
     \vspace{2mm}
     \begin{tikzpicture}
@@ -1546,7 +1545,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \end{array}
       \end{align*}
     \end{minipage}
-  }
+  }\hspace{15mm}
   \begin{minipage}[c]{0.4\linewidth}
     \vspace{2mm}
     \begin{tikzpicture}
