@@ -462,6 +462,10 @@ While re-ranking has led to gains in overall performance \parencite{Charniak-Joh
 Recent work has explored this question in more depth, but focusing on how variation in inference and model parameters impacts performance on standard metrics \parencite{huang:08a,Ng-etal:2010,Auli-Lopez:2011,Ng-Curran:2012}.
 We will explore the question from the perspective of observed errors, considering the potential for improvement using only the n-best list of parses, and how many errors a re-ranker actually avoids.
 
+\begin{landscape}
+\input{figures/reranking.tex}
+\end{landscape}
+
 In Table~\ref{tab:reranking} we present a breakdown over error types for the Charniak parser, using the self-trained model and reranker.
 For both the top half and bottom half of the table, we first used the Charniak parser to create $K$-best lists of varying length (indicated by the $K$ column).
 In the top half, we chose the parse from the list that has the highest F-score (this is an oracle because to do it we use the correct answer, which we have for this data)\footnote{
@@ -469,10 +473,6 @@ This result is not the absolute best possible result, as F-score does not factor
 }.
 In the bottom half, we let the \textcite{Charniak-Johnson:2005} reranker select the parse from the list, with no gold information.
 The table has the same columns as Table~\ref{tab:wsj23-comp}, but the ranges on the bars now reflect the min and max for these sets.
-
-\begin{landscape}
-\input{figures/reranking.tex}
-\end{landscape}
 
 While there is improvement on all errors when using the reranker, there is very little additional gain beyond the first 5-10 parses (this may be easier to see by rotating the page containing the table).
 Even for the oracle
@@ -526,10 +526,6 @@ more unusual uses of conjunctions, for example here \emph{no mistake} is a phras
 \emph{She was a living doll and no mistake -- the ... }
 \vspace{3mm}
 
-\begin{landscape}
-\input{figures/domains_charniak.tex}
-\end{landscape}
-
 \begin{table}
 \begin{center}
 \begin{tabular}{|llrr|}
@@ -570,6 +566,10 @@ not appear in the \ptb.  There are also some more difficult cases, for example:
 
 \noindent where \emph{or do} is a QP.
 This typographical error of \emph{do} instead of \emph{two} is extremely difficult to handle for a parser trained only on well-formed text.
+
+\begin{landscape}
+\input{figures/domains_charniak.tex}
+\end{landscape}
 
 For e-mail there is a substantial drop on single word phrases.  Breaking the
 errors down by label we found that the majority of the new errors are missing

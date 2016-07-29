@@ -342,11 +342,11 @@ This is lower than other systems, including the \textcite{cck} parser, which sco
 However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
 
 \paragraph{Speed}
-Pruning thresholds for the first two passes and the trace pruner were tuned to retain $99\%$ of the gold non-trace edges.
+Pruning thresholds for the arc pass and the trace pruner were tuned to retain $99\%$ of the gold non-trace edges.
 With that setting, the first pass prunes all but $0.302\%$ of possible edges, and $53.0\%$ of chart cells.
-The trace pruner retains only $6.0\%$ of traces.
-The threshold for the spine pruner is tuned to retain $99.5\%$ of the gold spines, at which level it retains only $6.5\%$ of all spines.
-The second pass prunes all but TODO trace edges, and TODO chart cells. % TODO: use new results
+The trace pruner prunes all but $6.0\%$ of traces.
+The threshold for the spine pruner is tuned to retain $99.5\%$ of the gold spines, at which level it prunes all but $6.5\%$ of all spines.
+%%%The second pass prunes all but TODO trace edges, and TODO chart cells. % TODO: use new results
 %%%The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells. % TODO: use new results
 %%%However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained. % TODO
 With these settings, for sentences up to length $40$, it took $4.3$ seconds per sentence.
