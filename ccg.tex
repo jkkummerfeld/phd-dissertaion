@@ -6,7 +6,11 @@
 }
 \end{center}
 
-In this chapter, we propose an improved, bottom-up method for converting \ccg derivations into \ptb-style phrase structure trees.
+In the previous chapter, we explored error analysis of \ptb parser output, developing a new tool and applying it to understand the mistakes systems make.
+However, not all parsers are designed to produce \ptb-style phrase structure parses; many have been developed for other grammar formalisms.
+In our effort to understand the relative performance of different parsers, we turned to the task of automatic parse conversion to enable comparison of systems across formalisms.
+
+In this chapter, we propose an improved, bottom-up method for converting one of sysntactic representation, \ccg, into \ptb parses.
 In contrast with past work \parencite{Clark-Curran:2009}, which used simple rules based on category pairs, our approach follows the generalizations of \ccg, assigning richer rules to individual categories and defining general methods of combining them for each of the \ccg combinators.
 Our conversion preserves more sentences under round-trip conversion (51.1\% \myvs 39.6\%) and is more robust.
 In particular, unlike past methods, ours does not require ad-hoc rules over non-local features, and so could be integrated into a parser.

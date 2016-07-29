@@ -1,7 +1,10 @@
 \chapter{Graph Parsing} \label{chp:parsing}
 
 Parses in the Penn Treebank \parencite{ptb} are graph structured, but parsers are typically restricted to tree structures for efficiency and modeling reasons.
-In this chapter, we propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit learning and inference that is almost as efficient as for trees.
+All except one of the parsers considered in Chapter~\ref{chp:analysis} produce trees, which is why we did not consider the non-tree components of structure in our analysis.
+The frequency of this deficiency provides strong motivation for the goal of this chapter: to construct an efficient parser for graph structures.
+
+We propose a new representation and algorithm for a restricted class of graph structures that are flexible enough to cover almost all treebank structures, yet are restricted enough to admit learning and inference that is almost as efficient as for trees.
 In particular, we consider directed, acyclic, one-endpoint-crossing graph structures, which cover most dislocation, shared argumentation, and similar tree-violating linguistic phenomena.
 We describe how to convert phrase structure parses, including traces, to our new representation, in a reversible manner.
 Our dynamic program uniquely decomposes structures, is sound and complete with respect to a subset of the class of one-endpoint-crossing graphs, and covers $97.7\%$ of the Penn English treebank.

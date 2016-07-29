@@ -341,21 +341,19 @@ After one training pass through sections $2$--$21$ of the PTB on sentences up to
 This is lower than other systems, including the \textcite{cck} parser, which scores $92.0$ on all sentences.
 However, our result does show that even with simple features and limited training our algorithm can parse at a non-trivial level of accuracy.
 
-\framebox{
-\parbox{0.8\textwidth}{
-\textbf{Old - new results coming soon}
-% TODO: new results
+\paragraph{Speed}
+Pruning thresholds for the first two passes and the trace pruner were tuned to retain $99\%$ of the gold non-trace edges.
+With that setting, the first pass prunes all but $0.302\%$ of possible edges, and $53.0\%$ of chart cells.
+The trace pruner retains only $6.0\%$ of traces.
+The threshold for the spine pruner is tuned to retain $99.5\%$ of the gold spines, at which level it retains only $6.5\%$ of all spines.
+The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells. % TODO: use new results
+However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained. % TODO
+With these settings, for sentences up to length $40$, it took $4.3$ seconds per sentence.
 
-For full graph parsing we considered sentences up to length $25$ (half of the treebank).
-For unlabeled trace edges, we obtain a precision of $73\%$ and a recall of $15\%$.
-Using \textcite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $52\%$ and recall $18\%$.
+\paragraph{Accuracy}
+For full graph parsing we considered sentences up to length $40$ ($92.3\%$ of the treebank).
+On section 22, for unlabeled trace edges, we obtain a precision of $88.5\%$ and a recall of $49.5\%$. % TODO: get section 23 results
+Using \textcite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $52\%$ and recall $18\%$. % TODO: update
 This is lower than \textcite{Johnson:2002}'s results ($73$ and $63$ on all sentences).
 However, we have shown that our algorithm can recover trace edges and expect that it can improve with feature development and longer training on the full corpus.
 
-Finally, we measured the speed of the complete parser.
-Pruning thresholds for the first two passes were tuned to retain $99\%$ of non-trace edges.
-With that setting, the first pass prunes all but $0.43\%$ of possible edges, and $48.9\%$ of chart cells.
-The second pass prunes all but $0.2\%$ of trace edges, and $64.3\%$ of chart cells.
-However, at this threshold while $99\%$ of non-trace edges are retained, only $88.8\%$ of trace edges are retained.
-With these settings, for sentences up to length $25$, it took $57$ seconds per sentence.
-}}
