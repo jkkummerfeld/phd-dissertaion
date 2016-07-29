@@ -1286,7 +1286,7 @@ The clean division of cases between edges that will be crossed and those that wi
 
 \paragraph{Items}
 We have one entirely new item type, the Exterval, and we have added requirements for the later items.
-Specifically, while the allowed crossings are the same, we add the requirment that at least one crossing of the specified type exists (this is also reflected in the renaming of their $LR$ item to $B$).
+Specifically, while the allowed crossings are the same, we add the requirement that at least one crossing of the specified type exists (this is also reflected in the renaming of their $LR$ item to $B$).
 These changes are necessary to avoid derivational ambiguity when a structure falls into multiple classes.
 Enforcing these difference involves changes throughout the deduction rules.
 
@@ -1301,7 +1301,7 @@ This is due to a combination of the tree constraints they apply, the need to for
 For the normal $B$ case, the choice of split point is a source of derivational ambiguity in their algorithm.
 
 \paragraph{Left and Right}
-Our decomposition of this item differs from their's in several ways because of our decision to separate edge creation and item combination, and because we need to track if there are multiple edges to the external point.
+Our decomposition of this item differs from theirs in several ways because of our decision to separate edge creation and item combination, and because we need to track if there are multiple edges to the external point.
 
 \paragraph{Neither}
 As for $L$ and $R$, our decomposition differs because of our altered definition of $N$, and the need to track if there are multiple edges to the external point.
@@ -1633,7 +1633,7 @@ However, we can roughly relate the inference rules as follows, where some of our
 \end{center}
 
 Another connection to make at this point is with the CFG version of Eisner's algorithm, presented by \textcite{P07-1022}.
-It is probably not possible to perform a similar transofmration on the algorithm we propose, though in Section~\ref{sec:impl} we discuss similar challenges in terms of correctly computing inside and outside scores as are raised in Section 4 of \textcite{P07-1022}.
+It is probably not possible to perform a similar transformation on the algorithm we propose, though in Section~\ref{sec:impl} we discuss similar challenges in terms of correctly computing inside and outside scores as are raised in Section 4 of \textcite{P07-1022}.
 
 \subsection{Initialization}
 
@@ -2491,10 +2491,10 @@ We will define the complexity in terms of:
   \item $s$, the number of word labels, \myeg Part-of-Speech tags, in the model.
 \end{itemize}
 
-\paragraph{Unlabaled Structure}
+\paragraph{Unlabeled Structure}
 We can determine the complexity by considering how many different ways the deduction rules can apply.
 For the ternary rules, the left end could be one of $O(n)$ words, the right end could be one of $O(n)$ words, and each of the two split points could be one of $O(n)$ words, giving $O(n^4)$ overall.
-The precise number is smaller, since if we choose word $p$ as the left end then we have $n-p$ choices for the first split point, and similarly for the other two points, but the assymptotic complexity remains the same.
+The precise number is smaller, since if we choose word $p$ as the left end then we have $n-p$ choices for the first split point, and similarly for the other two points, but the asymptotic complexity remains the same.
 Similarly, for binary rules with an external point there are four positions (left, right, split, external), and so the complexity is $O(n^4)$.
 The other rules have fewer possible instantiations, and so do not impact the overall complexity.
 This means the overall complexity is $O(n^4)$.
