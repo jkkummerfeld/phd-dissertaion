@@ -4,7 +4,7 @@
 % Note: Requires the Noto Sans Mono CJK TC font, download the .otf definition (free online) and on OS X install by double clicling, then selecting install.
 
 \documentclass{ucbthesis}
-\usepackage[style=authoryear-icomp,backref,sorting=nyt,sortcase=false,backend=biber,maxbibnames=999]{biblatex}
+\usepackage[style=authoryear-icomp,backref,sortcites=true,sorting=ynt,sortcase=false,backend=biber,maxcitenames=2,maxbibnames=999]{biblatex}
 
 % If the Grad. Division insists that the first paragraph of a section
 % be indented (like the others), then include this line:
@@ -78,7 +78,7 @@ anchorcolor=black,% text of the anchor
 citecolor=gray,% bib refs
 urlcolor=magenta,% URLs
 pdftitle={Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output},
-pdfauthor={Jonathan K. Kummerfeld},
+pdfauthor={Jonathan Kay Kummerfeld},
 pdfsubject={Natural Language Processing},
 pdfpagelayout=OneColumn}
 
@@ -264,7 +264,7 @@ pdfpagelayout=OneColumn}
 \pagenumbering{roman}
 
 \title{Algorithms for Identifying Syntactic Errors and Parsing with Graph Structured Output}
-\author{Jonathan K. Kummerfeld}
+\author{Jonathan Kay Kummerfeld}
 \degreesemester{Summer}
 \degreeyear{2016}
 \degree{Doctor of Philosophy}
@@ -278,17 +278,10 @@ pdfpagelayout=OneColumn}
 \maketitle
 %\approvalpage % Only needed for physical hand in
 \copyrightpage
+\pagenumbering{arabic}
 \include{abstract}
 
 \begin{frontmatter}
-
-%\begin{dedication}
-%\null\vfil
-%\begin{center}
-%Dedicate?
-%\end{center}
-%\vfil\null
-%\end{dedication}
 
 \tableofcontents
 \clearpage
@@ -314,6 +307,8 @@ pdfpagelayout=OneColumn}
 \input{conclusion}
 \appendix
 \input{resources}
+
+\newrefcontext[sorting=nyt]
 \printbibliography
 
 \end{document}
