@@ -193,7 +193,7 @@ pdfpagelayout=OneColumn}
 
 \newcommand{\Lone}{$L_1$\@\xspace}
 \newcommand{\Ltwo}{$L_2$\@\xspace}
-\newcommand*{\argmax}{\operatornamewithlimits{argmax}\limits}
+\DeclareMathOperator*{\argmax}{argmax}
 \newcommand{\pluseq}{\mathrel{+}=}
 
 \newcolumntype{x}[1]{%
@@ -275,40 +275,40 @@ pdfpagelayout=OneColumn}
 \field{Computer Science}
 \campus{Berkeley}
 
-\maketitle
-%\approvalpage % Only needed for physical hand in
-\copyrightpage
-\pagenumbering{arabic}
-\include{abstract}
+%%%\maketitle
+%%%%\approvalpage % Only needed for physical hand in
+%%%\copyrightpage
+%%%\pagenumbering{arabic}
+%%%\include{abstract}
 
-\begin{frontmatter}
+%%%\begin{frontmatter}
 
-\tableofcontents
-\clearpage
-\listofalgorithms
-\addcontentsline{toc}{chapter}{List of Algorithms}
-\clearpage
-\listoffigures
-\clearpage
-\listoftables
-\include{acknowledgements}
+%%%\tableofcontents
+%%%\clearpage
+%%%\listofalgorithms
+%%%\addcontentsline{toc}{chapter}{List of Algorithms}
+%%%\clearpage
+%%%\listoffigures
+%%%\clearpage
+%%%\listoftables
+%%%\include{acknowledgements}
 
-\end{frontmatter}
+%%%\end{frontmatter}
 
-\pagestyle{headings}
-\pagenumbering{arabic}
+%%%\pagestyle{headings}
+%%%\pagenumbering{arabic}
 
-\input{introduction}
+%%%\input{introduction}
 \input{error-analysis}
-\input{ccg}
-\input{algorithm}
-\input{representation}
-\input{implementation}
-\input{conclusion}
-\appendix
-\input{resources}
+%%%\input{ccg}
+%%%\input{algorithm}
+%%%\input{representation}
+%%%\input{implementation}
+%%%\input{conclusion}
+%%%\appendix
+%%%\input{resources}
 
-\newrefcontext[sorting=nyt]
-\printbibliography
+%%%\newrefcontext[sorting=nyt]
+%%%\printbibliography
 
 \end{document}

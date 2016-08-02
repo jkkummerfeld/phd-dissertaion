@@ -2,12 +2,12 @@
 
 \begin{center}
 \textit{
-  Preliminary versions of this chapter appeared as \textcite{Kummerfeld-etal:2012:EMNLP} and \textcite{Kummerfeld-etal:2013:ACL}.
+  Preliminary versions of parts of this chapter appeared as \textcite{Kummerfeld-etal:2012:EMNLP} and \textcite{Kummerfeld-etal:2013:ACL}.
 }
 \end{center}
 
 Constituency parser performance is primarily interpreted through a single metric, F-score on \wsj section 23, that conveys no linguistic information regarding the remaining errors.
-In this chapter, we describe a new error analysis method that classifies errors within a set of linguistically meaningful types using tree transformations that repair groups of errors together.
+In this chapter, we describe a new error analysis method that classifies errors within a set of linguistically meaningful types using transformations that repair groups of errors together.
 We use this analysis to answer a range of questions about parser behavior, including what linguistic constructions are difficult for state-of-the-art parsers, what types of errors are being resolved by rerankers, what types are introduced when parsing out-of-domain text, and how the challenges change for Chinese.
 
 \begin{figure}
@@ -32,8 +32,10 @@ We use this analysis to answer a range of questions about parser behavior, inclu
 							[PP [.t in 1986]]]]]]]]]
 }
 
-(a) Parser output
 \vspace{3mm}
+(a) Parser output
+
+\vspace{6mm}
 
 \scalebox{\derivscale}{
 \synttree
@@ -58,7 +60,7 @@ We use this analysis to answer a range of questions about parser behavior, inclu
 \end{center}
 \derivspace
 \caption[Error analysis example: PP attachment.]{ \label{fig:PP-attachment}
-	\textbf{Incorrect PP~Attachment}, as \emph{(PP in~1986)} is too low.
+	\textbf{Incorrect PP~Attachment} \emph{in~1986} is too low.
 	Bold, boxed nodes are either extra (marked in red in the parser output) or missing (marked in blue in the gold parse).
 }
 \derivaftercompress
@@ -70,7 +72,7 @@ The standard metric for parsing is:
 
 \begin{align*}
   \text{F}_1 & = \frac{2 * \text{precision} * \text{recall}}{\text{precision} + \text{recall}} \\
-            & = \frac{2 * |\text{matching nodes}|}{|\text{nodes in gold parse}| + |\text{nodes in predicted parse}|}
+            & = \frac{2 * |\text{matching nodes}|}{|\text{nodes in predicted parse}| + |\text{nodes in true parse}|}
 \end{align*}
 
 This is a robust metric that gives a sense of overall parser performance, but a single number cannot provide linguistically meaningful intuition for the source of remaining errors.
@@ -82,7 +84,7 @@ Additionally, once an aggregate count of node errors is made, different types of
 In contrast, the approach we describe below takes into consideration the relations between node errors, grouping them into linguistically meaningful sets.
 
 We classify node errors in two phases.
-First, we find a set of tree transformations that convert the output parse into the gold parse (Section~\ref{sec:tree-transform}).
+First, we find a set of transformations that convert the output parse into the gold parse (Section~\ref{sec:tree-transform}).
 Second, each transformation is classified as one of several error types (Section~\ref{sec:classify}).
 Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
 
@@ -92,21 +94,15 @@ Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
 \State Sort $U$ by the depth of the error in the parse, deepest first
 \State
 \State $G = \emptyset$ \Comment{Transformation stage (Section~\ref{sec:tree-transform})}
-\Repeat
-	\ForAll{errors $e \in U$}
-		\If{$e$ fits an environment template $t$}
-			\State $g =$ new error group
-			\State Correct $e$ as specified by $t$
-			\ForAll{errors $f$ that $t$ corrects}
-				\State Remove $f$ from $U$
-				\State Insert $f$ into $g$
-			\EndFor
-			\State Add $g$ to $G$
-		\EndIf
-	\EndFor
-\Until{unable to correct any further errors}
-\ForAll{remaining errors $e \in U$}
-	\State Insert a group into $G$ containing $e$
+\ForAll{errors $e \in U$}
+  \State $t = \underset{t \;\in\; \mathrm{transformations\tiny\strut}}{\argmax}$ errors repaired by $t$
+  \State $g =$ new error group
+  \State Correct $e$ as specified by $t$
+  \ForAll{errors $f$ that $t$ corrects}
+    \State Remove $f$ from $U$
+    \State Insert $f$ into $g$
+  \EndFor
+  \State Add $g$ to $G$
 \EndFor
 \State
 \ForAll{groups $g \in G$} \Comment{Classification stage (Section~\ref{sec:classify})}
@@ -114,11 +110,11 @@ Pseudocode for our method is shown in Algorithm~\ref{alg:code}.
 \EndFor
 \end{algorithmic}
 \caption{ \label{alg:code}
-	Tree transformation error classification
+	Transformation based error classification
 }
 \end{algorithm}
 
-\subsection{Tree Transformations} \label{sec:tree-transform}
+\subsection{Transformations} \label{sec:tree-transform}
 
 Our algorithm finds a path from the parser output to the gold parse, where states are parse structures and steps are transformations.
 We define three general types of transformations:
@@ -126,7 +122,7 @@ We define three general types of transformations:
 \begin{description}
   \item[Create node] takes a set of nodes that are siblings and places them under a new node.
   \item[Delete node] removes a node and re-attaches its children where it was.
-  \item[Move subtree] takes a node and moves it either up or down within the parse, with the constraint that it must not make the structure discontinuous. If this move leads to the creation of a unary production between two non-terminals of the same type, also remove one of them.
+  \item[Move nodes] takes a node and moves it either up or down within the parse, with the constraint that it must not make the structure discontinuous. If this move leads to the creation of a unary production between two non-terminals of the same type, also remove one of them.
 \end{description}
 
 The first two of these are straightforward, to demonstrate the third we will describe the move transformation that fixes the errors in Figure~\ref{fig:PP-attachment}.
@@ -147,7 +143,7 @@ This is the case because in many sentences a single correction will fix the pars
 
 \subsection{Transformation Classification} \label{sec:classify}
 
-We began with a large set of node errors, in the first stage they were placed into groups, one group per tree transformation used to get from the automatically generated parse to the gold parse.
+We began with a large set of node errors, in the first stage they were placed into groups, one group per transformation used to get from the automatically generated parse to the gold parse.
 Now we classify each group as one of the error types below.
 The ideal set of error classes would consider each group of incorrect constituents and show how their function has been misinterpreted by the parser, but it is difficult to define simple rules for such a classification.
 In future work it would be interesting to build statistical models for classifying errors, using expert analysis of parse errors to train the system.
@@ -205,7 +201,7 @@ When the correction involves moving a VP, \myeg \\
 where the VP should modify \emph{research}, not \emph{financing}.
 
 \paragraph{Adverb and Adjective Modifier Attachment} (Figure~\ref{fig:modifier-attachment}) \\
-Cases involving incorrectly placed adjectives and adverbs, including errors corrected by subtree movement and errors requiring only creation of a node, \myeg \\
+Cases involving incorrectly placed adjectives and adverbs, including errors corrected by mode movement and errors requiring only creation of a node, \myeg \\
 (NP (ADVP \emph{even more}) \emph{severe setbacks}) \\
 where there should be an extra ADVP node over \emph{even more severe}.
 
@@ -217,8 +213,8 @@ In this particular example we can see how not modeling traces may be hurting per
 
 \begin{landscape}
 \begin{figure}
-\centering
 \begin{minipage}[b]{3in}
+\centering
 \input{figures/error-modifier-attachment}
 \end{minipage}\hfill
 \begin{minipage}[b]{5in}
@@ -251,15 +247,10 @@ Node errors that span a single word, \myeg \\
 where the ADVP should not be present.
 We include checks to ensure this is not linked to another error, such as one part of a set of internal noun phrase errors.
 
-\paragraph{Parenthetical Attachment} (Figure~\ref{fig:PRN-attachment})
+\paragraph{Parenthetical Attachment} (Figure~\ref{fig:PRN-attachment}) \\
 When a parenthetical node modifies at the wrong level, \myeg \\
 (NP \emph{other forms} (PP \emph{of} (NP \emph{housing} (PRN \emph{(such as low-income)})))) \\
 where the parenthetical should be higher.
-
-\paragraph{Missing Parenthetical} (Figure~\ref{fig:missing-PRN})
-When a parenthetical is entirely missing, \myeg \\
-(S \emph{Moreover, explains one official, \ldots}) \\
-where there should be a PRN around \emph{, explains one official,}.
 
 \begin{landscape}
 \begin{figure}
@@ -279,6 +270,11 @@ where there should be a PRN around \emph{, explains one official,}.
 \input{figures/error-NP-internal-structure}
 \end{figure}
 
+\paragraph{Missing Parenthetical} (Figure~\ref{fig:missing-PRN}) \\
+When a parenthetical is entirely missing, \myeg \\
+(S \emph{Moreover, explains one official, \ldots}) \\
+where there should be a PRN around \emph{, explains one official,}.
+
 \paragraph{NP Internal Structure} (Figure~\ref{fig:NP-internal-structure}) \\
 While most NP structure is not annotated in the \ptb, there is some use of ADJP, NX, NAC and QP nodes.
 We form a single group for each NP that has one or more errors involving these types of nodes, \myeg \\
@@ -287,16 +283,16 @@ should have a QP over \emph{about six}.
 
 \paragraph{Other}
 There is a long tail of other errors.
-Some could be placed within the categories above, but would require far more specific rules.
+Some could be placed within the categories above, but would require far more specific rules. \\
 
 Working from only a raw list of node errors in a parse, it would be difficult to determine errors like those described above.
 Even for error types that can be measured by counting node errors or rule production errors, our approach has the advantage that we identify groups of errors with a single cause.
-For example, what appears as a missing unary production may correspond to an extra bracket that contains a subtree that attached incorrectly.
+For example, what appears as a missing unary production may correspond to an extra bracket that contains a noe that attached incorrectly.
 By grouping node errors and classifying each group as a single mistake, we are able to more precisely characterize the mistakes a parser makes.
 
 \section{Results} \label{sec:errors-results}
 
-We used sections 00 and 24 of the WSJ section of the \ptb as development data while constructing the tree transformation and error group classification methods.
+We used sections 00 and 24 of the WSJ section of the \ptb as development data while constructing the transformation and error group classification methods.
 All of our examples in text come from these sections as well, but for all tables of results we ran our system on section 23.
 We chose to run our analysis on section 23 as it is the only section we are sure was not used in the development of any of the parsers, either for tuning or feature development.
 Our evaluation is entirely focused on the errors of the parsers, so unless there is a particular construction that is unusually prevalent in section 23, we are not revealing any information about the test set that could bias future work.
@@ -340,23 +336,23 @@ For all parsers we used the publicly available version, with the standard parame
 \paragraph{Berkeley} \parencite{Petrov-etal:2006,Petrov-Klein:2007}.
 An unlexicalised parser with a grammar constructed with automatic state splitting.
 
-\paragraph{\textcite{Bikel:2004}} implementation of \textcite{Collins:1997}.
+\paragraph{\textcite{Bikel:2004}} Implementation of \textcite{Collins:1997}.
 
 \paragraph{BUBS} \parencite{Dunlop-Bodenstab-Roark:2011,Bodenstab-Dunlop-Hall-Roark:2011}.
 A `grammar-agnostic constituent parser,' which uses a Berkeley Parser grammar, but parses with various pruning techniques to improve speed, at the cost of accuracy.
 
-\paragraph{\textcite{Charniak:2000}}.
+\paragraph{\textcite{Charniak:2000}}
 A generative parser with a maximum entropy-inspired model.
-We also use the reranker \parencite{Charniak-Johnson:2005}, and the self-trained model \parencite{McClosky-Charniak-Johnson:2006}.
+We also use the reranker \parencite[-R;][]{Charniak-Johnson:2005}, and the self-trained model \parencite[-S;][]{McClosky-Charniak-Johnson:2006}.
 
-\paragraph{\textcite{Collins:1997}}.
+\paragraph{\textcite{Collins:1997}}
 A generative lexicalized parser, with three models, a base model, a model that uses subcategorisation frames for head words, and a model that takes into account traces.
 
-\paragraph{SSN} \parencite{Henderson:2003,Henderson:2004}.
+\paragraph{SSN} \parencite{Henderson:2003,Henderson:2004}
 A statistical left-corner parser, with probabilities estimated by a neural network.
 
-\paragraph{Stanford} \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
-We consider both the unlexicalised PCFG parser (-U) and the lexicalized factored parser (-L), which combines the PCFG parser with a lexicalized dependency parser.
+\paragraph{Stanford} \parencite{Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}
+We consider both the unlexicalised PCFG parser (-U) and the lexicalized factored parser (-L), which combines the PCFG parser with a lexicalized dependency parser. \\
 
 Table~\ref{tab:standard-results} shows the standard performance metrics,
 measured on section 23 of the \wsj, using all sentences.  Speeds were measured
@@ -398,7 +394,7 @@ not show which constructions are the source of those variations.
 \end{table}
 
 Our system enables us to answer questions about parser behavior that could previously only be probed indirectly.
-We demonstrate its usefulness by applying it to a range of parsers (here), to reranked K-best lists of various lengths, and to output for out-of-domain parsing (following sections).
+We demonstrate its usefulness by applying it to a range of parsers (here), to reranked K-best lists of various lengths (\S~\ref{sec:reranking}), and to output for out-of-domain parsing (\S~\ref{sec:out-of-domain}).
 
 First, in Table~\ref{tab:charniak-breakdown}, we focus on a detailed error breakdown for the best system we consider, the Charniak parser with a self-trained model and with reranking of the top fifty candidate parses produced by the parser \parencite{Charniak:2000,Charniak-Johnson:2005,McClosky-Charniak-Johnson:2006}.
 For each of our error types, the table shows how many times it occurred in the 2,416 sentences in \wsj section 23 of the \ptb (Occurrences), the total number of nodes involved in the groups that were classified as each error type (Nodes Involved), and the ratio between the two (Nodes / Occurrences).
@@ -452,7 +448,7 @@ PP, IN and CC in sentences.  Here we see gains on all error types, though
 particularly for clause attachment, modifier attachment and coordination, which
 fits with their observations.
 
-\subsection{Reranking}
+\subsection{Reranking} \label{sec:reranking}
 
 The standard dynamic programming approach to parsing limits the range of features that can be employed.
 One way to deal with this issue is to use a two-stage process.
@@ -493,7 +489,7 @@ features necessary to make the decision better than the parser.  The other
 interesting outlier is NP internal structure, which continues to make
 improvements for longer lists, unlike the other error types.
 
-\subsection{Out-of-Domain}
+\subsection{Out-of-Domain} \label{sec:out-of-domain}
 
 Parsing performance drops considerably when shifting outside of the domain a
 parser was trained on \parencite{Gildea:2001}.
@@ -542,8 +538,8 @@ more unusual uses of conjunctions, for example here \emph{no mistake} is a phras
 		Brown N & Adventure & 4415 & 16.0 \\
 		Brown P & Romance & 3942 & 17.4 \\
 		Brown R & Humor & 967 & 22.7 \\
-		G-Web Blogs & Blogs & 1016 & 23.6 \\
-		G-Web Email & E-mail & 2450 & 11.9 \\
+		Google Web & Blogs & 1016 & 23.6 \\
+		Google Web & E-mail & 2450 & 11.9 \\
 	\hline
 \end{tabular}
 \caption[Variation in size and contents of the domains we consider.]{ \label{tab:domain-info}
@@ -558,14 +554,15 @@ Comparing the Brown corpora and the Google Web corpora, there are much larger
 divergences.  We see a particularly large decrease in NP internal structure.
 Looking at some of the instances of this error, it appears to be largely caused
 by incorrect handling of structures such as URLs and phone numbers, which do
-not appear in the \ptb.  There are also some more difficult cases, for example:
+not appear in the \ptb\footnote{The corpus contains articles from 1989, pre-dating public internet access.}.
+There are also some more difficult cases, for example:
 
 \vspace{3mm}
 \emph{... going up for sale in the next month or do .}
 \vspace{3mm}
 
 \noindent where \emph{or do} is a QP.
-This typographical error of \emph{do} instead of \emph{two} is extremely difficult to handle for a parser trained only on well-formed text.
+The typographical error of \emph{do} instead of \emph{two} is extremely difficult to handle for a parser trained only on well-formed text.
 
 \begin{landscape}
 \input{figures/domains_charniak.tex}
@@ -615,7 +612,7 @@ Our analysis builds on the system described in Sections~\ref{sec:classify}~and~\
 When directly applied to Chinese parser output, the system placed over 27\% of the errors in the catch-all `Other' type.
 Many of these errors clearly fall into one of a small set of error types, motivating an adaptation to Chinese syntax.
 
-To adapt the system to Chinese, we developed a new version of the second stage of the system, which assigns an error category to each tree transformation step.
+To adapt the system to Chinese, we developed a new version of the second stage of the system, which assigns an error category to each transformation step.
 
 To characterize the errors the original system placed in the `Other' category,
 we looked through one hundred sentences, identifying error types generated by
@@ -641,22 +638,22 @@ errors.
   Error Type & Brackets & \% of total \\
   \hline
   \hline
-              NP-internal* & 6019 & 22.70\% \\
+    NP-internal structure* & 6019 & 22.70\% \\
               Coordination & 2781 & 10.49\% \\
    Verb taking wrong args* & 2310 &  8.71\% \\
                      Unary & 2262 &  8.53\% \\
-Adverb and Adjective Modifier Attachment & 1900 &  7.17\% \\
-             One Word Span & 1560 &  5.88\% \\
+Adverb and adjective modifier attachment & 1900 &  7.17\% \\
+             One word span & 1560 &  5.88\% \\
            Different label & 1418 &  5.35\% \\
             Unary A-over-A & 1208 &  4.56\% \\
    Wrong sense/bad attachment* & 1018 &  3.84\% \\
       Noun boundary error* &  685 &  2.58\% \\
-             VP Attachment &  626 &  2.36\% \\
-         Clause Attachment &  542 &  2.04\% \\
-             PP Attachment &  514 &  1.94\% \\
-      Split Verb Compound* &  232 &  0.88\% \\
+             VP attachment &  626 &  2.36\% \\
+         Clause attachment &  542 &  2.04\% \\
+             PP attachment &  514 &  1.94\% \\
+      Split verb compound* &  232 &  0.88\% \\
               Scope error* &  143 &  0.54\% \\
-             NP Attachment &  109 &  0.41\% \\
+             NP attachment &  109 &  0.41\% \\
                      Other & 3186 & 12.02\% \\
 \hline
 \end{tabular}
@@ -685,18 +682,18 @@ As discussed in Section~\ref{sec:errors-results}, for the purpose of understandi
 \end{minipage}
 \end{figure}
 
-\paragraph{NP-internal} (Figure~\ref{fig:np_internal}) \\
+\paragraph{NP-Internal Structure} (Figure~\ref{fig:np_internal}) \\
 The \pctb annotates more NP-internal structure than the \ptb.
 We assign this error type when a transformation involves words whose parts of speech in the gold parse are one of: CC, CD, DEG, ETC, JJ, NN, NR, NT and OD.
 
 We investigated the errors that fall into the NP-internal category and found that 49\% of the errors involved the creation or deletion of a single pre-terminal phrasal bracket.
 These errors arise when a parser proposes a parse in which POS tags (for instance, JJ or NN) occur as siblings of phrasal tags (such as NP), a configuration used by the PCTB bracketing guidelines to indicate complementation as opposed to adjunction \parencite{Xue:2005:NLE}.
 
-\paragraph{Adverb and Adjective Modifier attachment} (Figure~\ref{fig:mod_att}) \\
+\paragraph{Adverb and Adjective Modifier Attachment} (Figure~\ref{fig:mod_att}) \\
 Incorrect modifier scope caused by modifier phrase attachment level.
 This is less frequent in Chinese than in English: while English VP modifiers occur in pre- and post-verbal positions, Chinese only allows pre-verbal modification.
 
-\paragraph{Wrong sense/bad attachment} (Figure~\ref{fig:sense}) \\
+\paragraph{Wrong Sense / Bad Attachment} (Figure~\ref{fig:sense}) \\
 This applies when the head word of a phrase receives the wrong POS, leading to an attachment error.
 This error type is common in Chinese because of POS fluidity, \myeg the well-known Chinese verb/noun ambiguity often causes mis-attachments that are classified as this error type.
 
@@ -747,8 +744,9 @@ verb compounds are split, with the two halves of the compound placed in
 different phrases.
 
 \paragraph{Scope error} \strut \\
-These are cases in which a new span must be added to more closely bind a modifier phrase (ADVP, ADJP, and PP), for example, in 
-(IP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year,}}) (NP \mbox{\glos{中国 银行}{Bank of China}}) \ldots), the ADVP should modify the first NP only, which can be indicated by adding an NP to form (NP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year}})).
+These are cases in which a new span must be added to more closely bind a modifier phrase (ADVP, ADJP, and PP), \myeg \\
+(IP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year,}}) (NP \mbox{\glos{中国 银行}{Bank of China}}) \ldots), \\
+where the ADVP should modify the first NP only, which can be indicated by adding an NP to form (NP (ADVP \mbox{\glos{仅}{Only}}) (NP \mbox{\glos{去年}{last year}})).
 
 \paragraph{PP attachment} \strut \\
 This error type is rare in Chinese, as adjunct PPs are pre-verbal.  It does
@@ -764,7 +762,7 @@ English parsing because of substantial changes in the classification method,
 and differences in treebank annotations.
 
 As described in the previous section, the set of error categories considered for Chinese is very different to the set of categories for English.  
-Even for some of the categories that were not substantially changed, errors may be classified differently because of cross-over between two categories (\myeg between Verb taking wrong args and NP Attachment).
+Even for some of the categories that were not substantially changed, errors may be classified differently because of cross-over between two categories (\myeg between Verb Taking Wrong Arguments and NP Attachment).
 
 Differences in treebank annotations also present a challenge for cross-language error comparison.
 The most common error type in Chinese, NP-internal structure, is rare in the English results, but the datasets are not comparable because the \ptb has much more limited NP-internal structure annotated than the \pctb.
@@ -777,7 +775,7 @@ syntactic structures generating traces and null-elements in Chinese compared to 
 
 \subsection{Cross-Parser Analysis} \label{sec:cross_parser_analysis}
 
-The previous section described the error types and their distribution for a single Chinese parser.
+Table~\ref{tab:errors} showed the error types and their distribution for a single Chinese parser.
 Here we confirm that these are general trends, by showing that the same pattern
 is observed for several different parsers on the \pctb 6 dev set.\footnote{
   We use the standard data split suggested by the \pctb 6 file manifest.
@@ -798,7 +796,7 @@ We label the product parser as Berk-2, as opposed to Berk-1.
 A lexicalized parser.
 
 \paragraph{Stanford} \parencite{Levy-Manning:2003:ACL,Klein-Manning:2003:ACL,Klein-Manning:2003:NIPS}.
-The same parsers described in Section~\ref{sec:errors-results}, but trained on Chinese instead of English.
+The same parsers described in Section~\ref{sec:errors-results}, but trained on Chinese instead of English. \\
 
 These parsers represent a variety of parsing methods, though exclude some recently developed parsers that are not publicly available \parencite{Qian-Liu:2012:EMNLP,Xiong-etal:2005:IJCNLP}.
 
@@ -831,7 +829,7 @@ It is difficult to confidently say why some errors are reduced and others are no
 	Berk-1 \hfill 81.1 &  \mybar{5.637080} &  \mybar{5.854733} &  \mybar{4.914895} &  \mybar{5.637384} &  \mybar{4.160972} &  \mybar{5.409644} &  \mybar{5.105299} &  \mybar{4.288569} &  \mybar{4.581930} &  \mybar{4.594485} &  \mybar{4.516671} &  \mybar{4.351321} &  \mybar{4.375378} \\
 	ZPAR \hfill 78.1 &  \mybar{5.603375} &  \mybar{6.374733} &  \mybar{5.487246} &  \mybar{7.386910} &  \mybar{5.851629} &  \mybar{5.863920} &  \mybar{6.833466} &  \mybar{4.423375} &  \mybar{5.725748} &  \mybar{5.299080} &  \mybar{6.791682} &  \mybar{6.653960} &  \mybar{5.833838} \\
 	Bikel \hfill 76.1 &  \mybar{6.464990} &  \mybar{7.357862} &  \mybar{6.227640} &  \mybar{6.372585} &  \mybar{6.280885} &  \mybar{6.602543} &  \mybar{5.609351} &  \mybar{6.904680} &  \mybar{8.000000} &  \mybar{5.790822} &  \mybar{6.700012} &  \mybar{6.484650} &  \mybar{5.983631} \\
-	Stan-F \hfill 76.0 &  \mybar{6.824621} &  \mybar{8.000000} &  \mybar{6.340422} &  \mybar{6.721463} &  \mybar{6.291805} &  \mybar{6.949312} &  \mybar{6.977479} &  \mybar{4.827803} &  \mybar{5.886282} &  \mybar{7.060545} &  \mybar{7.166674} &  \mybar{6.933336} &  \mybar{5.501970} \\
+	Stan-L \hfill 76.0 &  \mybar{6.824621} &  \mybar{8.000000} &  \mybar{6.340422} &  \mybar{6.721463} &  \mybar{6.291805} &  \mybar{6.949312} &  \mybar{6.977479} &  \mybar{4.827803} &  \mybar{5.886282} &  \mybar{7.060545} &  \mybar{7.166674} &  \mybar{6.933336} &  \mybar{5.501970} \\
 	Stan-U \hfill 70.0 &  \mybar{8.000000} &  \mybar{7.035766} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{7.464874} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} &  \mybar{8.000000} \\
 	\emph{Worst}   & 3.94 & 1.75 & 1.73 & 1.48 & 1.68 & 1.06 & 1.02 & 0.88 & 0.55 & 0.50 & 0.44 & 0.44 & 4.11 \\
 	\hline
@@ -846,7 +844,7 @@ It is difficult to confidently say why some errors are reduced and others are no
   the Berkeley product parser with two grammars \parencite[Berk-2;][]{Petrov:2010:NAACLHLT},
   ZPAR \textcite{Zhang-Clark:2009:ICPT},
   the Bikel parser \parencite{Bikel-Chiang:2000:CLP},
-  the Stanford Factored parser \parencite[Stan-F;][]{Levy-Manning:2003:ACL,Klein-Manning:2003:NIPS},
+  the Stanford Factored parser \parencite[Stan-L;][]{Levy-Manning:2003:ACL,Klein-Manning:2003:NIPS},
   and the Stanford Unlexicalized PCFG parser \parencite[Stan-U;][]{Klein-Manning:2003:ACL}.
 }
 \end{table*}
@@ -922,7 +920,7 @@ logical form.
 The single F-score objective over brackets or dependencies obscures important differences between statistical parsers.
 For instance, one or many mismatched brackets could be caused by a single attachment error.
 
-In Sections~\ref{sec:tree-transform}~and~\ref{sec:classify}, we presented a novel tree-transformation methodology for
+In Section~\ref{sec:errors-intro}, we presented a novel transformation-based methodology for
 evaluating parsers that categorizes errors into linguistically meaningful
 types.  Using this approach, we presented the first detailed examination of the
 errors produced by a wide range of constituency parsers for
@@ -932,7 +930,7 @@ than previously thought.  We also noted interesting variations in error types
 for parser variants.
 
 We investigated the errors resolved in reranking, and introduced by changing
-domains. We found that the Charniak rerankers improved most error types, but
+domains. We found that the Charniak reranker improved most error types, but
 made little headway on improving PP attachment.  Changing domain has an impact
 on all error types, except NP internal structure.
 
@@ -947,5 +945,5 @@ will require new developments that suit the distinctive properties of Chinese
 syntax.
 
 We released our system so that future constituent parsers could be evaluated using our methodology (see Appendix~\ref{chp:resources}).
-Our analysis provides new insight into the development of parsers over the past fifteen years, and the challenges that remain.
+Our analysis provides new insight into the development of parsers over the past two decades, and the challenges that remain.
 
