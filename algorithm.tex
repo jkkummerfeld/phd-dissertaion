@@ -510,7 +510,7 @@ An example derivation using our graph parsing deduction rules.
 
 \newlength{\deductionCaptionLength}
 \newlength{\deductionRuleLength}
-\setlength{\deductionCaptionLength}{0.35\textwidth}
+\setlength{\deductionCaptionLength}{0.32\textwidth}
 \setlength{\deductionRuleLength}{0.95\textwidth}
 
 One set of deduction rules is concerned with removing direct edges between the points $p$, $q$, and $o$ in each item.
@@ -559,7 +559,7 @@ No, then split at $p+1$: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut ${p+1}$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-a} Deduction rule $I_0$}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-a} $I$ deduction rules, case one.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -597,7 +597,7 @@ No, then split at $s$: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-b} Deduction rule $I_1$}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-b} $I$ deduction rules, case two.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -656,7 +656,7 @@ Yes to both: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-d} Deduction rule $I_2$}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-d} $I$ deduction rules, case four.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -706,7 +706,7 @@ Yes $s < t$, no $s$--$(tq)$ edges (in this case it is also possible that $t = q$
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-c} Deduction rule $I_3$}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-c} $I$ deduction rules, cases three and five.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -764,7 +764,7 @@ Yes: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-f} Deduction rule $I_4$}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-f} $I$ deduction rules, case six.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -818,7 +818,7 @@ No: \\
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-e} Deduction rule $I_5$}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-e} $I$ deduction rules, case seven.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -997,7 +997,7 @@ In this case the possibilities follow a pattern: \\
   \draw (p.north) -- (q.north);
 \end{tikzpicture}
 }\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-both-fail-b} $B$ structural pattern}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-both-fail-b} $B$ structural pattern}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1057,7 +1057,7 @@ No, then use the end of the edge crossing pattern as $s$ and decompose the item 
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-both} Deduction rule $B$}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-both} $B$ deduction rule.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1111,7 +1111,7 @@ No: \\
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[c]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-c} Deduction rule $L_0$}}}
+\raisebox{5mm}{\parbox[c]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-c} $L$ deduction rules, cases three through eight.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1160,7 +1160,7 @@ No: \\
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-a} Deduction rule $L_1$}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-a} $L$ deduction rules, cases one and two.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1207,7 +1207,7 @@ Yes: \\
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-b} Deduction rule $L_2$}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-left-b} $L$ deduction rules, cases nine and ten.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1259,7 +1259,7 @@ The case with $o$ to the left is symmetrical to the case with $o$ on the right, 
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-neither} Deduction rule $N$}}}
+\raisebox{1mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-neither} $N$ deduction rule.}}}
 \end{minipage}
 \vspace{5mm}
 
@@ -1375,7 +1375,7 @@ Note, since we are considering graphs, two points could be linked both directly 
 We track parent information to know about parents of items, and existence of specific edges.
 As a result, if both an indirect link and a direct link are present, the state records a direct link being present.
 
-\subsection{\textcite{eisner:1996}'s algorithm}
+\subsection{\textcite{eisner:1996}'s Algorithm}
 
 This work and \textcite{ec}'s algorithm both extend upon the ideas first described by \textcite{eisner:1996}.
 Eisner's algorithm is an $O(n^3)$ dynamic program for projective dependency tree parsing.
@@ -2459,7 +2459,7 @@ For $[sq.o]$ we only have one $o$--$[sq]$ edge, namely $os$, and so this is an $
   $I[ps \; . \; .] \quad X\cdotp [sqo \; .\overline{O} \; .\overline{O} \; S\overline{Q}]$
 \end{finalEquation}
 
-\subsection{Additional constraints}
+\subsection{Additional Constraints}
 The description above gives the complete decomposition, additional general rules are used to determine the specific rule set.
 They are enforced by the code that converts the templates into all valid deduction rules:
 
@@ -2473,7 +2473,7 @@ Both of these can be enforced in the rule creation because we have the complete 
 
 \section{Algorithm Properties} \label{sec:algorithm-properties}
 
-\subsection{Derivational ambiguity}
+\subsection{Derivational Ambiguity}
 
 One key difference between our algorithm and the original one-endpoint-crossing algorithm presented by \textcite{ec} is that we avoid spurious ambiguity in the ways a parse can be decomposed.
 Most of the cases in which this ambiguity arises in \textcite{ec}'s algorithm are due to symmetry that is not explicitly broken.

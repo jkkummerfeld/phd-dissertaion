@@ -11,8 +11,8 @@
 
   \node (top) at (10,3) [question] {Item type?};
 
-  \node (endX) at (6,0.2) {\S~\ref{sec:alg:exterval}};
-  \node (endB) at (9,0.2) {\S~\ref{sec:alg:both}};
+  \node (endX) at (6,0.2) {None needed};
+  \node (endB) at (9,0.2) {Fig.~\ref{fig:rule-both}};
   \node (endN) at (12,0.2) {Fig.~\ref{fig:rule-neither}};
   \node [align=left] (endR) at (19,0.2) {Symmetric\\with L};
 
@@ -27,7 +27,7 @@
   \draw [thick,out=60,in=120,color=white] (q1p.center) to node (q1pc) [midway] {} (q1c.center);
   \draw [thick,out=60,in=120,color=white] (q1t.center) to node (q1ta) [midway] {} (q1a.center);
   \draw [thick,out=60,in=120,color=white] (q1t.center) to node (q1tb) [midway] {} (q1b.center);
-  \draw [thick,out=60,in=120,color=blue] (q1p.center) to node (q1ps) [midway] {} (q1s.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q1p.center) to node (q1ps) [midway] {} (q1s.center);
   \node (q1) [fit=(q1p) (q1q) (q1ps) (q1pc) (q1ta) (q1tb)] {};
 
   \node (endIa) at (0,-1.8) {Fig.~\ref{fig:rule-interval-a}};
@@ -43,7 +43,7 @@
   \draw [thick,out=60,in=120,color=white] (q2p.center) to node (q2pc) [midway] {} (q2c.center);
   \draw [thick,out=60,in=120,color=white] (q2t.center) to node (q2tb) [midway] {} (q2b.center);
   \draw [thick,out=60,in=120,color=black] (q2p.center) to node (q2ps) [midway] {} (q2s.center);
-  \draw [thick,out=60,in=120,color=blue] (q2t.center) to node (q2ta) [midway] {} (q2a.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q2t.center) to node (q2ta) [midway] {} (q2a.center);
   \node (q2) [fit=(q2p) (q2q) (q2ps) (q2pc) (q2ta) (q2tb)] {};
 
   \node (endIb) at (2,-3.8) {Fig.~\ref{fig:rule-interval-b}};
@@ -59,7 +59,7 @@
   \draw [thick,out=60,in=120,color=white] (q3p.center) to node (q3pc) [midway] {} (q3c.center);
   \draw [thick,out=60,in=120,color=black] (q3p.center) to node (q3ps) [midway] {} (q3s.center);
   \draw [thick,out=60,in=120,color=black] (q3t.center) to node (q3ta) [midway] {} (q3a.center);
-  \draw [thick,out=60,in=120,color=blue] (q3t.center) to node (q3tb) [midway] {} (q3b.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q3t.center) to node (q3tb) [midway] {} (q3b.center);
   \node (q3) [fit=(q3p) (q3q) (q3ps) (q3pc) (q3ta) (q3tb)] {};
 
   \node (q4p) at (3, -6) {};
@@ -74,7 +74,7 @@
   \draw [thick,out=60,in=120,color=white] (q4t.center) to node (q4tb) [midway] {} (q4b.center);
   \draw [thick,out=60,in=120,color=black] (q4p.center) to node (q4ps) [midway] {} (q4s.center);
   \draw [thick,out=60,in=120,color=black] (q4t.center) to node (q4ta) [midway] {} (q4a.center);
-  \draw [thick,out=60,in=120,color=blue] (q4s.center) to node (q4sc) [midway] {} (q4b.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q4s.center) to node (q4sc) [midway] {} (q4b.center);
   \node (q4) [fit=(q4p) (q4q) (q4ps) (q4pc) (q4ta) (q4tb)] {};
 
   \node (endIc) at (2,-7.8) {Fig.~\ref{fig:rule-interval-c}};
@@ -91,7 +91,7 @@
   \draw [thick,out=60,in=120] (q5p.center) to node (q5ps) [midway] {} (q5s.center);
   \draw [thick,out=60,in=120] (q5t.center) to node (q5ta) [midway] {} (q5a.center);
   \draw [thick,out=60,in=120] (q5t.center) to node (q5tb) [midway] {} (q5b.center);
-  \draw [thick,out=60,in=120,color=blue] (q5p.center) to node (q5pc) [midway] {} (q5c.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q5p.center) to node (q5pc) [midway] {} (q5c.center);
   \node (q5) [fit=(q5p) (q5q) (q5ps) (q5pc) (q5ta) (q5tb)] {};
 
   \node (endIe) at (9,-7.8) {Fig.~\ref{fig:rule-interval-e}};
@@ -109,7 +109,7 @@
   \draw [thick,out=60,in=120,color=white] (q6b.center) to node (q6bx) [midway] {} (q6x.center);
   \draw [thick,out=60,in=120] (q6p.center) to node (q6ps) [midway] {} (q6s.center);
   \draw [thick,out=60,in=120] (q6a.center) to node (q6ax) [midway] {} (q6x.center);
-  \draw [thick,out=60,in=120,color=blue] (q6c.center) to node (q6cx) [midway] {} (q6x.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q6c.center) to node (q6cx) [midway] {} (q6x.center);
   \node (q6) [fit=(q6p) (q6q) (q6x) (q6ps) (q6ax) (q6bx) (q6cx)] {};
 
   \node (endLc) at (17,-1.8) {Fig.~\ref{fig:rule-left-c}};
@@ -126,7 +126,7 @@
   \draw [thick,out=60,in=120,color=white] (q7c.center) to node (q7cx) [midway] {} (q7x.center);
   \draw [thick,out=60,in=120] (q7p.center) to node (q7ps) [midway] {} (q7s.center);
   \draw [thick,out=60,in=120] (q7a.center) to node (q7ax) [midway] {} (q7x.center);
-  \draw [thick,out=60,in=120,color=blue] (q7b.center) to node (q7bx) [midway] {} (q7x.center);
+  \draw [very thick,out=60,in=120,color=blue,densely dashed] (q7b.center) to node (q7bx) [midway] {} (q7x.center);
   \node (q7) [fit=(q7p) (q7q) (q7x) (q7ps) (q7ax) (q7bx) (q7cx)] {};
 
   \node (endLa) at (11,-3.8) {Fig.~\ref{fig:rule-left-a}};
@@ -154,10 +154,10 @@
   \draw [answer] (q6) -- node [midway,left=4pt] {Yes} (endLc);
 
 \end{tikzpicture}
-\caption[Overall picture of deduction rule definitions]{\label{fig:deduction-defs}
+\caption[Overall picture of deduction rule definitions.]{\label{fig:deduction-defs}
 Our algorithm defines a unique decomposition for any structure.
-This chart shows how we define those decompositions.
-Each rectangle poses a questions, using the black structure to express what is known, and the blue edge to ask the question: is such an edge present or not?
+This chart shows how we define the decompositions that involve multiple items (as opposed to removing a single edge, such as in $X$ cases).
+Each rectangle poses a questions, using the black structure to express what is known, and the dashed blue edge to ask the question: is such an edge present or not?
 Leaves of the chart are labeled with the section in the text that gives the decomposition for that case.
 }
 \end{figure}

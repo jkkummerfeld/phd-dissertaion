@@ -29,7 +29,7 @@ Our system uses a bottom-up approach that is more flexible and more effective th
 Finally, we explore how to extend parsing algorithms beyond tree structured output.
 Existing algorithms need the tree constraint to be efficient, but the standard way to apply the constraint has been to discard structure for a range of phenomena, such as wh-movement, passivization, and fronting.
 We introduce a new algorithm that can efficiently find the max or sum over all possible graph structures for a sentence, scored with an edge-factored model.
-We also define a new parse representation that is compatible with the algorithm and deterministically convertable into the Penn Treebank style.
+We also define a new parse representation that is compatible with the algorithm and deterministically convertable into the Penn Treebank (\ptb) style.
 Together, our algorithm and representation are able to produce parses that cover virtually all forms of structure in the Penn Treebank, providing a more complete expression of the structure of sentences for downstream processing.
 
 \section{Syntax}
@@ -177,9 +177,9 @@ The specific form of dynamic programming applied to the task of finding optimal 
 
 The standard resource for parsing research is the Wall Street Journal section of the Penn Treebank \parencite{ptb}, a collection of one million words of text from 1989 issues of the Wall Street Journal that have been annotated by experts with syntactic structure in a \gb style.
 The standard measure of constituent parser performance is the F-Score, the harmonic mean of precision\footnote{
-Number of correct nodes divided by number of nodes in the output structure.
+Number of correct nodes in the output structure, divided by the total number of nodes it has.
 } and recall\footnote{
-Number of correct nodes divided by number of nodes in the gold structure.
+Number of correct nodes in the output structure, divided by the number of nodes in the gold structure.
 } on labeled nodes in the parse.
 Performance on \wsj section 23 has exceeded $90$ F\textsubscript{1} \parencite{Petrov-Klein:2007}, and $92$ F\textsubscript{1} when using self-training and reranking \parencite{McClosky-Charniak-Johnson:2006,Charniak-Johnson:2005}. 
 While these results give a useful measure of overall performance, they provide no information about the nature, or relative importance, of the remaining errors.

@@ -57,7 +57,7 @@ We use this analysis to answer a range of questions about parser behavior, inclu
 (b) Gold parse
 \end{center}
 \derivspace
-\caption[Error analysis example: PP Attachment.]{ \label{fig:PP-attachment}
+\caption[Error analysis example: PP attachment.]{ \label{fig:PP-attachment}
 	\textbf{Incorrect PP~Attachment}, as \emph{(PP in~1986)} is too low.
 	Bold, boxed nodes are either extra (marked in red in the parser output) or missing (marked in blue in the gold parse).
 }
@@ -585,59 +585,6 @@ case:
 Some of these issues, such as URL handling, could be resolved with suitable
 training data.  Other issues, such as ungrammatical language and
 unconventional use of words, pose a greater challenge.
-
-%%%  ============================================================================
-%%%  
-%%%  This paper reports on the results of systematic analysis of errors
-%%%  made by Chinese parsers.
-%%%  
-%%%  The experimental results are very interesting.
-%%%  Though the basic methodology used in the paper builds directly
-%%%  on a previous work, it is adapted well to Chinese through careful
-%%%  analysis of error types.
-%%%  
-%%%  It would be nice to give more in-depth comparison with previous
-%%%  findings on the difficulty of Chinese parsing, but I understand
-%%%  the authors have already done well within the limited space.
-%%%  
-%%%  ============================================================================
-%%%  
-%%%  The paper is a thorough analysis of problems in Chinese parsing. I like it that
-%%%  a variety of parsers were used. The paper is generally well written. The
-%%%  results do not seem particularly surprising but it is good to have empirical
-%%%  evidence to support them. The analysis and software should support future
-%%%  research into the problematic areas.
-%%%  However, I would suggest adding statistical significance tests, and reworking
-%%%  Section 4. I understand that not all error categories can be discussed in
-%%%  detail but the selection was unsatisfactory. Table 1 shows which error types
-%%%  are new in this work, but not all of them are explained. It's not clear how the
-%%%  order of subsections is determined. Some types are presented mostly to say that
-%%%  they are less important than in English (PP attachment), while the second
-%%%  biggest error type (coordination) is not discussed in this section at all, and
-%%%  the third-highest only very briefly (not enough to make me understand why this
-%%%  is substantially different from English).
-%%%  Maybe for those categories that are comparable to Kummerfeld, you could add the
-%%%  English percentages to Table 1?
-%%%  I'm not so convinced by the final conclusion, NP internal structure is an issue
-%%%  in English as well, just not in the PTB annotation. Coordination is still not
-%%%  properly solved for English.
-%%%  
-%%%  ============================================================================
-%%%  
-%%%  This paper presents a comprehensive analysis of errors in Chinese Parsing,
-%%%  and releases an open-source code for it.
-%%%  
-%%%  The author adapt the system from Kummerfeld et al.2012 to Chinese,
-%%%  and examine a wide range of Chinese constitute Parsers.
-%%%  Experimental results show a series of interesting findings,
-%%%  mainly on verb-argument-attach-error and coordination errors.
-%%%  The idea is clear and the paper is well written.
-%%%  
-%%%  What I miss is a more specific conclusion: I think it's not as deep as
-%%%  Kummerfeld in 2012. Yes, empirically we can see the coord and verb args fields
-%%%  are not quite improved even with gold POS tag. But I think it would be clearer
-%%%  if the author can give some examples to explain why gold POS can't do that. And
-%%%  this would help us to find the right direction to address these problems.
 
 \section{Chinese Parsing}
 

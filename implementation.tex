@@ -354,7 +354,7 @@ With these settings, for sentences up to length $40$, it took $4.3$ seconds per 
 \paragraph{Accuracy}
 For full graph parsing we considered sentences up to length $40$ ($92.3\%$ of the treebank).
 On section 22, for unlabeled trace edges, we obtain a precision of $88.3\%$ and a recall of $50.4\%$.
-Using \textcite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $39\%$ and recall $32\%$.
+Using \textcite{Johnson:2002}'s metric, which requires the label and span of the source and target nodes in the parse to be correct, we get precision $64\%$ and recall $48\%$.
 This is lower than \textcite{Johnson:2002}'s results ($73$ and $63$ on all sentences in section 23).
 However, given the non-local properties considered by Johnson's patterns, it would be difficult for our model to do as well.
 One potential future direction is to use a forest reranker to incorporate such features, an option that is feasible for our approach and would avoid the constrained parser output Johnson's approach relies on.
