@@ -287,7 +287,7 @@ Some could be placed within the categories above, but would require far more spe
 
 Working from only a raw list of node errors in a parse, it would be difficult to determine errors like those described above.
 Even for error types that can be measured by counting node errors or rule production errors, our approach has the advantage that we identify groups of errors with a single cause.
-For example, what appears as a missing unary production may correspond to an extra bracket that contains a noe that attached incorrectly.
+For example, what appears as a missing unary production may correspond to an extra bracket that contains a node that attached incorrectly.
 By grouping node errors and classifying each group as a single mistake, we are able to more precisely characterize the mistakes a parser makes.
 
 \section{Results} \label{sec:errors-results}
@@ -309,7 +309,7 @@ For all parsers we used the publicly available version, with the standard parame
 	\hline
 		\multicolumn{6}{|c|}{Enhanced Training / Systems} \\
 		Charniak S \& R (SR)       & 92.44 & 91.70 & 92.07 & 44.87 & 1.8 \\
-		Charniak Re ranking (R)     & 91.78 & 91.04 & 91.41 & 44.04 & 1.8 \\
+		Charniak Re-ranking (R)     & 91.78 & 91.04 & 91.41 & 44.04 & 1.8 \\
 		Charniak Self-trained (S)  & 91.16 & 90.89 & 91.02 & 40.77 & 1.8 \\
 	\hline
 		\multicolumn{6}{|c|}{Standard Parsers} \\
@@ -346,7 +346,7 @@ A generative parser with a maximum entropy-inspired model.
 We also use the reranker \parencite[-R;][]{Charniak-Johnson:2005}, and the self-trained model \parencite[-S;][]{McClosky-Charniak-Johnson:2006}.
 
 \paragraph{\textcite{Collins:1997}}
-A generative lexicalized parser, with three models, a base model, a model that uses subcategorisation frames for head words, and a model that takes into account traces.
+A generative lexicalized parser, with three models, a base model, a model that uses subcategorization frames for head words, and a model that takes into account traces.
 
 \paragraph{SSN} \parencite{Henderson:2003,Henderson:2004}
 A statistical left-corner parser, with probabilities estimated by a neural network.

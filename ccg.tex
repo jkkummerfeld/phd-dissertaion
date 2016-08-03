@@ -10,7 +10,7 @@ In the previous chapter, we explored error analysis of \ptb parser output, devel
 However, not all parsers are designed to produce \ptb-style phrase structure parses; many have been developed for other grammar formalisms.
 In our effort to understand the relative performance of different parsers, we turned to the task of automatic parse conversion to enable comparison of systems across formalisms.
 
-In this chapter, we propose an improved, bottom-up method for converting one of syntactic representation, \ccg, into \ptb parses.
+In this chapter, we propose an improved, bottom-up method for converting one syntactic representation, \ccg, into another, \ptb.
 In contrast with past work \parencite{Clark-Curran:2009}, which used simple rules based on category pairs, our approach follows the generalizations of \ccg, assigning richer rules to individual categories and defining general methods of combining them for each of the \ccg combinators.
 Our conversion preserves more sentences under round-trip conversion (51.1\% \myvs 39.6\%) and is more robust.
 In particular, unlike past methods, ours does not require ad-hoc rules over non-local features, and so could be integrated into a parser.
@@ -111,7 +111,7 @@ powerful combinators allow categories to combine with greater flexibility.
 
 We cannot form a \ptb tree by simply relabeling the categories in a \ccg derivation for two reasons.
 First, the mapping from categories to phrase labels is many-to-many, so it would be difficult to determine the correct label (though other researchers have tried, as discussed in Section~\ref{sec-learned-conv}).
-Second, there are some spans that occur only in the \ccg derivation and others that occur only in the \ptb parse, \myeg in Figure~\ref{fig:ccg-example} there is a node for \emph{his death a suicide} in \ptb but not \ccg, and vice versa for \emph{labeled his death} (CCGbank).
+Second, there are some spans that occur only in the \ccg derivation and others that occur only in the \ptb parse, \myeg in Figure~\ref{fig:ccg-example} there is a node for \emph{his death a suicide} in \ptb but not \ccg, and vice versa for \emph{labeled his death}.
 This second issue is particularly difficult because in some cases, including the example given, the differing nodes in the two parses cover spans of the sentence that cross\footnote{This means a local insertion or deletion of a node cannot make the necessary changes, there would have to be several simultaneous changes to go from one structure to the other.}.
 These differences are the result of conscious decisions made in the construction of CCGbank, in many cases enabling the derivation to encode extra dependencies that are either implicit or expressed via traces in the \ptb.
 
@@ -229,7 +229,7 @@ For convenience, in this description we will refer to the parses coming from the
 The first operator is the one described above, though note that it can be more powerful, constructing any set of \ptb nodes indicated with standard bracket notation plus the two markers for the functor and argument.
 The \{~\} operator indicates that a flattened version of that sub-parse should be placed, in the example in the table the top node in the sub-parse for the argument would be deleted so its children are placed instead.
 The * operator takes the label for the new node from the argument sub-parse, \myeg the result of an \cf{S\bs S_1} should correspond to the label of argument 1 (SINV, SBAR, etc, which all appear as \cf{S} in \ccg).
-This is necessary because CCGBank uses additional annotations on categories to distinguish cases that are assigned entirely different labels in the \ptb.
+This is necessary because CCGbank uses additional annotations on categories to distinguish cases that are assigned entirely different labels in the \ptb.
 The final operator enables breaking up children in a sub-parse and placing them at different locations in the structure being formed.
 This only makes sense when creating multiple nodes, a PP and an S in the example, and uses subscripts to indicate which sub-parse to place where.
 Finally, complex categories with multiple arguments are assigned a list of instructions, one per argument.
@@ -238,12 +238,12 @@ The lists of rules are processed by following the \ccg derivation, taking action
 
 \vspace{5mm}
 \noindent
-\textbf{Lexical assignment:} The initial instruction list for a category is taken from our hand-annotated set.
+\textbf{Lexical Assignment} The initial instruction list for a category is taken from our hand-annotated set.
 
 \vspace{3mm}
 \noindent
 \begin{minipage}[c]{0.6\textwidth}
-\textbf{Function application:} The next rule in the functor's list is applied and any remaining rules in its list are retained as the new rule set (any rules remaining in the list for the argument are discarded).
+\textbf{Function Application} The next rule in the functor's list is applied and any remaining rules in its list are retained as the new rule set (any rules remaining in the list for the argument are discarded).
 \end{minipage}\hfill
 \begin{minipage}[c]{0.3\textwidth}
 \zerodisplayskips
@@ -256,7 +256,7 @@ The lists of rules are processed by following the \ccg derivation, taking action
 \vspace{3mm}
 \noindent
 \begin{minipage}[c]{0.6\textwidth}
-\textbf{Function composition:} The unapplied instructions of the argument are inserted into the remaining steps for the functor.
+\textbf{Function Composition} The unapplied instructions of the argument are combined with the remaining steps for the functor.
 \end{minipage}\hfill
 \begin{minipage}[c]{0.3\textwidth}
 \zerodisplayskips
@@ -269,7 +269,7 @@ The lists of rules are processed by following the \ccg derivation, taking action
 \vspace{3mm}
 \noindent
 \begin{minipage}[c]{0.6\textwidth}
-\textbf{Crossed composition:}
+\textbf{Crossed Composition}
 Only backwards crossed composition is used (the lower of the two).
 The new instruction list is composed of the top rule from the left, followed by all but the top rule from the right.
 \end{minipage}\hfill
@@ -284,28 +284,28 @@ The new instruction list is composed of the top rule from the left, followed by 
 \vspace{3mm}
 \noindent
 \begin{minipage}[c]{0.6\textwidth}
-\textbf{Type raising:}
+\textbf{Type Raising}
 A new list of instructions is taken from our hand-annotated set.
 If necessary, the current structure is flattened to prevent a unary production of identical symbols being formed when the next instruction is applied.
 \end{minipage}\hfill
 \begin{minipage}[c]{0.3\textwidth}
 \zerodisplayskips
 \begin{align*}
-  \cf{Y} & \Rightarrow & \quad \cf{T / (T \bs X)} \\
+  \cf{X} & \Rightarrow & \quad \cf{T / (T \bs X)} \\
   \cf{X} & \Rightarrow & \quad \cf{T \bs (T / X)}
 \end{align*}
 \end{minipage}
 
 \vspace{3mm}
 \noindent
-\textbf{Coordination:}
-In \ccg coordination is a single step, but for implementation in parsing it is typically broken into two steps.
+\textbf{Coordination}
+In \ccg, coordination is a single step, but for implementation in parsing it is typically broken into two steps.
 We follow the derivation, doing the core structural construction in the second step.
 The instructions retained after the second step are from the right conjunct.
 
 \vspace{3mm}
 \noindent
-\textbf{Functional substitution:}
+\textbf{Functional Substitution}
 These combinators occur rarely in the treebank and are not used in current parsers, so we do not implement them.
 \vspace{5mm}
 
@@ -416,8 +416,10 @@ However, for this particular construction the \ptb annotations are inconsistent,
 Our approach naturally handles our QP \myvs ADJP example from the previous section because the two cases have different lexical categories: 
 
 \begin{center}
-{\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}} on \textit{than} and \\
-{\small \cf{(N/N)/(N/N)}} on \textit{relatively}
+\begin{tabular}{lc}
+  \textit{than} \hspace{1cm} & {\small\cf{((N/N)/(N/N))\bs (S[adj]\bs NP)}} \\
+  \textit{relatively} \hspace{1cm} & {\small\cf{(N/N)/(N/N)}}
+\end{tabular}
 \end{center}
 
 This lexical difference means we can assign different instructions to correctly recover the QP and ADJP nodes, whereas \old applies the same schema in both cases because after the first function application for \textit{than}, the category becomes the same as the category for \textit{relatively}.
@@ -513,7 +515,7 @@ In the top plot, the y-axis is \parseval on converted \candc parser output.
 Conversion quality essentially bounds the performance of the parser.
 The few points above the diagonal are mostly short sentences on which the \candc parser uses categories that lead to one extra correct node (a common case is ADVP v ADJP).
 The main constructions on which parse errors occur, \myeg PP attachment, are rarely converted incorrectly, and so we expect the number of errors to be cumulative.
-The bottom right plot shows three noteworthy properties, (1) in general the two evaluation metrics are correlated, (2) the \ccg evaluation is slightly harsher, with fewer points below the diagonal line than above it\footnote{This is consistent with prior work, and the fact that \ccg makes some additional distinctions, such as between arguments and adjuncts.}, (3) there are some very common cases on the far right, where the \ccg evaluation is perfect, but conversion mistakes mean the \ptb score is not perfect.
+The bottom right plot shows three noteworthy properties, (1) in general the two evaluation metrics are correlated, (2) the \ccg evaluation is slightly harsher, with fewer points below the diagonal line than above it\footnote{This is consistent with prior work, and the fact that \ccg makes some additional distinctions, such as between arguments and adjuncts.}, (3) there are many cases on the far right, where the \ccg evaluation is perfect, but conversion mistakes mean the \ptb score is not perfect.
 Some sentences are higher in the right plot than the left because there are distinctions in \ccg that are not always present in the \ptb, \myeg the argument-adjunct distinction.
 
 \begin{table}

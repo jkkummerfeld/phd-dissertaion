@@ -6,7 +6,7 @@ To address this issue, we define a new representation in which each non-terminal
 Unlike dependency parsing, we retain all the information required to reconstruct the constituency parse.
 
 Our representation is based on \textcite{cck}'s tree representation, with three key differences:
-(1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in the structure,
+(1) we encode all non-terminals explicitly, rather than implicitly through adjunction operations, which can cause ambiguity in their structure,
 (2) we add representations of null elements and co-indexation,
 (3) we modify the head rules to avoid problematic structures.
 
@@ -25,7 +25,7 @@ Specifically, the algorithm only allows two types of structure to be built: word
 In contrast, the standard \ptb representation has structural components that do not fit directly into either labels or edges, for example, the S at the top in \subref{fig:repr-ptb} is not associated with any particular word (and so cannot be a label) and is not associated with a particular pair of words either (and so cannot be an edge).
 
 We address this issue by lexicalizing the \ptb, as shown in \subref{fig:repr-lex-ptb}.
-Going from \subref{fig:repr-ptb} to \subref{fig:repr-lex-ptb}, all we have done is shift some of the non-terminal symbols left or right, the connectivity is the same, and so the structure is the same.
+Going from \subref{fig:repr-ptb} to \subref{fig:repr-lex-ptb}, all we have done is shift some of the non-terminal symbols left or right; the connectivity is the same, and so the structure is the same.
 These shifts associate each non-terminal symbol with a specific word, it's \emph{head}.
 For example, the S mentioned above is associated with \emph{told}, indicated by the fact that it is now directly above \emph{told}.
 
@@ -332,7 +332,7 @@ Since prior work focused on trees, not graphs, support for this constraint has n
 
 To ensure every point gets one and only one structural parent, we add booleans to the state, indicating whether $p$, $q$ and $o$ have structural parents.
 When adding edges, a structural edge can not be added if a point already has a structural parent.
-When combining items, no point can receive more than one structural parent, and points in the middle of the span must have at least one.
+When combining items, no point can receive more than one structural parent, and points that will end up in the middle of the span must have exactly one.
 Together, these constrains ensure we have a tree.
 
 To ensure the tree is projective we need to prevent structural edges from crossing.

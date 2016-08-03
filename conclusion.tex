@@ -10,14 +10,14 @@ An alternative approach to handling these aspects of syntax, explored in prior w
 Unfortunately, it is difficult to compare performance of systems producing parses with different representations, and to provide consistent output across systems for downstream applications.
 Our novel method of converting from \ccg into \ptb-style parses, described in Chapter~\ref{chp:conversion} explores one way to bridge this gap, and improved significantly over prior work.
 
-Finally, in Chapter~\ref{chp:analysis}, we described our work on going beyond measurements of performance to more nuanced analysis of mistakes.
+In Chapter~\ref{chp:analysis}, we described our work on going beyond measurements of performance to more nuanced analysis of mistakes.
 Our error analysis method gives a summary of the types of errors in system output, with categories that are easily interpretable.
 We applied the technique to a range of parsers, writing styles, and languages, confirming previously anecdotal claims such as the prevalence of prepositional phrase attachment errors.
 
 There are a range of possible extensions for this work.
 Both the error analysis and conversion systems are designed around trees, and could be extended to cover graph structures.
 Doing so would require breaking assumptions built-in to the algorithms, but would be particularly illuminating regarding the challenge of long-distance dependencies.
-As for the graph parsing algorithm, there are a several interesting possibilities.
+There are a several interesting possibilities for the graph parsing algorithm.
 In the structure of the chapter presenting the algorithm, the parsing algorithm is kept separate from the definition of the syntactic representation we use.
 That choice was intentional, as the algorithm is a general parsing approach that could also be applied to exciting new resources like the Abstract Meaning Representation.
 Having non-local structure available also opens new opportunities for downstream applications.

@@ -15,26 +15,26 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
 \renewcommand{\algorithmicrequire}{}
 \renewcommand{\algorithmicensure}{}
 \begin{algorithm}
-\caption{The Online Primal Subgradient Algorithm with $\ell_1$ or $\ell_2$ regularization, and sparse updates}
-\algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop on the left over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
+\caption{Online Primal Subgradient with $\ell_1$ or $\ell_2$ regularization, sparse updates}
+\algcomment{Note: To implement without the sparse update, use SCORE~$= \mathbf{w}^\top \mathbf{f}(y')$, and run the update loop over all features. Also, for comparison, to implement the perceptron, remove the sparse update and use UPDATE-ACTIVE $= \mathbf{return} \; w + g$.}
 \label{alg:ops}
-\begin{algorithmic}[]
+\noindent\begin{algorithmic}[1]
     \State Parameter: $\mathrm{iters}$ \Comment{Number of iterations}
     \State Parameter: C \Comment{Regularization constant ($10^{-1}$ to $10^{-8}$)}
     \State Parameter: $\eta$ \Comment{Learning rate ($10^0$ to $10^{-4}$)}
     \State Parameter: $\delta$ \Comment{Initializer for $q$ ($10^{-6}$)}
     \State $\mathbf{w} = \mathbf{0} $ \Comment{Weight vector}
     \State $\mathbf{q} = \boldsymbol{\delta} $ \Comment{Cumulative squared gradient}
-    \State $\mathbf{u} = \mathbf{0} $ \Comment{Time of last update for each weight}
-    \State $n = 0$ \Comment{Number of updates so far}
+    \State $\mathbf{u} = \mathbf{0} $ \Comment{Time of last update for each weight [sparse updates only]}
+    \State $n = 0$ \Comment{Number of updates so far [sparse updates only]}
     \For{$\mathrm{iter} \in [1, \mathrm{iters}]$}
       \For{$\mathrm{batch} \in \mathrm{data}$}
         \State $\mathbf{g} = \mathbf{0}$ \Comment{Sum of gradients from loss-augmented decodes}
         \For{$(x_i,y_i) \in \mathrm{batch}$}
-          \State $y = \argmax_{y' \in Y(x_i)} [${\footnotesize SCORE}$(y') + \mathbf{L}(y', y_i) ]$
+          \State $y = \argmax_{y' \in Y(x_i)} [${\footnotesize SCORE}$(y') + \mathbf{L}(y', y_i) ]$ \Comment{Loss-augmented decode}
           \State $\mathbf{g} \pluseq (\mathbf{f}(y) - \mathbf{f}(y_i))$ \Comment{Update the active features}
         \EndFor
-        \State $\mathbf{q} \pluseq \mathbf{g}^2$ \Comment{Element-wise square}
+        \State $\mathbf{q} \pluseq \mathbf{g}^2$ \Comment{Add the element-wise square of the subgradient}
         \State $n \pluseq 1$
         \For{$f \in \mathbf{g} \; \mathrm{where} \; g_f \neq 0 $} \Comment{Over all features if not doing sparse updates}
           \State $w_f =$ {\footnotesize UPDATE-ACTIVE}($w_f$, $g_f$, $q_f$)
@@ -42,17 +42,33 @@ Our features are based on the set defined by \textcite{McDonald-etal:2005:Proj}.
         \EndFor
       \EndFor
     \EndFor
-    \Function{\footnotesize UPDATE-ACTIVE}{$w$, $g$, $q$}                                               \Comment{The AdaGrad update}
+    \Function{\footnotesize UPDATE-ACTIVE}{$w$, $g$, $q$}     \Comment{The AdaGrad update}
       \State $[\ell_2]$ $\mathbf{return} \; \frac{w \sqrt{q} - \eta g}{\eta \mathrm{C} + \sqrt{q}}$               
       \State $[\ell_1]$ $\mathrm{d} = |w - \frac{\eta}{\sqrt{q}} g| - \frac{\eta}{\sqrt{q}} \mathrm{C}$           
       \State $[\ell_1]$ $\mathbf{return} \; \mathrm{sign}(w - \frac{\eta}{\sqrt{q}} g) \cdot \max(0, \mathrm{d})$ 
     \EndFunction
+%%%    \Function{\footnotesize SCORE}{$y'$} \Comment{Compute $\mathbf{w}^\top \mathbf{f}(y')$, but if doing sparse updates, then}
+%%%        \State $s = 0$                   \Comment{for each weight, apply an update to catch up on the}
+%%%        \For{$f \in \mathbf{f}(y')$}     \Comment{steps in which the gradient for that weight was zero}
+%%%          \State $[\ell_2]$ $w_f = w_f \left(\frac{\sqrt{q_f}}{\eta \mathrm{C} + \sqrt{q_f}}\right)^{n - u_f}$
+%%%          \State $[\ell_1]$ $w_f = \mathrm{sign}(w_f) \cdot \max(0, |w_f| - \frac{\eta \mathrm{C}}{\sqrt{q_f}} (n - u_f))$
+%%%          \State $u_f = n$
+%%%          \State $s \pluseq w_f$
+%%%        \EndFor
+%%%        \State $\mathbf{return} \; s$
+%%%    \EndFunction
+    \Function{\footnotesize UPDATE-CATCHUP}{$w$, $q$, $t$}               \Comment{A single update equivalent to a series of AdaGrad}
+          \State $[\ell_2]$ $\mathbf{return} \; w \left(\frac{\sqrt{q}}{\eta \mathrm{C} + \sqrt{q}}\right)^t$ \Comment{updates where the weight's subgradient was zero}
+          \State $[\ell_1]$ $\mathbf{return} \; \mathrm{sign}(w) \cdot \max(0, |w| - \frac{\eta \mathrm{C}}{\sqrt{q}} t$
+    \EndFunction
     \Function{\footnotesize SCORE}{$y'$} \Comment{Compute $\mathbf{w}^\top \mathbf{f}(y')$, but if doing sparse updates, then}
         \State $s = 0$                   \Comment{for each weight, apply an update to catch up on the}
         \For{$f \in \mathbf{f}(y')$}     \Comment{steps in which the gradient for that weight was zero}
-          \State $[\ell_2]$ $w_f = w_f \left(\frac{\sqrt{q_f}}{\eta \mathrm{C} + \sqrt{q_f}}\right)^{n - u_f}$
-          \State $[\ell_1]$ $w_f = \mathrm{sign}(w_f) \cdot \max(0, |w_f| - \frac{\eta \mathrm{C}}{\sqrt{q_f}} (n - u_f))$
-          \State $u_f = n$
+          \State $nw =$ \label{alg:line:parallel:start} {\footnotesize UPDATE-CATCHUP}($w_f$, $q_f$, $n - u_f$)
+          \If{$u_f \neq n$} \Comment{For parallel decoding, this enables updates without}
+            \State $u_f = n$ \Comment{locking. In some cases, an old weight will be used,}
+            \State $w_f = nw$ \label{alg:line:parallel:end} \Comment{but $w_f$ will not be updated incorrectly.}
+          \EndIf
           \State $s \pluseq w_f$
         \EndFor
         \State $\mathbf{return} \; s$
@@ -85,16 +101,17 @@ Algorithm~\ref{alg:ops} gives pseudocode for our implementation.
 Sparse updates do add some memory and computation costs.
 First, when accessing weights and applying the delayed updates, we need to use synchronization to ensure an exact update.
 Second, we need to use memory to track the last time each weight was updated and to provide a lock for each weight (used for synchronization).
-However, if we are willing to give up exactness we can avoid these costs by applying a lock-free approach \parencite{hogwild}\footnote{
+
+If we are willing to give up exactness we can avoid the synchronization delay by applying a lock-free approach similar to \textcite{hogwild}.
+Our approach is shown in lines~\ref{alg:line:parallel:start} to \ref{alg:line:parallel:end} of Algorithm~\ref{alg:ops}.
 To perform an update we first read all the relevant variables (weight, gradient sum, update time), then calculate the new weight.
-Before saving the new weight, we check to see if the time of the last update matches what we read earlier.
-If it does, then we set the new update time, then update the weight (that order is important).
-If it doesn't, we do nothing and continue.
+Before saving the new weight, we check to see if the time of the last update ($u_f$) is now equal to the current time ($n$).
+If it does, we do nothing and continue.
+If it doesn't, then we set the new update time, then update the weight (that order is important).
 If multiple threads are applying an update simultaneously then the race to do the update can play out in a few ways.
-Since the update time is changed before the weight is changed, and all threads are updating to the same new time, we can guarantee that any thread that gets through the time check will be doing the correct update (the worry is that it read an inconsistent set of values).
-If the time has changed then either another thread already did the work, in which case all is well, or another thread is part way through, in which case we may continue with an old version of the weight.
+Since the update time is changed before the weight is changed, and all threads are updating to the same new time, we can guarantee that any thread that gets through the time check will be doing the correct update (the worry is that the thread read an inconsistent set of values).
+If the time has changed then either another thread already did the work, in which case all is well, or another thread has set $u_f$, but not $w_f$, in which case we may continue with an old version of the weight.
 That slight possibility of using an old weight turns out to not be an issue.
-}.
 We found that avoiding locks did not impact accuracy, but also did not substantially impact speed.
 
 \subsubsection{Loss Function}
@@ -127,7 +144,7 @@ In our system we use the first approach.
 
 The core contributions of this entire chapter is the inference algorithm presented in Section~\ref{sec:full-algorithm}.
 The core idea behind the algorithm is to constrain the space to consider so that it can be explored efficiently, while still covering the structures observed in language.
-Here we describe modifications at various scales that further improve speed by pruning the space further.
+Here we describe modifications at various scales that improve speed by pruning the space further.
 
 \subsubsection{State beams}
 
@@ -163,12 +180,12 @@ The third pass also prunes spines that are not consistent with at least one unpr
 There are two general algorithm classes for parsing that our algorithm can be used within: Viterbi and Inside--Outside.
 The first of these finds the optimal structure for a sentence under a given model and in the process determines the optimal substructure for every span of the sentence.
 While that is sufficient for parsing, it does not provide the information we need for pruning.
-Instead we use the inside--outside algorithm, which computes for each item either the sum or max over all parses that include that item.
+Instead we use the inside--outside algorithm, which computes for every item either the sum or max over all parses that include that item.
 
 When using our algorithm with a model that only places weights on the edges, calculation of the scores is straightforward.
 Each edge exists in only one place in the derivation, between the item without it and the item with it.
 Once spines are introduced the situation changes because we would like to score them in all of the items they appear in.
-This scoring is important for the beams and cube pruning to be effective, if we only scored spines in one of the items they appear in there would be ties in the beams.
+This scoring is important for the beams and cube pruning to be effective; if we only scored spines in one of the items they appear in there would be many ties.
 
 For the projective algorithm case each spine is introduced in exactly two items in the derivation, and so we can simply assign half the score to each.
 For the non-projective version the spine may appear in more locations because it needs to be introduced when we add external points.
@@ -215,7 +232,9 @@ Pruned dynamic program, including only rules observed in the training set, inclu
 %%%  46     123
 
 Many structures that can be generated by our dynamic program are not seen in the data we consider.
-To improve speed, we leave out all rules that are not used in the derivation of sentences in the training set.
+To improve speed, we leave out all rules that are not used in the derivation of sentences in the training set\footnote{
+Note, this pruning occurs after the parses have been modified to be \oneEC structures, \myie trace edges that created cycles or made non-\oneEC crossings have been removed.
+}.
 Of the 49,292 specific rules in the algorithm, only 158 are needed to generate all sentences in the training set.
 Narrowing down to these does have implications for coverage, but looking at the development set we found only one rule in one parse that was not in the set of 158.
 
@@ -236,7 +255,7 @@ One description of the space is that it is the set of structures generated by th
 In particular, it may be the case that this set of rules is impacted by variations such as the choice of head rules.
 
 While this pruning opens new questions about the space of structures in parsing, for our purposes it is primarily a way of improving speed.
-The drastic reduction in rules to consider leads to a substantial improvement in the time required for parsing.
+The drastic reduction in rules leads to a substantial improvement in the time required for parsing.
 
 \section{Results}
 
@@ -328,7 +347,7 @@ For instance, *ICH*-attach is used in `heavy shift' constructions when the movem
 %%% 8 other
 For the cases where the parse structure does not satisfy the one-endpoint-crossing property, it was more difficult to determine trends.
 The same three cases, Expletive, Interpret Constituent Here, and NP \emph{said} accounted for half of the issues.
-Of the rest, most involved a set of arcs like the crossing arcs with no clear way to avoid the crossings by adjusting head rules.
+Of the rest, most involved a set of crossing arcs with no clear way to avoid the crossings by adjusting head rules.
 
 \subsection{Parsing Performance}
 

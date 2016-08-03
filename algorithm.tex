@@ -109,7 +109,7 @@ Algorithm~\ref{alg:general-cky} shows a pseudocode outline of the CKY algorithm.
 \begin{algorithmic}[]
   \State Initialize with an empty parse item for each position in the sentence
   \For{each possible width, from 1 to the length of sentence}
-    \For{each span\footnote{A continuous range, \myeg from 1 to 4 would be a span of width 3} mark of that width}
+    \For{each span\footnotemark mark of that width}
       \State Create items by combining existing, smaller, items
       \State Create items by adding structure to items with this span
     \EndFor
@@ -119,6 +119,7 @@ Algorithm~\ref{alg:general-cky} shows a pseudocode outline of the CKY algorithm.
 General CKY algorithm.
 }
 \end{algorithm}
+\footnotetext{A continuous range, \myeg from 1 to 4 would be a span of width 3}
 
 This algorithm works by exploiting the constraint that the larger problem (find the optimal parse) can be decomposed into independent sub-problems (find the optimal parse for part of the sentence) whose solutions can be combined to solve the original problem (combine the best solution from one span with the best solution from another span).
 To turn this into a specific algorithm we need to specify:
@@ -167,7 +168,7 @@ Eventually we will show how we can support directed, labeled edges, and labeled 
 
 \noindent
 \parbox{4in}{
-The intuition for the items is that they are either a continuous span of the sentence, going from one word to another (shown here with a line, intentionally not showing any internal): \\
+The intuition for the items is that they are either a continuous span of the sentence, going from one word to another (shown with a line, intentionally without internal structure): \\
 }\hfill\begin{tikzpicture}
   \node (w3) at (0, 0) {w$_3$};
   \node (w4) at (1, 0) {w$_4$};
@@ -333,7 +334,7 @@ We use six item types, differing in the type of edge crossing they contain: \\
   \end{tikzpicture} &
   \parbox{0.70\textwidth}{
     \textbf{$I$, Interval}
-    A span in which all points in $(pq)$ have a parent in $[pq]$, and no edges exist that go from outside $[pq]$ to points in $(pq)$. \\
+    A span in which all points in $(pq)$ have a parent in $[pq]$, and no edges will exist that go between $(pq)$ and points outside $[pq]$. \\
   } \\
 \end{tabular}\hfill\strut
 
@@ -347,7 +348,7 @@ We use six item types, differing in the type of edge crossing they contain: \\
     \draw [out=45,in=135] (p.north) to (o.north);
   \end{tikzpicture} &
   \parbox{0.70\textwidth}{
-    \textbf{$X$, Exterval}
+    \textbf{$X$, Exterval (an external point + an Interval)}
     An interval plus a single edge between $o$ and either $p$ or $q$, where $o$ is outside $[pq]$. \\
   } \\
 \end{tabular}\hfill\strut
@@ -371,7 +372,7 @@ We use six item types, differing in the type of edge crossing they contain: \\
   \parbox{0.70\textwidth}{
     \textbf{$B$, Both}
     An interval $[pq]$ and a point $o$.
-    $o$--$(pq)$ edge may be crossed by $p$--$(pq)$ or $q$--$(pq)$ edges, and at least one crossing of each type occurs.
+    $o$--$(pq)$ edges may be crossed by $p$--$(pq)$ or $q$--$(pq)$ edges, and at least one crossing of each type occurs.
     $o$--$(pq)$ edges may not be crossed by $(pq)$--$(pq)$ edges. \\
   } \\
 \end{tabular}\hfill\strut
@@ -424,7 +425,7 @@ We use six item types, differing in the type of edge crossing they contain: \\
   \end{tikzpicture} &
   \parbox{0.70\textwidth}{
     \textbf{$N$, Neither}
-    An interval and a point, with a least one $o$--$(pq)$ edge.
+    An interval and a point, with at least one $o$--$(pq)$ edge.
     $o$--$(pq)$ edges can only be crossed by $pq$, not other $[pq]$--$[pq]$ edges. \\
   }
 \end{tabular}\hfill\strut
@@ -432,7 +433,7 @@ We use six item types, differing in the type of edge crossing they contain: \\
 \subsection{Example Derivation} \label{sec:example-derivation}
 
 Figure~\ref{fig:alg-example} presents a derivation of a sentence with crossing edges, showing examples of several deduction rules.
-We define the deduction rules in the next section from a top-down perspective to easily show how well they cover the space of structures.
+In the next section, we define the deduction rules from a top-down perspective to easily show how well they cover the space of structures.
 To build intuition, here we describe the example bottom-up and with more conventional deductive reasoning notation. \\
 
 \noindent
@@ -450,13 +451,13 @@ We can add edges though, such as the \emph{We}--\emph{like} edge, and the \emph{
 Note, in the second case the edge creates an Exterval, and the edge will eventually be crossed. \\
 }\hfill\parbox{1.5in}{
   $I_{1,2} \; \land \; pq_{1,2} \; \mapsto \; I_{1,2}$ \\
-  $I_{0,1} \; \land \; po_{0,2} \; \mapsto \; X_{0,1}$ 
+  $I_{0,1} \; \land \; op_{0,2} \; \mapsto \; X_{0,1}$ 
 }
 
 \noindent
 \parbox{4.5in}{
 In the next step we consider items of width two.
-We can form an item of width two by combining items either side of \emph{to}: \\
+We can form an item of width two by combining items either side of \emph{to}. \\
 }\hfill\mbox{
   $I_{2,3} \; \land \; I_{3,4} \; \mapsto \; I_{2,4}$
 }
@@ -464,9 +465,9 @@ We can form an item of width two by combining items either side of \emph{to}: \\
 \noindent
 \parbox{4.5in}{
 From (3) to (4) we are still considering items of width two, but now adding edges, such as \emph{We}--\emph{run}.
-This edge would not be part of a tree parse, and will be crossed in our complete parse: \\
+This edge would not be part of a tree parse, and will be crossed in our complete parse. \\
 }\hfill\mbox{
-  $I_{2,4} \; \land \; po_{1,4} \; \mapsto \; X_{2,4}$ 
+  $I_{2,4} \; \land \; oq_{1,4} \; \mapsto \; X_{2,4}$ 
 }
 
 \noindent
@@ -475,7 +476,7 @@ Next, a width four item is formed by combining items either side of \emph{run}.
 This creates a Neither item, as there is an uncrossed edge from the external point to within the span.
 Note that we can determine it is an $N$ with only limited information about the internal structure of the items being combined. \\
 }\hfill\mbox{
-  $X_{2,4} \; \land \; I_{4,2} \; \mapsto \; N_{2,6}$
+  $X_{2,4} \; \land \; I_{4,6} \; \mapsto \; N_{2,6}$
 }
 
 \noindent
@@ -483,7 +484,7 @@ Note that we can determine it is an $N$ with only limited information about the 
 Going from (5) to (6) we introduce our first crossing of edges.
 The new edge, \emph{.}--\emph{like}, crosses the edge added two steps ago. \\
 }\hfill\mbox{
-  $N_{2,6} \; \land \; po_{2,6} \; \mapsto \; N_{2,4}$ 
+  $N_{2,6} \; \land \; qp_{2,6} \; \mapsto \; N_{2,6}$ 
 }
 
 \noindent
@@ -517,12 +518,12 @@ One set of deduction rules is concerned with removing direct edges between the p
 These are straightforward, so we leave them for the full derivation in Section~\ref{sec:full-algorithm}.
 The other type of deduction rules, which we sketch below, involve decomposing an item into parts.
 
-To make the deduction rules manageable, we define some constraints explicitly, and then use code to enumerate all options and enforce additional constraints.
+To make the deduction rules manageable, we define only some constraints explicitly, and then use code to enumerate all options and enforce additional constraints.
 Here we describe the explicit constraints and the reasoning behind them.
 
 When parsing, we simply have a list of valid rules and consider any way of combining items that satisfies a rule.
 To define the rules, we need to consider each of our item types and define a unique decomposition into smaller pieces.
-Figure~\ref{fig:deduction-defs} gives an overview of how this process works.
+Figure~\ref{fig:deduction-defs} gives an overview of the distinctions we make in order to define each type of decomposition.
 For some item types, such as $X$, every possible structure can be broken down into pieces in the same way.
 For others, such as $L$, how the item is broken down depends on some properties of its structure.
 Below we work through each path in Figure~\ref{fig:deduction-defs}, specifying the questions more precisely and then providing the decomposition.
@@ -607,8 +608,61 @@ If $|C| > 1$, let $t$ be the common endpoint of all edges in $C$ (they must have
 If $|C| = 1$, let $t$ be the endpoint outside $ps$.
 
 \noindent
+\begin{minipage}{\textwidth}
+\noindent
 Is $s < t$ and are there any $s$--$(tq)$ edges? \\
-Yes to both: \\
+Yes $s < t$, no $s$--$(tq)$ edges (in this case it is also possible that $t = q$, in which case there is no $[tq]$ item): \\
+
+\noindent
+\begin{minipage}{\deductionRuleLength}
+\centering
+\hfill\begin{tikzpicture}
+  \pgfmathsetlength{\vertSmall}{2ex}
+  \pgfmathsetlength{\labelGap}{1ex}
+  \pgfmathsetlength{\coordGap}{-0.5ex}
+  \node (l) at (0, 0) {};
+  \node (ls) at (0.5, 0) {};
+  \node (s) at (1.5, 0) {};
+  \node (t) at (2.5, 0) {};
+  \node (tr) at (3.5, 0) {};
+  \node (r) at (4, 0) {};
+
+  \node (v0) at (l) {};
+  \node (p0) at (v0 -| l) {};
+  \node (q0) at (v0 -| s) {};
+  \node (o0) at (v0 -| t) {};
+  \node [pointO] at (o0) {};
+  \node (label0) [left=\labelGap of v0] {$B$, $L$, $R$ or $N$};
+  \node (v1) [below=\vertSmall of v0.center] {};
+  \node (p1) at (v1 -| s) {};
+  \node (q1) at (v1 -| t) {};
+  \node (label1) [left=\labelGap of v1] {$I$};
+  \node (v2) [below=\vertSmall of v1.center] {};
+  \node (p2) at (v2 -| t) {};
+  \node (q2) at (v2 -| r) {};
+  \node (label2) [left=\labelGap of v2] {$I$};
+  \draw (p0.center) -- (q0.center);
+  \draw (p1.center) -- (q1.center);
+  \draw (p2.center) -- (q2.center);
+  \draw [required,out=30,in=150] (p0.center) to (q0.center);
+  \draw [required,out=150,in=30] (o0.center) to (v0 -| ls);
+
+  \node (lb) at (v2 -| l) {};
+  \node (tb) at (v2 -| t) {};
+  \node (sb) at (v2 -| s) {};
+  \node (rb) at (v2 -| r) {};
+  \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
+  \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
+  \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
+  \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
+\end{tikzpicture}\hfill
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-c} $I$ deduction rules, cases three and five.}}}
+\end{minipage}
+\end{minipage}
+\vspace{5mm}
+
+\noindent
+Yes $s < t$, and yes there are $s$--$(tq)$ edges:
 
 \noindent
 \begin{minipage}{\deductionRuleLength}
@@ -661,7 +715,10 @@ Yes to both: \\
 \vspace{5mm}
 
 \noindent
-Yes $s < t$, no $s$--$(tq)$ edges (in this case it is also possible that $t = q$, in which case there is no $[tq]$ item): \\
+Now consider $s > t$.
+In this case $C > 1$ by construction.
+Are there any $p$--$(ts)$ edges? \\
+No: \\
 
 \noindent
 \begin{minipage}{\deductionRuleLength}
@@ -671,31 +728,35 @@ Yes $s < t$, no $s$--$(tq)$ edges (in this case it is also possible that $t = q$
   \pgfmathsetlength{\labelGap}{1ex}
   \pgfmathsetlength{\coordGap}{-0.5ex}
   \node (l) at (0, 0) {};
-  \node (ls) at (0.5, 0) {};
-  \node (s) at (1.5, 0) {};
-  \node (t) at (2.5, 0) {};
-  \node (tr) at (3.5, 0) {};
+  \node (t) at (1.5, 0) {};
+  \node (ts) at (2, 0) {};
+  \node (s) at (2.5, 0) {};
+  \node (sr1) at (3, 0) {};
+  \node (sr2) at (3.5, 0) {};
   \node (r) at (4, 0) {};
 
   \node (v0) at (l) {};
   \node (p0) at (v0 -| l) {};
-  \node (q0) at (v0 -| s) {};
-  \node (o0) at (v0 -| t) {};
+  \node (q0) at (v0 -| t) {};
+  \node (o0) at (v0 -| s) {};
   \node [pointO] at (o0) {};
-  \node (label0) [left=\labelGap of v0] {$B$, $L$, $R$ or $N$};
+  \node (label0) [left=\labelGap of v0] {$R$, $N$ or $X$};
   \node (v1) [below=\vertSmall of v0.center] {};
-  \node (p1) at (v1 -| s) {};
-  \node (q1) at (v1 -| t) {};
+  \node (p1) at (v1 -| t) {};
+  \node (q1) at (v1 -| s) {};
   \node (label1) [left=\labelGap of v1] {$I$};
   \node (v2) [below=\vertSmall of v1.center] {};
-  \node (p2) at (v2 -| t) {};
+  \node (p2) at (v2 -| s) {};
   \node (q2) at (v2 -| r) {};
-  \node (label2) [left=\labelGap of v2] {$I$};
+  \node (o2) at (v2 -| t) {};
+  \node [pointO] at (o2) {};
+  \node (label2) [left=\labelGap of v2] {$N$};
   \draw (p0.center) -- (q0.center);
   \draw (p1.center) -- (q1.center);
   \draw (p2.center) -- (q2.center);
-  \draw [required,out=30,in=150] (p0.center) to (q0.center);
-  \draw [required,out=150,in=30] (o0.center) to (v0 -| ls);
+  \draw [required,out=30,in=150] (p0.center) to (o0.center);
+  \draw [required,out=30,in=150] (o2.center) to (v2 -| sr1);
+  \draw [required,out=30,in=150] (o2.center) to (v2 -| sr2);
 
   \node (lb) at (v2 -| l) {};
   \node (tb) at (v2 -| t) {};
@@ -706,14 +767,11 @@ Yes $s < t$, no $s$--$(tq)$ edges (in this case it is also possible that $t = q$
   \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
   \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
 \end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-c} $I$ deduction rules, cases three and five.}}}
+\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-e} $I$ deduction rules, case seven.}}}
 \end{minipage}
 \vspace{5mm}
 
 \noindent
-Now consider $s > t$.
-In this case $C > 1$ by construction.
-Are there any $p$--$(ts)$ edges? \\
 Yes: \\
 
 \noindent
@@ -768,66 +826,15 @@ Yes: \\
 \end{minipage}
 \vspace{5mm}
 
-\noindent
-No: \\
-
-\noindent
-\begin{minipage}{\deductionRuleLength}
-\centering
-\hfill\begin{tikzpicture}
-  \pgfmathsetlength{\vertSmall}{2ex}
-  \pgfmathsetlength{\labelGap}{1ex}
-  \pgfmathsetlength{\coordGap}{-0.5ex}
-  \node (l) at (0, 0) {};
-  \node (t) at (1.5, 0) {};
-  \node (ts) at (2, 0) {};
-  \node (s) at (2.5, 0) {};
-  \node (sr1) at (3, 0) {};
-  \node (sr2) at (3.5, 0) {};
-  \node (r) at (4, 0) {};
-
-  \node (v0) at (l) {};
-  \node (p0) at (v0 -| l) {};
-  \node (q0) at (v0 -| t) {};
-  \node (o0) at (v0 -| s) {};
-  \node [pointO] at (o0) {};
-  \node (label0) [left=\labelGap of v0] {$R$, $N$ or $X$};
-  \node (v1) [below=\vertSmall of v0.center] {};
-  \node (p1) at (v1 -| t) {};
-  \node (q1) at (v1 -| s) {};
-  \node (label1) [left=\labelGap of v1] {$I$};
-  \node (v2) [below=\vertSmall of v1.center] {};
-  \node (p2) at (v2 -| s) {};
-  \node (q2) at (v2 -| r) {};
-  \node (o2) at (v2 -| t) {};
-  \node [pointO] at (o2) {};
-  \node (label2) [left=\labelGap of v2] {$N$};
-  \draw (p0.center) -- (q0.center);
-  \draw (p1.center) -- (q1.center);
-  \draw (p2.center) -- (q2.center);
-  \draw [required,out=30,in=150] (p0.center) to (o0.center);
-  \draw [required,out=30,in=150] (o2.center) to (v2 -| sr1);
-  \draw [required,out=30,in=150] (o2.center) to (v2 -| sr2);
-
-  \node (lb) at (v2 -| l) {};
-  \node (tb) at (v2 -| t) {};
-  \node (sb) at (v2 -| s) {};
-  \node (rb) at (v2 -| r) {};
-  \node (ltext) [below=\coordGap of lb.center] {\small \strut $p$};
-  \node (ttext) [below=\coordGap of tb.center] {\small \strut $t$};
-  \node (stext) [below=\coordGap of sb.center] {\small \strut $s$};
-  \node (rtext) [below=\coordGap of rb.center] {\small \strut $q$};
-\end{tikzpicture}\hfill
-\raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-interval-e} $I$ deduction rules, case seven.}}}
-\end{minipage}
-\vspace{5mm}
-
 \subsubsection{Exterval} \label{sec:alg:exterval}
 No decomposition rules are needed, as the removal of the $op$ or $oq$ edge leaves behind an Interval.
 
 \subsubsection{Both} \label{sec:alg:both}
 Consider the case when $o$ is to the right (the case when $o$ is to the left is symmetrical).
 Consider $ps_p$, the longest $p$--$(pq)$ edge. \\
+
+\noindent
+\begin{minipage}{\textwidth}
 Does $ps_p$ cross any $q$--$(pq)$ edges? \\
 Yes: \\
 
@@ -885,6 +892,7 @@ Yes: \\
   \node (otext) [below=\coordGap of ob.center] {\small \strut $o$};
 \end{tikzpicture}\hfill
 \raisebox{4mm}{\parbox[b]{\deductionCaptionLength}{\captionof{figure}{\label{fig:rule-both-fail-a} Excluded $B$ deduction rule}}}
+\end{minipage}
 \end{minipage}
 \vspace{5mm}
 
@@ -1212,7 +1220,7 @@ Yes: \\
 \vspace{5mm}
 
 We also have to track whether there are multiple edges or only a single $o$--$(pq)$ edge, to avoid derivational ambiguity in the $I$ decomposition.
-The top and bottom cases lead to multiple such edges, while the middle case will only have one.
+The first two cases lead to multiple such edges, while the third case will only have one.
 
 We could also track the chaining property discussed in the previous section.
 The property is only true in the following cases: when the edge $pq$ is present, when an $X$ is combined with an $L$ that has the property, and when an $X$ is combined with an $N$ that has the $pq$ edge.
@@ -1268,7 +1276,7 @@ When a sub-item is an $X$ there is only one $o$--$(pq)$ edge, and when it is an 
 
 \section{Comparison with \textcite{ec}} \label{sec:ec-comparison}
 
-Our algorithm is based on \textcite{ec}, which had the crucial ideas of one-endpoint crossing, isolated crossing regions, and the decomposition that we modify.
+Our algorithm is based on \textcite{ec}, which had the crucial ideas of one-endpoint crossing, isolated crossing regions, and a complete decomposition.
 Our changes give several overall benefits:
 
 \begin{itemize}
@@ -1297,7 +1305,7 @@ In that circumstance we require it to be the endpoint further from $p$ (see the 
 
 \paragraph{Both}
 The difficult cases we discuss do not come up in their algorithm.
-This is due to a combination of the tree constraints they apply, the need to form a complete structure, and use of directed edges.
+This is due to a combination of (1) the tree constraints they apply, (2) the need to form a complete structure, and (3) use of directed edges.
 For the normal $B$ case, the choice of split point is a source of derivational ambiguity in their algorithm.
 
 \paragraph{Left and Right}
@@ -1316,8 +1324,8 @@ In the figures black solid curves indicate edges that must exist, and red dotted
 \subsection{Notation}
 
 To indicate a range we use $[pq]$, $[pq)$, $(pq]$, or $(pq)$, where the bracket variations indicate inclusion, $[]$, or exclusion, $()$, of the endpoint.
-We also used $[pq]$ to indicate a span without an external point, and $[pq.o]$ to indicate a span with external point $o$.
-To indicate edges we either use two points without brackets, \myeg $pq$, or a point and a set connected by a hyphen, \myeg $o$--$(pq)$, or two sets connected by a hyphen, \myeg $(ps)$--$(sq)$.
+We also use $[pq]$ to indicate a span without an external point, and $[pq.o]$ to indicate a span with external point $o$.
+To indicate edges we either use two points without brackets, \myeg $pq$, a point and a set connected by a hyphen, \myeg $o$--$(pq)$, or two sets connected by a hyphen, \myeg $(ps)$--$(sq)$.
 
 \subsection{Item Types}
 
@@ -1355,25 +1363,25 @@ Each consists of a span, $[pq]$ and an optional point outside the span, $o$, eit
 Figure~\ref{fig:complete-dp} shows the templates for the complete dynamic program.
 The notation used is as follows:
 
-The notation for edges is $A[p \; c]$, where $p$ and $c$ are the parent and child positions.
+\noindent
+Edges are $A[p \; c]$, where $p$ and $c$ are the parent and child positions.
 
-%   Available:      cde gh jk m opq stuvw yz
-% proposal: (p, q) for final span edges, (s, t) for split points, (o) for external point
-The notation for items is: $T[lrx \; pl \; pr \; px]$
+\noindent
+Items are $T[lrx \; pl \; pr \; px]$, where each part is:
 
 \begin{itemize}
   \item $T$ is the type of item, with multiple letters indicating any one of those types are allowed.
-  \item A $\cdotp$ is used to indicate where the external point is relative to the item's span (to the left or the right).
-  \item A $\dotuline{\hspace{2mm}}$ indicates that an item has only one edge from the external point into the span, while $\uwave{\hspace{2mm}}$ indicates that there is more than one such edge.
+  \item \textbf{$\cdotp$}$T$ and $T$\textbf{$\cdotp$} indicates the position of the external point relative to the item's span (left or right respectively).
+  \item $\dotuline{T}$ indicates that an item has only one edge from the external point into the span, while $\uwave{T}$ indicates that there is more than one such edge.
   \item $l$, $r$, and $x$ are labels that indicate the position of the left end of the span, the right end, and the external point, respectively.
-  \item $pl$, $pr$, and $px$ are expressions that indicate the parents of the left end of the span, the right end, and the external point.
+  \item $pl$, $pr$, and $px$ are expressions that indicate the parents of the left end of the span, the right end of the span, and the external point.
   \item The parent expressions can be an explicit need for a link, either direct, indirect, or none, \myeg $I$, $i$, and $F$.
   They can also be the complement of such an expression, \myeg $\overline{I}$, or if they can be any value a $.$ is used.
 \end{itemize}
 
 Note, since we are considering graphs, two points could be linked both directly and indirectly.
 We track parent information to know about parents of items, and existence of specific edges.
-As a result, if both an indirect link and a direct link are present, the state records a direct link being present.
+If both an indirect link and a direct link are present, the state records a direct link.
 
 \subsection{\textcite{eisner:1996}'s Algorithm}
 
@@ -1400,7 +1408,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (p) at (0, 0) {\footnotesize \strut $p$};
       \node (q) at (1.5, 0) {\footnotesize \strut $q$};
       \draw (0,0.2) -- (1.5,0.2);
-      \draw [out=45,in=135,->,thin,>=Stealth] (p.north) to (q.north);
+      \draw [out=45,in=135,<-,thin,>=Stealth] (p.north) to (q.north);
     \end{tikzpicture}
   \end{minipage}
 
@@ -1420,7 +1428,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (p) at (0, 0) {\footnotesize \strut $p$};
       \node (q) at (1.5, 0) {\footnotesize \strut $q$};
       \draw (0,0.2) -- (1.5,0.2);
-      \draw [out=45,in=135,<-,thin,>=Stealth] (p.north) to (q.north);
+      \draw [out=45,in=135,->,thin,>=Stealth] (p.north) to (q.north);
     \end{tikzpicture}
   \end{minipage}
 \end{subfigure}
@@ -1473,7 +1481,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
       \node (halfa) at ($(s0b)!0.5!(q0)$) {};
       \node (half) [above=3pt of halfa.center] {};
-      \draw [dashed,out=180,in=45,->,thin,>=Stealth] (half) to (s0b.center);
+      \draw [dashed,out=45,in=135,->,thin,>=Stealth] (s0b.center) to (q0.center);
 
       \node (hlrefL) at (0, -1.8) {};
       \node (hmrefL) at (1.5, -1.8) {};
@@ -1493,7 +1501,7 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (ltextL) [below=-0.5ex of lbL.center] {\small \strut $p$};
       \node (stextL) [below=-0.5ex of sbL.center] {\small \strut ${s}$};
       \node (rtextL) [below=-0.5ex of rbL.center] {\small \strut $q$};
-      \draw [out=45,in=135,->,thin,>=Stealth] (p0L.center) to (s0aL.center);
+      \draw [out=45,in=135,<-,thin,>=Stealth] (p0L.center) to (s0aL.center);
     \end{tikzpicture}
   \end{minipage}
 
@@ -1528,10 +1536,10 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (ltext) [below=-0.5ex of lb.center] {\small \strut $p$};
       \node (stext) [below=-0.5ex of sb.center] {\small \strut ${s}$};
       \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
-      \draw [out=45,in=135,->,thin,>=Stealth] (p0.center) to (s0a.center);
+      \draw [out=45,in=135,<-,thin,>=Stealth] (p0.center) to (s0a.center);
       \node (halfa) at ($(s0b)!0.5!(q0)$) {};
       \node (half) [above=3pt of halfa.center] {};
-      \draw [dashed,out=0,in=135,->,thin,>=Stealth] (half) to (q0.center);
+      \draw [dashed,out=135,in=45,->,thin,>=Stealth] (q0.center) to (s0b.center);
     \end{tikzpicture}
   \end{minipage}
 
@@ -1568,8 +1576,8 @@ If the reader is familiar with Eisner's algorithm, then this definition of it us
       \node (rtext) [below=-0.5ex of rb.center] {\small \strut $q$};
       \node (halfa) at ($(p0)!0.5!(s0a)$) {};
       \node (half) [above=3pt of halfa.center] {};
-      \draw [dashed,out=45,in=180,<-,thin,>=Stealth] (p0.center) to (half);
-      \draw [out=45,in=135,<-,thin,>=Stealth] (s0b.center) to (q0.center);
+      \draw [dashed,out=135,in=45,<-,thin,>=Stealth] (s0a.center) to (p0.center);
+      \draw [out=45,in=135,->,thin,>=Stealth] (s0b.center) to (q0.center);
     \end{tikzpicture}
   \end{minipage}
 \end{subfigure}
@@ -1584,7 +1592,7 @@ A projective graph parsing algorithm can be formed by changing the boxed blue pa
 These rules are all present in our algorithm as well, they correspond to the rules that only use intervals.
 
 Eisner's algorithm has been formulated in several different ways that share the same core idea, but structure the deduction rules slightly differently.
-One well-known formulation of was presented by \textcite{eisner-smith-2005}.
+One well-known formulation was presented by \textcite{eisner-smith-2005}.
 Their items are slightly different, with their triangle items going from on one word to between two words (whereas ours are always from on one word to on another word).
 However, we can roughly relate the inference rules as follows, where some of our rules take place in two steps in their rules:
 
@@ -1643,6 +1651,7 @@ To start, an item is added for every position $p$ in the sentence, except the la
   $I[p \; p{+}1 \; F \; F]$
 }
 
+\noindent
 If any type of word label is being used, an item must be inserted for every pair of possible labels.
 
 \subsection{Interval}
@@ -1684,7 +1693,7 @@ The second item has an $\overline{F}$ because $p+1$ must get a parent from somew
 \end{finalEquation}
 
 If $p$--$(pq)$ edges do exist, consider the longest such edge, $ps$.
-Consider the set $C$, of edges that cross $ps$.
+Consider the set $C$, of edges that cross $ps$ (\myie $(ps)$--$(sq)$).
 Depending on the size of the set $C$ we get different decompositions.
 
 \begin{center}
@@ -1696,7 +1705,7 @@ Depending on the size of the set $C$ we get different decompositions.
   \node (sq) at (4, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,not allowed] (ps.north) to (sq.north);
 \end{tikzpicture}
 \end{center}
@@ -1721,7 +1730,7 @@ The right interval can have a range of options for parent sets, which we leave u
   \node (t) at (4, 0) {\strut $t$};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,required undirected] (ps.north) to (t.north);
 \end{tikzpicture}
 \end{center}
@@ -1742,7 +1751,7 @@ We subdivide this into two cases, depending on whether there is an $s$--$(tq)$ e
   \node (tq) at (4.5, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,required undirected] (ps.north) to (t.north);
   \draw [out=45,in=135,required undirected] (s.north) to (tq.north);
 \end{tikzpicture}
@@ -1761,7 +1770,7 @@ Otherwise it will be either an $L$ or $N$, depending on whether the $s$--$(tq)$ 
 If $st$ or $ts$ exists, we attribute it to the middle sub-item (it could come from any of them, so this avoids a spurious ambiguity).
 
 \begin{finalEquation}
-\caption{Making $I$, case four.}
+\caption{\label{alg:I:4}Making $I$, case four.}
   $RN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad \cdotp LNX[tqs \; .\overline{S} \; . \; \overline{T}.]$
 \end{finalEquation}
 
@@ -1775,7 +1784,7 @@ If $st$ or $ts$ exists, we attribute it to the middle sub-item (it could come fr
   \node (tq) at (4.5, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,required undirected] (ps.north) to (t.north);
   \draw [out=45,in=135,not allowed] (s.north) to (tq.north);
 \end{tikzpicture}
@@ -1789,7 +1798,7 @@ It cannot be a $B$ because there is only one $(ps)$--$t$ edge.
 In this case it's also possible that $t = q$, in which case there is no third item (it would have width 0).
 
 \begin{finalEquation}
-\caption{Making $I$, cases three and five (part one).}
+\caption{\label{alg:I:3:5}Making $I$, cases three and five (part one).}
   $LRN\cdotp [psq \; F \; P\overline{Q} \; \overline{PS}] \quad I[sq \; . \; .]$ \\
   $LRN\cdotp [pst \; F \; P\overline{T} \; \overline{PS}] \quad I[st \; . \; .] \quad I[tq \; . \; .]$
 \end{finalEquation}
@@ -1804,14 +1813,14 @@ In this case it's also possible that $t = q$, in which case there is no third it
   \node (t) at (4, 0) {\strut $t$};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,required undirected] (ps.north) to (t.north);
   \draw [out=45,in=135,required undirected] (ps2.north) to (t.north);
 \end{tikzpicture}
 \end{center}
 
 This is the first of two cases where $|C| > 1$, distinguished by the position of $t$, either inside or outside of $ps$.
-The same arguments given above apply here, giving the same derivation, the only differences is that $[ps.t]$ must contain at least two $t$--$(ps)$ edges, and as a result the left item could be a $B$ now.
+Following an argument similar to the one above, we get the same derivation as shown in Algorithms~\ref{alg:I:4} and \ref{alg:I:3:5}, the only differences is that $[ps.t]$ must contain at least two $t$--$(ps)$ edges, and as a result the left item could be a $B$ now.
 
 \begin{finalEquation}
 \caption{Making $I$, cases three and five (part two).}
@@ -1829,7 +1838,7 @@ The same arguments given above apply here, giving the same derivation, the only 
   \node (sq2) at (4, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq2.north);
 \end{tikzpicture}
@@ -1850,14 +1859,14 @@ As in the previous case there are two decomposition options, this time depending
   \node (sq2) at (4, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
-  \draw [out=45,in=135,required directed] (p.north) to (ts.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (ts.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq2.north);
 \end{tikzpicture}
 \end{center}
 
-In this case there are no $(pt)$--$(ts]$ edges, or between $(ts)$ and $(sq]$, because they would violate the \oneEC property for the edges in $C$.
+In this case there are no $(pt)$--$(ts]$ edges, and no $(ts)$--$(sq]$ edges, because they would violate the \oneEC property for the edges in $C$.
 There are also no $(pt)$--$[sq]$ edges, because they would violate the \oneEC property for the $p$--$(ts)$ edges.
 There are no $p$--$(sq]$ edges by construction.
 This means the left item is $[pt]$, the middle item is $[ts.p]$, and the right item is $[sq.t]$.
@@ -1866,7 +1875,7 @@ The middle item can be an $L$ or $N$, but an $R$ would violate the \oneEC proper
 The right item must be an $N$ with multiple edges from the external point to the interior of the span.
 Any other option would violate the \oneEC property for edges in $C$.
 
-Additional constraints are added to ensure direct $st$ and $pt$ edges can only occur in one of the items.
+Additional constraints are added to ensure direct $ts$ and $pt$ edges can occur in only one of the items.
 Also, $sq$ cannot occur, as it would violate the \oneEC property for edges in $C$.
 
 \begin{finalEquation}
@@ -1885,7 +1894,7 @@ Also, $sq$ cannot occur, as it would violate the \oneEC property for edges in $C
   \node (sq2) at (4, 0) {\strut};
   \node (q) at (5, 0) {\strut $q$};
   \draw (p.north) -- (q.north);
-  \draw [out=45,in=135,required directed] (p.north) to (s.north);
+  \draw [out=45,in=135,required undirected] (p.north) to (s.north);
   \draw [out=45,in=135,not allowed] (p.north) to (ts.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq.north);
   \draw [out=45,in=135,required undirected] (t.north) to (sq2.north);
@@ -1955,7 +1964,7 @@ The $B$ item is not involved in any further decompositions, so these are the onl
 As in the Interval case, we start by separating out cases with direct edges and those without.
 
 \subsubsection{Direct Edges Present}
-In this case we have these two structures, with all the edges shown required because of the definition of a $B$ item:
+In this case we have two possible structures, with additional edges shown as required by the definition of a $B$ item:
 
 \begin{center}
 \begin{tikzpicture}
@@ -2171,7 +2180,7 @@ In order to avoid a spurious ambiguity, we also need to ensure that the left ite
 If the left item is an $N$, it does, as the edge $ps$ provides a suitable split point.
 For an $L$ we need to track whether the property is true or not.
 In practice we avoid the chaining pattern entirely, using the constraint that $L$ must also contain the edge $ps$, with no loss in coverage.
-How to track the chaining property is discussed below for completeness.
+For completeness, we show how to track the chaining property in the following section.
 
 \begin{finalEquation}
 \caption{Making $B$.}
@@ -2219,6 +2228,7 @@ Adding this edge guarantees that there are multiple such edges.
 \end{finalEquation}
 
 Once that edge is removed we are either left with an $L$ that has no direct edges, or one with the dashed edge above.
+Note, if the dashed edge is present, then the chaining property from the previous section is true.
 Next are rules to remove that edge:
 
 \begin{finalEquation}
@@ -2288,6 +2298,9 @@ The $N$ case occurs when the only edge crossing the $o$--$(pq)$ edges is an edge
   $N[pso \; S\overline{O} \; \overline{PO} \; \overline{P}S] \quad I[sq \; . \; .]$
 \end{finalEquation}
 
+In all six of these rules, the chaining property from the previous section is not present.
+We know this because there is no crossing between edges in the $I$ items and edges in the $N$ or $L$ items, and so no edge ending at $q$ can be part of a chain of crossing edges starting at $p$.
+
 \begin{center}
 \begin{tikzpicture}
   \node [text width=2cm] (relation) at (0,0.5) {Single \\ Crossing};
@@ -2306,7 +2319,7 @@ The $N$ case occurs when the only edge crossing the $o$--$(pq)$ edges is an edge
 Consider the case when $os$ is the only $o$--$(pq)$ edge.
 Here, the first sub-item is an $X$, $[ps.o]$.
 For the second sub-item, all $p$--$(s, q]$ edges will be crossed by $os$ and so cannot be crossed by $q$--$(sq)$ edges.
-If there is an $s$--$(sq)$ edge that crosses an $p$--$(sq)$ edge then this sub-item is an $L$, otherwise it is an $N$.
+If there is an $s$--$(sq)$ edge that crosses a $p$--$(sq)$ edge then this sub-item is an $L$, otherwise it is an $N$.
 Also, the item being split in this case can be marked as containing only one edge from the external point into the span.
 
 \begin{finalEquation}
@@ -2314,6 +2327,11 @@ Also, the item being split in this case can be marked as containing only one edg
   $X[pso \; .\overline{O} \; .O \; F] \quad \cdotp LN[sqp \; .\overline{P} \; .\overline{P} \; \overline{SQ}]$ \\
   $X[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp LN[sqp \; .\overline{P} \; .\overline{P} \; \overline{SQ}]$
 \end{finalEquation}
+
+Both of these rules could produce items with the chaining property.
+If the right item is an $L$ and it has the chaining property, then the final item will have it too.
+This is because we know the chain must start at $s$, and so the $X$ effectively adds one link to the chain.
+In the case of an $N$ item, the chaining property will be true if the $N$ contains the $pq$ edge, and false otherwise.
 
 \begin{center}
 \begin{tikzpicture}
@@ -2334,7 +2352,7 @@ Also, the item being split in this case can be marked as containing only one edg
 
 Consider the case when $os$ is not the only $o$--$(pq)$ edge.
 If there is an $o$--$(ps)$ edge that is crossed by a $p$--$(ps)$ edge then $ps.o$ is an $L$.
-Otherwise, $[ps.o]$ is an $N$.
+Otherwise, $[ps.o]$ is an $N$ (being an $R$ is not possible as by definition, no $(pq)$--$(pq)$ edge can cross a $(pq)$--$o$ edge).
 For the second half, all $p$--$(sq)$ edges are going to cross two or more $o$--$(ps]$ edges, and so the \oneEC property means they cannot be crossed by any $[sq]$--$[sq]$ edges.
 Therefore, $[sq.p]$ is an $N$.
 
@@ -2343,6 +2361,9 @@ Therefore, $[sq.p]$ is an $N$.
   $LN[pso \; .\overline{O} \; .O \; \overline{PS}] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$ \\
   $LN[pso \; .\overline{O} \; .\overline{O} \; \overline{P}S] \quad \cdotp N[sqp \; \overline{QP} \; \overline{SP} \; \overline{SQ}]$
 \end{finalEquation}
+
+In these cases the chaining property is false.
+The chain cannot exist because the multiple $(pq)$--$o$ edges limit the crossing that can occur within the span (any edge crossing the longest $p$--$(pq)$ edge would violate the \oneEC property).
 
 \subsection{Right}
 Defined symmetrically to $L$.
@@ -2406,7 +2427,11 @@ The definition of an $N$ item also means that any $N$ that has an $op$ or $oq$ e
 
 Now we can consider the case with no direct edges.
 As for $L$, we will define the split point based on the $o$--$(pq)$ edges.
-The split point will be the endpoint furthest from $o$ (\myie leftmost or rightmost in $(pq)$, depending on which side $o$ is on).
+The split point will be the endpoint furthest from $o$ (\myie leftmost or rightmost in $(pq)$, depending on which side $o$ is on)\footnote{
+Note that we could have used the point closest to $o$ and also formed a valid set of deduction rules, though slightly different from the ones shown here.
+Choices like this make impact parsing efficiency by determining which structures are competing on which beams, but should not change accuracy.
+Characterizing the space of algorithms similar to this one is an interesting question beyond the scope of this work.
+}.
 The two sides are symmetrical, so we will only show the case with $o$ to the right here.
 There are two cases, depending on how many edges are in the $o$--$(pq)$ set.
 
@@ -2521,5 +2546,5 @@ We resolve this issue through several types of pruning, described in Section~\re
 Finally, it is also worth noting that there is an important constant in the complexity, relating to the number of rules.
 For any set of split points there are multiple items that could be combined.
 Once our templates are expanded to show the possible state combinations there are 49,292 rules.
-However, in Section~\ref{sec:inference} we will also see how the number of rules can be drastically reduced, to 158, with almost no loss in coverage.
+However, at the end of Section~\ref{sec:inference} we will also see how the number of rules can be drastically reduced, to 158, with almost no loss in coverage.
 
